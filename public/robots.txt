@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://swe-marathon.vercel.app/sitemap.xml
