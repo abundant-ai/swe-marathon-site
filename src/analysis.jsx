@@ -462,7 +462,16 @@ function FamilyHeatmap() {
         axisLine: { show: false },
         axisTick: { show: false },
         splitArea: { show: false },
-        axisLabel: { color: PAPER.ink2, fontFamily: "IBM Plex Mono, monospace", fontSize: 11 },
+        axisLabel: {
+          color: PAPER.ink2,
+          fontFamily: "IBM Plex Mono, monospace",
+          fontSize: 11,
+          interval: 0,             // force every header to render
+          hideOverlap: false,
+          overflow: "break",       // wrap long labels onto two lines
+          width: 110,
+          lineHeight: 13,
+        },
       },
       yAxis: {
         type: "category",
