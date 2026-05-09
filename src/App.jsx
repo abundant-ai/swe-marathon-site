@@ -922,9 +922,9 @@ function Citation() {
           <h2 className="section-title">A <span className="ital">paper</span> is in submission.</h2>
         </div>
         <div className="citation-block">
-          {`Paper currently under double-blind review. We plan to post an arXiv
-preprint shortly — once it's up, the title, authors, and a canonical
-bibtex entry will appear here.
+          {`Paper currently in submission. We plan to post an arXiv preprint
+shortly — once it's up, the title, authors, and a canonical bibtex
+entry will appear here.
 
 In the meantime, the benchmark and evaluation harness are public; see
 the GitHub link in the nav. Headline numbers on this page come straight
