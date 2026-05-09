@@ -970,9 +970,10 @@ function About() {
                 <div className="bib" key={p.num}>
                   <div className="bib-top">
                     <div className="bib-num">{p.num}</div>
-                    <div className="bib-km">{p.t}</div>
+                    <div className="bib-km">STAGE</div>
                   </div>
                   <div className="bib-body">
+                    <div className="bib-title">{p.t}</div>
                     <div className="bib-desc">{p.d}</div>
                   </div>
                 </div>
