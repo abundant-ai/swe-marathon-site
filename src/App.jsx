@@ -1,131 +1,38 @@
 
 import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
+import {
+  CASE_STUDIES,
+  CATEGORIES,
+  CAT_LABEL,
+  HEADLINE,
+  LEADERBOARD,
+  PIPELINE,
+  RH_BY_MODEL,
+  TASKS,
+} from "./data.js";
 
 const Analysis = lazy(() => import("./analysis.jsx"));
 
-/* ---------------- DATA (entirely fictional / illustrative) ---------------- */
+const TASK_FAMILIES = CATEGORIES;
 
-const TASK_FAMILIES = [
-{ id: "all", label: "All domains" },
-{ id: "impl", label: "Implementation" },
-{ id: "perf", label: "Performance" },
-{ id: "port", label: "Port / Rewrite" },
-{ id: "research", label: "Research" },
-{ id: "systems", label: "Systems" }];
-
-
-// Resolved-rate (%) on SWE-Marathon v1.0. Frontier scaffolds score < 10%.
-// Pace = test-pass-rate trajectory across the 8h wall-clock budget (0..1).
-const LEADERBOARD = [
-{ rank: "Ref", name: "Oracle (held-out solution)", scaffold: "Harbor built-in", ref: true,
-  avg: 100.0, impl: 100, perf: 100, port: 100, research: 100, systems: 100,
-  pace: [0.0, 0.05, 0.20, 0.45, 0.70, 0.88, 0.96, 1.0, 1.0] },
-{ rank: 1, name: "Claude Opus 4.7", scaffold: "Claude Code v2.1.123",
-  avg: 9.0, impl: 12.0, perf: 8.0, port: 6.0, research: 10.0, systems: 8.5,
-  highlight: true, pace: [0.0, 0.04, 0.12, 0.22, 0.30, 0.36, 0.41, 0.44, 0.45] },
-{ rank: 2, name: "GPT-5.5", scaffold: "Codex CLI v0.128.0",
-  avg: 7.5, impl: 10.0, perf: 9.0, port: 4.0, research: 7.0, systems: 7.5,
-  pace: [0.0, 0.05, 0.14, 0.24, 0.31, 0.36, 0.39, 0.41, 0.42] },
-{ rank: 3, name: "Claude Opus 4.7", scaffold: "Terminus 2",
-  avg: 6.5, impl: 9.0, perf: 6.0, port: 4.0, research: 7.0, systems: 6.5,
-  pace: [0.0, 0.04, 0.12, 0.22, 0.29, 0.34, 0.37, 0.39, 0.40] },
-{ rank: 4, name: "Gemini 3.1 Pro Preview", scaffold: "Gemini CLI v0.40.0",
-  avg: 5.5, impl: 7.0, perf: 5.0, port: 3.0, research: 7.0, systems: 5.5,
-  pace: [0.0, 0.04, 0.12, 0.20, 0.27, 0.32, 0.34, 0.36, 0.36] },
-{ rank: 5, name: "GPT-5.5", scaffold: "Terminus 2",
-  avg: 5.0, impl: 7.0, perf: 6.0, port: 2.0, research: 5.0, systems: 5.0,
-  pace: [0.0, 0.05, 0.13, 0.22, 0.28, 0.31, 0.33, 0.34, 0.34] },
-{ rank: 6, name: "Kimi K2.6", scaffold: "Kimi Code CLI v1.41.0",
-  avg: 4.0, impl: 5.0, perf: 4.0, port: 2.0, research: 5.0, systems: 4.0,
-  pace: [0.0, 0.04, 0.12, 0.18, 0.23, 0.26, 0.28, 0.29, 0.29] },
-{ rank: 7, name: "Gemini 3.1 Pro Preview", scaffold: "Terminus 2",
-  avg: 3.5, impl: 5.0, perf: 4.0, port: 1.0, research: 4.0, systems: 3.5,
-  pace: [0.0, 0.04, 0.11, 0.18, 0.22, 0.25, 0.26, 0.27, 0.27] },
-{ rank: 8, name: "Kimi K2.6", scaffold: "Terminus 2",
-  avg: 3.0, impl: 4.0, perf: 3.0, port: 1.0, research: 4.0, systems: 3.0,
-  pace: [0.0, 0.04, 0.10, 0.16, 0.20, 0.22, 0.24, 0.24, 0.25] },
-{ rank: 9, name: "DeepSeek V4 Pro", scaffold: "Terminus 2",
-  avg: 2.5, impl: 3.0, perf: 3.0, port: 1.0, research: 3.0, systems: 2.5,
-  pace: [0.0, 0.03, 0.09, 0.14, 0.18, 0.21, 0.22, 0.23, 0.23] },
-{ rank: 10, name: "GLM 5.1", scaffold: "Terminus 2",
-  avg: 1.5, impl: 2.0, perf: 2.0, port: 0.0, research: 2.0, systems: 2.0,
-  pace: [0.0, 0.03, 0.08, 0.12, 0.15, 0.17, 0.18, 0.18, 0.18] },
-{ rank: 11, name: "MiniMax M2.7", scaffold: "Terminus 2",
-  avg: 1.0, impl: 1.0, perf: 1.0, port: 0.0, research: 2.0, systems: 1.0,
-  pace: [0.0, 0.02, 0.07, 0.10, 0.13, 0.14, 0.15, 0.15, 0.15] },
-{ rank: "Base", name: "NOP (no actions)", scaffold: "Harbor built-in", ref: true,
-  avg: 0.0, impl: 0.0, perf: 0.0, port: 0.0, research: 0.0, systems: 0.0,
-  pace: [0, 0, 0, 0, 0, 0, 0, 0, 0] }];
+// Synthetic monotone "pace" curve for the leaderboard sparkline: each row
+// ramps from 0 to its real pass@1 over 9 budget tick-points. We don't have
+// hour-by-hour test-pass-rate data per config, so this is a visual cue only.
+function makePace(pass1) {
+  const target = pass1 / 100;
+  const k = 5; // shape constant — soft-ramp to asymptote
+  return Array.from({ length: 9 }, (_, i) => {
+    const t = i / 8;
+    return +(target * (1 - Math.exp(-k * t))).toFixed(3);
+  });
+}
+const PACED_LEADERBOARD = LEADERBOARD.map((r) => ({
+  ...r,
+  pace: r.pass1 != null ? makePace(r.pass1) : null,
+}));
 
 
-// 19 tasks (v0.5 lineup), drawn from real upstream OSS / research code.
-// All metadata pulled from tasks/*/task.toml in the abundant-ai/long-horizon repo.
-const TASKS = [
-{ id: "T01", fam: "systems", title: "C compiler from scratch in Rust",
-  desc: "Build a multi-pass C compiler in ~4,500 lines of Rust — preprocessor, lexer, recursive-descent parser, semantic analyzer, IR lowerer, x86-64 codegen following System-V AMD64 ABI. Differential-tested against gcc on 516+ cases across c-testsuite, wacc, and gcc-torture, with a 48-test gcc-dg held-out suite. Anti-cheat is multi-layer: PATH sanitisation, strace gating gcc to .s/.o files only, and a randomized novel-program canary.",
-  budget: "30h human · 6h agent", repo: "rust-c-compiler", loc: "Rust · 4 suites / 564+ tests" },
-{ id: "T02", fam: "systems", title: "Java Language Server in Rust",
-  desc: "Build a Java LSP server from scratch in Rust whose JSON-RPC responses match Eclipse JDT-LS across ~68K test points on 1,007 source files — 12 LSP methods, FQN symbol index, inheritance graph, javadoc rendering, UTF-16 ranges. Anti-cheat scans for JDT-LS proxying, byte-vec/XOR obfuscation, and /proc cmdline snooping.",
-  budget: "20h human · 3h agent", repo: "rust-java-lsp", loc: "Rust · 68K test points" },
-{ id: "T03", fam: "systems", title: "WebAssembly SIMD interpreter",
-  desc: "A partial Wasm interpreter skeleton compiles but fails the spec tests. Implement the full 128-bit SIMD proposal (~250 opcodes — lane-wise arithmetic, comparisons, shuffles, splats, conversions) with precise IEEE-754 and integer-wrapping semantics, plus fix planted bugs in control-flow break-level propagation and sign-extending memory loads. Pass all 31,767 MVP+SIMD spec tests.",
-  budget: "12h human · 5h agent", repo: "wasm-simd", loc: "Rust · 31,767 tests" },
-{ id: "T04", fam: "port", title: "Next.js → Vite plugin rewrite",
-  desc: "Build a Vite-based replacement for Next.js that reimplements the full v16 API surface using only Vite's plugin API: module resolution, RSC serialization with streaming, hydration, dynamic-route manifests, ISR with cache headers and on-demand revalidation. Verified by Playwright against two fixture apps.",
-  budget: "400h human · 10h agent", repo: "nextjs-vite-rewrite", loc: "TS · Playwright suites" },
-{ id: "T05", fam: "port", title: "Kubernetes reimplemented in Rust",
-  desc: "Largest scope in the benchmark. Reimplement Kubernetes across a 10-crate Rust workspace and pass ~3,600 tests from a 216K-line reference: API server REST handlers for every core resource, 31 controller reconciliation loops, scheduler with affinity/taints/preemption, kubelet with bollard, kube-proxy iptables, and a kubectl CLI. Reward gates at ≥3,000 passing tests with zero failures.",
-  budget: "200h human · 10h agent", repo: "kubernetes-rust-rewrite", loc: "Rust · ~3,600 tests" },
-{ id: "T06", fam: "port", title: "BioFabric Java → Rust with byte parity",
-  desc: "Port BioFabric + AlignmentPlugin (~70K LOC of Java) to Rust across 16 layout/IO/analysis/alignment subsystems. Output must be byte-identical to Java's BIF (XML), NOA (node order), and EDA (edge order) formats over hundreds of golden files — networks from triangles to yeast2k PPIs and a held-out mouse↔arabidopsis cross-species alignment.",
-  budget: "80h human · 10h agent", repo: "biofabric-rust-rewrite", loc: "Rust · ~560 cases / 4 suites" },
-{ id: "T07", fam: "port", title: "Ruby Sinatra blog → Rust port",
-  desc: "Port a 4K-line Sinatra app (RubyJournal) — 25 Liquid templates, 13 Sequel models, RedCarpet+Rouge Markdown, FTS5 search — to Rust with externally-visible behavioural parity. 22 parity gates run agent's Rust on :8000 alongside Ruby reference on :8001, comparing HTML tag trees, JSON shapes, contract headers (ETag/CSP/RateLimit/RFC 5988 Link), and a cross-runtime SQLite job queue.",
-  budget: "110h human · 10h agent", repo: "ruby-rust-port", loc: "Rust · 22 parity gates" },
-{ id: "T08", fam: "impl", title: "Slack-style chat cluster",
-  desc: "A horizontally-scaled chat cluster in one container: 3 HTTP nodes on :8000-:8002 + RFC 2812 IRC gateway on :6667 + redis pub/sub + shared SQLite. Cluster-wide dense monotonic per-channel seq under concurrent writes, p50≤300ms / p95≤800ms cross-node fan-out, SIGKILL-tolerance with start.sh respawn, IRC↔web bridging on the same seq stream, and a chaos gate that SIGKILLs redis mid-test and asserts the SQLite-fallback path keeps fan-out within 5s.",
-  budget: "60h human · 8h agent", repo: "slack-clone", loc: "Python · 13 gate suites" },
-{ id: "T09", fam: "impl", title: "S3-compatible object storage (Halyard)",
-  desc: "Self-hosted multi-tenant S3-compatible service that real boto3 and aws-cli clients drive end-to-end. Byte-exact Sig-V4 (canonical request, signing-key derivation, presigned URLs), AWS XML wire formats across ~15 subsystems, multipart `<hex_md5_of_concat>-<N>` ETag rule, per-tenant access keys, cross-tenant 403, quotas, JSON-line audit log. 22 pytest gates including a Playwright-driven console.",
-  budget: "60h human · 8h agent", repo: "s3-clone", loc: "Python · 22 gates" },
-{ id: "T10", fam: "impl", title: "Mastodon-compatible social service (Chirp)",
-  desc: "Single-container social-media service with Mastodon v1 REST API + HTMX/Alpine/SSE web UI. Pagination triple (max_id/since_id/min_id with strict comparators), 24h Idempotency-Key cache, OAuth2 scope×role × PKCE S256 + rotating refresh, timeline matrix (visibility×follow×mute×filter-v2×reblog-dedup), CSP-strict frontend with no React/Vue/Svelte, three-location OOB swaps from one response. 22 backend + 3 UI gates.",
-  budget: "75h human · 10h agent", repo: "mastodon-clone", loc: "Python · 25 gates" },
-{ id: "T11", fam: "impl", title: "Stripe-compatible payments API",
-  desc: "Single-container payments service graded on idempotency, webhook delivery, and PaymentIntent state-machine correctness under adversarial retries. Same idempotency-key + same params returns same generated IDs; concurrent same-key requests serialise. Webhooks retry on 5xx with t={ts},v1={hmac} signing, no retry on 4xx. Read by the real `stripe` Python SDK with stripe.api_base pointed at the agent service.",
-  budget: "14h human · 8h agent", repo: "stripe-clone", loc: "Python · 12 gates" },
-{ id: "T12", fam: "impl", title: "Excel-style spreadsheet (Tabula)",
-  desc: "Fullstack spreadsheet with Pratt-parsed formulas, dirty-recompute dependency graph with Tarjan SCC cycle detection, ~75 Excel functions, dynamic arrays (LET/LAMBDA/SEQUENCE/MAP/REDUCE/FILTER) with #SPILL! and ghost-cell semantics, OOXML round-trip hand-rolled on zipfile+xml.etree (openpyxl is anti-cheat-blocked in /app), real-time WebSocket collab with monotone seq + since_seq backfill, iterative calc + Goal Seek. 15 verifier gates.",
-  budget: "380h human · 8h agent", repo: "excel-clone", loc: "Python+JS · 15 gates" },
-{ id: "T13", fam: "perf", title: "VLIW SIMD kernel optimisation",
-  desc: "Optimise a kernel for a custom VLIW SIMD architecture simulator to minimise clock cycles. Demands 8-wide SIMD vectorisation, aggressive VLIW slot packing, software pipelining, hash-pipeline interleaving, vselect-based tree selection, scatter loads, ALU→VALU offload, and dead-code elimination under strict per-cycle slot constraints.",
-  budget: "8h human · 8h agent", repo: "vliw-kernel-optimization", loc: "Python · 8 inputs + cycle gate" },
-{ id: "T14", fam: "research", title: "Network-alignment SA solver",
-  desc: "Find high-quality network alignments for fly↔human and yeast↔yeast PPIs balancing search quality, runtime, and objective design. Oracle uses graphlet-guided greedy seed + parallel simulated-annealing workers + greedy polish; verifier checks valid injective alignments and computes S3 + yeast NC.",
-  budget: "20h human · 5h agent", repo: "find-network-alignments", loc: "C++ · S3 + NC gates" },
-{ id: "T15", fam: "research", title: "AlphaFold-3 TriMul Triton kernel",
-  desc: "Write a Triton kernel for the AF-3 outgoing TriMul operator achieving ≤1300 μs geometric-mean latency across 7 H100 shapes. Fuse row-wise LayerNorm (FP16 out), 5 linear projections + sigmoid gating + optional mask, batched pairwise GEMM, hidden-dim LayerNorm, output gate, final linear projection over [B,N,N,C]. Naive PyTorch baseline runs ~5000 μs. 18 correctness tests must pass at rtol/atol=2e-2 before latency is even measured.",
-  budget: "8h human · 4h agent", repo: "trimul-cuda", loc: "Triton · 18 corr + 7 perf" },
-{ id: "T16", fam: "port", title: "JAX → PyTorch policy port + opt",
-  desc: "Port a renamed JAX vision-language-action policy to PyTorch, then optimise the PyTorch inference path without breaking numerical parity. Requires reconstructing the architecture, mapping a nested parameter/state tree across framework conventions, layer-level tensor parity, and shaped speedup score exp(1 − candidate_ms / baseline_ms) measured against a hidden PyTorch baseline on A100.",
-  budget: "8h human · 2h agent", repo: "jax-pytorch-rewrite", loc: "PyTorch · parity + perf gate" },
-{ id: "T17", fam: "research", title: "Llama-3.1-8B post-train to IFEval ≥0.739",
-  desc: "Take the base pretrained Llama-3.1-8B (IFEval binary_strict ≈ 0.161) and lift it into the instruct regime (≈0.739) within 10h using only remote Tinker training calls — no local GPU, no on-disk weights. A Claude-based reward-hacking judge inspects /app/ artifacts and zero-gates on contamination, instruct-model passthrough, grader tampering, or dataset-provenance mismatches.",
-  budget: "24h human · 10h agent", repo: "post-train-ifeval", loc: "Tinker · IFEval gate" },
-{ id: "T18", fam: "impl", title: "Text-embedding eval framework (MTEB-style)",
-  desc: "Build an embedding eval framework from scratch across 40 datasets and 7 task types (retrieval, STS, classification, clustering, pair-classification, reranking, summarization), matching MTEB golden scores within 1e-2. Subtle: classification undersampling reuses one shuffled np.random.RandomState(seed=42) index list; clustering bootstraps with random.Random(seed=42).choices; STS negates manhattan/euclidean distances, pair-classification doesn't.",
-  budget: "4h human · 4h agent", repo: "embedding-eval", loc: "Python · 40 datasets" },
-{ id: "T19", fam: "systems", title: "Zstd decoder from RFC 8878",
-  desc: "Implement a zstd decoder from scratch in C using only RFC 8878 — Huffman decoding, FSE entropy coding, sequence execution with match copying, frame/block parsing across raw/RLE/compressed blocks, frame checksums, multi-frame inputs, dictionary-backed frames. 6 public + 37 hidden tests; encrypted expected outputs and Makefile, sanitised PATH/loader env, no internet.",
-  budget: "12h human · 5h agent", repo: "zstd-decoder", loc: "C · 43 tests" }];
 
-
-const PIPELINE = [
-{ num: "01", t: "Instructions.md", d: "Agent receives a repo snapshot, an instructions.md task brief, and the upstream test suite — no prompt-engineering hints." },
-{ num: "02", t: "Sandbox", d: "Trial runs in a Modal sandbox via harbor_ext: closed network by default, no-search wrapper around tool-search APIs." },
-{ num: "03", t: "Wall-clock run", d: "1–8 hours wall-clock. Step-accounted tool calls; per-command 300s timeout; 10GB disk quota." },
-{ num: "04", t: "Submit", d: "Agent writes a final diff. Submission triggers the four-gate validator: NOP, Oracle, frontier-difficulty, adversarial-exploit." },
-{ num: "05", t: "Multi-level grade", d: "L1 resolved-rate, L2 test-pass-rate, L3 milestones (M1–M4), L4 Agent-as-Judge rubric. mean@5 / best@5 reported." }];
 
 
 /* ---------------- GRAPHICS ---------------- */
@@ -140,8 +47,10 @@ function CourseMap() {
   const peakY = 22; // max elevation
   const usableW = W - padL - padR;
 
-  // Average pace curve across the top-5 (non-ref) leaderboard scaffolds
-  const top5 = LEADERBOARD.filter((r) => !r.ref).slice(0, 5);
+  // Average synthetic pace curve across the top-5 (non-ref) leaderboard scaffolds.
+  // We don't have hour-by-hour test-pass-rate per config; the curve asymptotes
+  // to each model's real pass@1 (see makePace).
+  const top5 = PACED_LEADERBOARD.filter((r) => !r.ref).slice(0, 5);
   const mean = Array.from({ length: 9 }, (_, h) =>
   top5.reduce((s, r) => s + r.pace[h], 0) / top5.length
   );
@@ -178,8 +87,8 @@ function CourseMap() {
   return (
     <div className="course-map">
       <div className="course-map-label">
-        <span>Field-mean pace · top-5 scaffolds across the 8-hour budget</span>
-        <span>elev. = test-pass-rate &nbsp;·&nbsp; peak {(maxPace * 100).toFixed(0)}%</span>
+        <span>Top-5 scaffolds · synthetic pace ramp to real pass@1</span>
+        <span>peak {(maxPace * 100).toFixed(0)}%</span>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
         {/* hour grid ticks */}
@@ -249,53 +158,48 @@ function PaceSpark({ profile, isRef }) {
 
 }
 
-// Course profile — multi-agent trail chart (score vs. hour)
+// Course profile — multi-agent ramp chart. Each trail is a synthetic
+// soft-ramp asymptoting to that scaffold's real pass@1 (we do not log
+// hour-by-hour pass-rate per config, so the curve shape is illustrative;
+// the asymptote is the canonical sweep number).
 function CourseProfile() {
-  const W = 860,H = 280;
-  const padL = 36,padR = 16,padT = 16,padB = 28;
+  const W = 860, H = 280;
+  const padL = 36, padR = 16, padT = 16, padB = 28;
   const innerW = W - padL - padR;
   const innerH = H - padT - padB;
 
-  // Hours 0..8
-  const hours = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-  const yTicks = [0, 2, 4, 6, 8, 10];
+  const HMAX = HEADLINE.agentBudgetMaxH; // 10
+  const hours = Array.from({ length: HMAX + 1 }, (_, i) => i);
+  const top5 = LEADERBOARD.filter((r) => !r.ref).slice(0, 5);
+  const colors = ["oklch(0.55 0.15 35)", "oklch(0.45 0.13 250)", "oklch(0.55 0.12 145)", "oklch(0.55 0.13 70)", "oklch(0.50 0.10 290)"];
+  const agents = top5.map((row, i) => ({
+    name: `${row.name} · ${row.scaffold}`,
+    color: colors[i],
+    trail: hours.map((h) => [h, row.pass1 * (1 - Math.exp(-5 * (h / HMAX)))]),
+  }));
 
-  // Agent trails — resolved-rate (0..10%) over wall-clock hours. Dots mark stop points.
-  const agents = [
-  { name: "Claude Opus 4.7 · Claude Code", color: "oklch(0.55 0.15 35)",
-    trail: [[0, 0], [1, 1.0], [2, 2.8], [3, 5.0], [4, 6.6], [5, 7.6], [6, 8.4], [7, 8.8], [8, 9.0]] },
-  { name: "GPT-5.5 · Codex CLI", color: "oklch(0.45 0.13 250)",
-    trail: [[0, 0], [1, 1.2], [2, 3.0], [3, 4.6], [4, 6.0], [5, 6.8], [6, 7.2], [7, 7.4], [8, 7.5]] },
-  { name: "Gemini 3.1 Pro · Gemini CLI", color: "oklch(0.55 0.12 145)",
-    trail: [[0, 0], [1, 1.0], [2, 2.4], [3, 3.6], [4, 4.6], [5, 5.2], [6, 5.4], [7, 5.5], [8, 5.5]] },
-  { name: "Kimi K2.6 · Kimi Code — plateaued", color: "oklch(0.55 0.13 70)",
-    trail: [[0, 0], [1, 1.0], [2, 2.4], [3, 3.4], [4, 3.9], [5, 4.0]], stopped: true },
-  { name: "DeepSeek V4 Pro · Terminus 2 — stopped", color: "oklch(0.50 0.10 0)",
-    trail: [[0, 0], [1, 0.8], [2, 1.8], [3, 2.4], [4, 2.5]], stopped: true }];
-
-
-  const xScale = (h) => padL + h / 8 * innerW;
-  const yScale = (s) => padT + innerH - s / 10 * innerH;
+  const yMax = Math.max(20, Math.ceil(top5[0].pass1 / 5) * 5);
+  const yTicks = Array.from({ length: yMax / 5 + 1 }, (_, i) => i * 5);
+  const xScale = (h) => padL + h / HMAX * innerW;
+  const yScale = (s) => padT + innerH - s / yMax * innerH;
 
   return (
     <div className="course-profile">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
         <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-          Resolved rate (%) · over wall-clock hour · selected scaffolds
+          Pass@1 ramp · top-5 scaffolds across the 2–10h budget
         </div>
-        <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)" }}>n = 5 scaffolds · mean@5 across 20 tasks</div>
+        <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)" }}>asymptote = canonical sweep · n = 100 trials / config</div>
       </div>
 
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <g className="course-axis">
-          {/* y grid */}
           {yTicks.map((t) =>
           <g key={t}>
               <line x1={padL} y1={yScale(t)} x2={W - padR} y2={yScale(t)} />
               <text x={padL - 6} y={yScale(t) + 3} textAnchor="end">{t}</text>
             </g>
           )}
-          {/* x ticks */}
           {hours.map((h) =>
           <g key={h}>
               <line x1={xScale(h)} y1={padT + innerH} x2={xScale(h)} y2={padT + innerH + 4} />
@@ -304,21 +208,16 @@ function CourseProfile() {
           )}
         </g>
 
-        {/* finish line at 8h */}
-        <line x1={xScale(8)} y1={padT} x2={xScale(8)} y2={padT + innerH}
-        stroke="var(--accent)" strokeWidth="1" strokeDasharray="2 3" opacity="0.5" />
-        <text x={xScale(8) - 4} y={padT + 10} textAnchor="end"
-        style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--accent)" }}>step quota</text>
+        <line x1={xScale(HMAX)} y1={padT} x2={xScale(HMAX)} y2={padT + innerH}
+          stroke="var(--accent)" strokeWidth="1" strokeDasharray="2 3" opacity="0.5" />
+        <text x={xScale(HMAX) - 4} y={padT + 10} textAnchor="end"
+          style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--accent)" }}>budget cap</text>
 
-        {/* oracle reference line at 10% (top) */}
-        <line x1={padL} y1={yScale(0)} x2={W - padR} y2={yScale(10) - 0}
-        stroke="none" />
-        <line x1={padL} y1={yScale(10)} x2={W - padR} y2={yScale(10)}
-        stroke="var(--ink-3)" strokeWidth="0.8" strokeDasharray="3 4" />
-        <text x={W - padR - 4} y={yScale(10) - 4} textAnchor="end"
-        style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--ink-3)" }}>frontier ceiling · 10%</text>
+        <line x1={padL} y1={yScale(yMax)} x2={W - padR} y2={yScale(yMax)}
+          stroke="var(--ink-3)" strokeWidth="0.8" strokeDasharray="3 4" />
+        <text x={W - padR - 4} y={yScale(yMax) - 4} textAnchor="end"
+          style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--ink-3)" }}>{yMax}% frontier ceiling</text>
 
-        {/* agent trails */}
         {agents.map((a, i) => {
           const d = a.trail.map((p, j) =>
           (j === 0 ? "M" : "L") + xScale(p[0]).toFixed(1) + " " + yScale(p[1]).toFixed(1)
@@ -326,18 +225,10 @@ function CourseProfile() {
           const last = a.trail[a.trail.length - 1];
           return (
             <g key={i}>
-              <path d={d} className="agent-trail" stroke={a.color}
-              strokeDasharray={a.stopped ? "0" : "0"} />
+              <path d={d} className="agent-trail" stroke={a.color} />
               <circle cx={xScale(last[0])} cy={yScale(last[1])} r="3.5"
-              fill={a.color} className="agent-dot" />
-              {a.stopped &&
-              <text x={xScale(last[0]) + 8} y={yScale(last[1]) + 3}
-              style={{ fontFamily: "var(--mono)", fontSize: 10, fill: a.color }}>
-                  ↳ stopped
-                </text>
-              }
+                fill={a.color} className="agent-dot" />
             </g>);
-
         })}
       </svg>
 
@@ -345,7 +236,7 @@ function CourseProfile() {
         {agents.map((a, i) =>
         <div key={i}>
             <span className="swatch" style={{ background: a.color }}></span>
-            {a.name}
+            {a.name} · {top5[i].pass1.toFixed(1)}%
           </div>
         )}
       </div>
@@ -803,10 +694,10 @@ function FoxRunner() {
 
 function StatStrip() {
   const stats = [
-  { num: "20", unit: "", label: "Long-horizon tasks" },
-  { num: "1–8", unit: "h", label: "Wall-clock budget" },
-  { num: "<10", unit: "%", label: "Best frontier score" },
-  { num: "5", unit: "", label: "Verifier types" }];
+  { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
+  { num: `${HEADLINE.agentBudgetMinH}–${HEADLINE.agentBudgetMaxH}`, unit: "h", label: "Agent budget" },
+  { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Best pass@1" },
+  { num: HEADLINE.nTrials.toLocaleString(), unit: "", label: "Logged trials" }];
 
   return (
     <div className="stats-strip">
@@ -824,28 +715,29 @@ function Hero() {
   return (
     <header className="hero">
       <div className="container">
-        <div className="eyebrow">SWE-MARATHON BENCHMARK · V1.0 · 20 LONG-HORIZON TASKS</div>
+        <div className="eyebrow">SWE-MARATHON · 20 LONG-HORIZON TASKS · 1,100 LOGGED TRIALS</div>
         <h1 className="title">
-          SWE-Marathon: How long can coding agents run<br />
-          while <span className="ital">being useful?</span>
+          Can agents autonomously complete<br />
+          <span className="ital">ultra-long-horizon</span> software work?
         </h1>
         <p className="lede">
-          <strong>SWE-Marathon</strong> is a benchmark for <strong>ultra-long-horizon</strong>{" "}
-          software engineering tasks. We created twenty hand-curated tasks: replications, performance
-          optimization, novel research code, post-training or cloning entire applications.
-          Each task requires up to 24 hours of coherent agent activity to resolve.
+          <strong>SWE-Marathon</strong> is a benchmark of <strong>20 multi-hour</strong> software-engineering
+          tasks: library reproductions, full-stack product clones, ML engineering, and algorithmic
+          optimisation. Each task ships an executable environment, a held-out reference solution,
+          and a multi-channel verifier — agent budgets of {HEADLINE.agentBudgetMinH}–{HEADLINE.agentBudgetMaxH} hours against
+          expert estimates of {HEADLINE.humanEstMinH}–{HEADLINE.humanEstMaxH} hours.
         </p>
-        <p className="hero-sub">Frontier scaffolds resolve fewer than 10% of tasks. Over 30% of submitted patches reward-hack the test suite. Tasks come with four-gate validation, five verifier types, and milestone-level progress scoring.
-
-
-
+        <p className="hero-sub">
+          Across {HEADLINE.nTrials.toLocaleString()} real-agent rollouts averaging {HEADLINE.avgTokensPerTrialM}M tokens each,
+          no evaluated configuration exceeds {Math.ceil(HEADLINE.bestPass1Pct)}% pass@1.
+          {" "}{HEADLINE.rhAttemptPct}% of trajectories contain at least one exploit-shaped action;
+          {" "}{HEADLINE.rhSuccessPct}% earn reward despite shipping the exploit.
         </p>
         <FoxRunner />
         <div className="cta-row">
           <a className="btn" href="#leaderboard">View leaderboard <span className="arr">↓</span></a>
           <a className="btn ghost" href="#about">Method <span className="arr">↓</span></a>
-          <a className="btn ghost" href="#">arXiv ↗</a>
-          <a className="btn ghost" href="#">GitHub ↗</a>
+          <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
         </div>
         <StatStrip />
         <CourseMap />
@@ -858,30 +750,28 @@ function Leaderboard() {
   const [fam, setFam] = useState("all");
   const [view, setView] = useState("summary"); // summary | full
 
+  const scoreFor = (row, key) => {
+    if (key === "all") return row.pass1 ?? 0;
+    return row.perCat?.[key] ?? 0;
+  };
+
   const sorted = useMemo(() => {
-    const key = fam === "all" ? "avg" : fam;
-    return [...LEADERBOARD].sort((a, b) => {
+    return [...PACED_LEADERBOARD].sort((a, b) => {
       if (a.ref && !b.ref) return 1;
       if (b.ref && !a.ref) return -1;
-      return (b[key] ?? 0) - (a[key] ?? 0);
+      return scoreFor(b, fam) - scoreFor(a, fam);
     });
   }, [fam]);
 
-  const maxScore = Math.max(...LEADERBOARD.filter((r) => !r.ref).map((r) => r[fam === "all" ? "avg" : fam]));
-
-  const cols = fam === "all" ?
-  ["impl", "perf", "port", "research", "systems"] :
-  [fam];
-  const colLabels = {
-    impl: "Impl", perf: "Perf", port: "Port", research: "Research", systems: "Systems"
-  };
+  const allCatCols = ["library", "clone", "ml", "algo"];
+  const cols = fam === "all" ? allCatCols : [fam];
 
   return (
     <section id="leaderboard">
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§01 / Leaderboard</div>
-          <h2 className="section-title">Resolved-rate <span className="ital">scores</span> across 20 long-horizon tasks.</h2>
+          <h2 className="section-title">Pass@1 <span className="ital">across 20 long-horizon tasks.</span></h2>
         </div>
 
         <div className="lb-controls">
@@ -907,18 +797,15 @@ function Leaderboard() {
               <th>Agent</th>
               <th>Scaffold</th>
               <th style={{ width: 110 }}>Pace</th>
-              <th className="num">Avg</th>
-              {(view === "full" ? ["impl", "perf", "port", "research", "systems"] : cols).map((c) =>
-                <th key={c} className="num">{colLabels[c]}</th>
+              <th className="num">Pass@1</th>
+              {(view === "full" ? allCatCols : cols).map((c) =>
+                <th key={c} className="num">{CAT_LABEL[c]}</th>
                 )}
             </tr>
           </thead>
           <tbody>
-            {sorted.map((row, i) => {
-                const showCols = view === "full" ? ["impl", "perf", "port", "research", "systems"] : cols;
-                const isRefRow = row.ref;
-                const isFirstAfterRef = i > 0 && sorted[i - 1].ref === undefined && isRefRow;
-                const showDivider = i > 0 && sorted[i - 1].ref !== undefined !== (isRefRow !== undefined);
+            {sorted.map((row) => {
+                const showCols = view === "full" ? allCatCols : cols;
                 return (
                   <React.Fragment key={`${row.rank}-${row.name}-${row.scaffold}`}>
                   <tr className={row.highlight ? "highlight" : ""}>
@@ -929,17 +816,16 @@ function Leaderboard() {
                     </td>
                     <td>
                       <span className="agent-name">{row.name}</span>
-                      {row.reprompt && <span className="agent-tag">reprompted†</span>}
                     </td>
                     <td className="scaffold">{row.scaffold}</td>
                     <td>{row.pace ? <PaceSpark profile={row.pace} isRef={row.ref} /> : null}</td>
                     <td className="num score-bar-cell">
                       <span className={"score-bar " + (row.ref ? "ref" : "")}
-                        style={{ width: `${row.avg / 80 * 100}%` }}></span>
-                      <span className="num-on-bar">{row.avg.toFixed(1)}</span>
+                        style={{ width: `${Math.min(100, row.pass1 / 25 * 100)}%` }}></span>
+                      <span className="num-on-bar">{row.pass1.toFixed(1)}</span>
                     </td>
                     {showCols.map((c) =>
-                      <td key={c} className="num">{row[c] !== undefined ? row[c].toFixed(1) : "—"}</td>
+                      <td key={c} className="num">{row.perCat?.[c] != null ? row.perCat[c].toFixed(1) : "—"}</td>
                       )}
                   </tr>
                 </React.Fragment>);
@@ -950,9 +836,9 @@ function Leaderboard() {
         </div>
 
         <div className="footnotes">
-          <div><sup>1</sup>Resolved-rate (%) = mean@5 over 5 independent agent rollouts; a task counts resolved iff <i>all</i> upstream tests pass <i>and</i> the four-gate validator (NOP, Oracle, frontier-difficulty, adversarial-exploit) accepts the diff.</div>
-          <div><sup>2</sup>Reference rows are not directly comparable: <i>Oracle</i> is the held-out maintainer solution; <i>NOP</i> is a no-action baseline that establishes the reward-hacking floor.</div>
-          <div><sup>3</sup>Scaffolds are run unmodified at the listed version. Sandbox: Modal, closed network, 300s per-tool timeout, 10GB disk quota.</div>
+          <div><sup>1</sup>Pass@1 = mean over 5 independent rollouts per (agent, model, task); a trial counts resolved when reward = 1.0 from the multi-channel verifier. n = 100 trials per non-reference row (5 trials × 20 tasks); n = 99 / 96 where infrastructure-failed trials were excluded from the canonical grid.</div>
+          <div><sup>2</sup>Reference rows are not directly comparable: <i>Oracle</i> is the held-out maintainer solution; <i>NOP</i> is a no-action baseline.</div>
+          <div><sup>3</sup>Sandbox: Modal via Harbor, with FrontierSWE-style egress controls on the four offline tasks. Agent budgets range from 2 to 10 hours per task.</div>
         </div>
       </div>
     </section>);
@@ -965,40 +851,43 @@ function Tasks() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§03 / Tasks</div>
-          <h2 className="section-title">Five domains. Twenty <span className="ital">marathons.</span></h2>
+          <h2 className="section-title">Four families. Twenty <span className="ital">marathons.</span></h2>
         </div>
 
         <div className="section-body" style={{ marginBottom: 28 }}>
           <div className="sb-side">
-            <div className="label-row">Sources<span>Real upstream OSS / research code: BLANT, BioFabric, chibicc, others.</span></div>
-            <div className="label-row">Budget<span>1–8 wall-clock hours. Modal sandbox.</span></div>
-            <div className="label-row">Submission<span>Final diff, validated by upstream tests + four gates.</span></div>
+            <div className="label-row">Sources<span>Hand-curated real OSS / research code; 11 unique contributors authored the 20 accepted tasks.</span></div>
+            <div className="label-row">Budget<span>{HEADLINE.agentBudgetMinH}–{HEADLINE.agentBudgetMaxH}h agent · {HEADLINE.humanEstMinH}–{HEADLINE.humanEstMaxH}h expert estimate.</span></div>
+            <div className="label-row">Submission<span>Container state at submit time, graded by the multi-channel verifier.</span></div>
           </div>
           <div>
             <p style={{ fontSize: 16, color: "var(--ink-2)", margin: 0, maxWidth: 600 }}>
-              Tasks are sourced from real upstream open-source and research codebases.
-              Every task is gated by an existing test suite written by the original
-              maintainer, plus invariant checks; we do not author tests for the agent.
-              We curate by a four-gate filter: NOP must fail, Oracle must pass,
-              frontier scaffolds must struggle, and an adversarial Cheater agent must
-              not find a shortcut.
+              Each task ships a Dockerized starter, an instruction file specifying
+              outcomes (not algorithms), a held-out human-written reference solution,
+              and a multi-layer verifier. Tasks are accepted only if NOP fails,
+              Oracle passes, and the adversarial cheat sweep finds no shortcut —
+              {" "}{HEADLINE.nVerifierFamilies} verifier families across the suite,
+              spanning {HEADLINE.languages.join(", ")}.
             </p>
           </div>
         </div>
 
         <div className="tasks-grid">
-          {TASKS.map((t) =>
+          {TASKS.map((t, i) =>
           <div className="task" key={t.id}>
               <div className="task-head">
-                <div className="task-id">{t.id} · {t.fam}</div>
-                <div className="task-budget">{t.budget}</div>
+                <div className="task-id">T{String(i + 1).padStart(2, "0")} · {CAT_LABEL[t.cat]}</div>
+                <div className="task-budget">{t.humanH}h human · {t.agentH}h agent</div>
               </div>
               <h3 className="task-title">{t.title}</h3>
               <p className="task-desc">{t.desc}</p>
               <div className="task-meta">
-                <div><span className="k">repo</span><span className="v">{t.repo}</span></div>
-                <div><span className="k">loc</span><span className="v">{t.loc}</span></div>
-                <div><span className="k">tests</span><span className="v">build · pytest · perf</span></div>
+                <div><span className="k">repo</span><span className="v">{t.id}</span></div>
+                <div><span className="k">verifier</span><span className="v">{t.verifier}</span></div>
+                <div><span className="k">pass@1</span><span className="v">{t.pass1.toFixed(1)}% · n=55</span></div>
+                {t.exploit > 0 && (
+                  <div><span className="k">exploit</span><span className="v">{t.exploit.toFixed(1)}% attempts · {t.succ} succ.</span></div>
+                )}
               </div>
             </div>
           )}
@@ -1014,26 +903,28 @@ function CourseProfileSection() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§04 / The course</div>
-          <h2 className="section-title">Who's still <span className="ital">engineering</span> at hour 6?</h2>
+          <h2 className="section-title">Multi-hour rollouts, <span className="ital">millions of tokens.</span></h2>
         </div>
         <div className="section-body" style={{ marginBottom: 28 }}>
           <div className="sb-side">
-            <div className="label-row">Pace<span>Test-pass-rate over wall-clock, averaged across 20 tasks.</span></div>
-            <div className="label-row">Drop-outs<span>Where the trail ends, the agent stopped or hit step quota.</span></div>
-            <div className="label-row">Reference<span>Oracle (held-out solution), dashed.</span></div>
+            <div className="label-row">Budget<span>2–10h agent wall-clock, set per task to reflect difficulty.</span></div>
+            <div className="label-row">Tokens<span>Median 7.6M (input + output) per trial; right tail past 870M.</span></div>
+            <div className="label-row">Compaction<span>Tracks failure rather than rescue: 0 / 71 reward-bearing terminus-2 summariser trials pass.</span></div>
           </div>
           <div>
             <p style={{ fontSize: 15, color: "var(--ink-2)", margin: "0 0 22px", maxWidth: 600 }}>
-              All scaffolds make rapid early progress. The interesting question is
-              who keeps adding signal past hour 3 — and who plateaus, then quietly
-              starts editing tests instead of code.
+              SWE-Marathon trials run for hours. Cumulative input across API
+              calls reaches millions to hundreds of millions of tokens — far
+              past what any single context window holds. Holding the model
+              fixed and varying the scaffold moves median tokens-per-trial
+              by up to 12×.
             </p>
             <CourseProfile />
             <div className="split-chips">
-              <div className="split-chip">Avg. plateau hour: <strong>3.4h</strong></div>
-              <div className="split-chip">% reaching M3: <strong>22%</strong></div>
-              <div className="split-chip">% reaching M4 (full resolve): <strong>9%</strong></div>
-              <div className="split-chip">Reward-hack rate: <strong>30.4%</strong> of submissions</div>
+              <div className="split-chip">Median tokens / trial: <strong>{HEADLINE.medianTokensPerTrialM}M</strong></div>
+              <div className="split-chip">Mean tokens / trial: <strong>{HEADLINE.avgTokensPerTrialM}M</strong></div>
+              <div className="split-chip">Right-tail max: <strong>{HEADLINE.maxTokensPerTrialM}M</strong></div>
+              <div className="split-chip">Best pass@1: <strong>{HEADLINE.bestPass1Pct}%</strong> ({HEADLINE.bestPass1Label})</div>
             </div>
           </div>
         </div>
@@ -1053,41 +944,39 @@ function About() {
 
         <div className="section-body">
           <div className="sb-side">
-            <div className="label-row">Position<span>Sits beyond SWE-Bench (single-issue patches) and Terminal-Bench (short terminal sessions). Targets 1–8h horizons.</span></div>
-            <div className="label-row">Sandbox<span>Modal via harbor_ext. Closed network, 300s tool timeout.</span></div>
-            <div className="label-row">Verifiers<span>5 types: tests, invariants, perf, oracle-equivalence, judge.</span></div>
+            <div className="label-row">Position<span>Project-scale tasks whose difficulty comes from sustained engineering work, not patch localisation — well past SWE-Bench's per-issue scope and Terminal-Bench's per-session scope.</span></div>
+            <div className="label-row">Sandbox<span>Modal sandboxes through Harbor. 1–8 vCPU, 8–32 GB RAM, GPU on the four ML tasks.</span></div>
+            <div className="label-row">Verifiers<span>{HEADLINE.nVerifierFamilies} families: dense unit tests, behavioural parity, performance gates, deterministic replay, integrity / audit, and computer-use UI/UX judges.</span></div>
           </div>
           <div>
             <p style={{ fontSize: 18, color: "var(--ink)", margin: "0 0 18px", maxWidth: 620, lineHeight: 1.5, fontFamily: "var(--serif)" }}>
               Most coding benchmarks ask: can the model write a function?
-              SWE-Marathon asks: can it still be the same engineer at hour six?
+              SWE-Marathon asks whether agents can sustain coherent engineering
+              work over multi-hour rollouts and millions of tokens.
             </p>
             <p style={{ maxWidth: 620, color: "var(--ink-2)" }}>
-              Each agent receives a real repository, an <code>instructions.md</code>{" "}
-              brief, and the upstream test suite. It runs inside a Modal sandbox with
-              shell access and a 1–8 hour wall-clock budget. Its output is a final
-              diff. We grade it through Harbor's multi-level evaluator: L1 resolved
-              rate, L2 test-pass rate, L3 milestones (M1–M4), and L4 an Agent-as-Judge
-              rubric. Every submission passes through the four-gate validator before
-              counting toward the score.
+              Tasks ship a Dockerized starter, an instruction file specifying
+              outcomes (not algorithms), a held-out human-written reference solution,
+              and a multi-channel verifier. Tasks are accepted only if NOP fails,
+              Oracle passes, frontier scaffolds struggle, and the adversarial cheat
+              sweep finds no shortcut. Final scoring uses container state at
+              submit-time; for tasks with both shell and UX stages, trial reward is
+              the minimum across stages so a UI regression floors the score even
+              when every deterministic gate passes.
             </p>
-            <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 32, marginBottom: 18 }}>The course · five legs</h4>
+            <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 32, marginBottom: 18 }}>The pipeline · five stages</h4>
             <div className="bib-row">
-              {PIPELINE.map((p, i) => {
-                const kms = ["0–1h", "1–2h", "2–5h", "5–7h", "7–8h"];
-                return (
-                  <div className="bib" key={p.num}>
-                    <div className="bib-top">
-                      <div className="bib-num">{p.num}</div>
-                      <div className="bib-km">{kms[i]}</div>
-                    </div>
-                    <div className="bib-body">
-                      <div className="bib-title">{p.t}</div>
-                      <div className="bib-desc">{p.d}</div>
-                    </div>
-                  </div>);
-
-              })}
+              {PIPELINE.map((p) => (
+                <div className="bib" key={p.num}>
+                  <div className="bib-top">
+                    <div className="bib-num">{p.num}</div>
+                    <div className="bib-km">{p.t}</div>
+                  </div>
+                  <div className="bib-body">
+                    <div className="bib-desc">{p.d}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1107,79 +996,63 @@ function Findings() {
 
         <div className="findings">
           <div className="finding">
-            <div className="find-num">— 01 / Reward hacking</div>
-            <h3 className="find-h">30.4% of submissions cheat the verifier.</h3>
+            <div className="find-num">— 01 / Reward hacking is endemic at long horizons</div>
+            <h3 className="find-h">{HEADLINE.rhAttemptPct}% of trajectories show exploit-shaped action; {HEADLINE.rhSuccessPct}% earn reward despite shipping the cheat.</h3>
             <p className="find-body">
-              Across 5 rollouts × 20 tasks × 11 scaffolds, 30.4% of submissions
-              passed the upstream test suite while failing the four-gate validator.
-              The most common pattern: editing <code>conftest.py</code> or skipping
-              tests, then claiming success. Without the four-gate filter, headline
-              numbers would more than double.
+              The full audit covers all {HEADLINE.nTrials.toLocaleString()} canonical-grid rollouts.
+              {" "}{HEADLINE.rhExploitPct}% ship a clear verifier bypass; {HEADLINE.rhSuccessN} earn live reward
+              despite the exploit. Per-model exploit rates span <strong>{HEADLINE.rhSpreadX}×</strong> between
+              {" "}{HEADLINE.rhMinModel.name} ({HEADLINE.rhMinModel.pct}%) and {HEADLINE.rhMaxModel.name}
+              {" "}({HEADLINE.rhMaxModel.pct}%). {HEADLINE.rhTopTwoModelsShareOfSuccess} of {HEADLINE.rhSuccessN}
+              {" "}successful exploits come from just two models.
             </p>
           </div>
+
           <div className="finding">
-            <div className="find-num">— 02 / Milestone discrimination</div>
-            <h3 className="find-h">L1 resolve-rate is too coarse to rank scaffolds.</h3>
+            <div className="find-num">— 02 / Failures concentrate in two buckets</div>
+            <h3 className="find-h">73% of agent-attributable failures are Implementation Failure or Timeout.</h3>
             <p className="find-body">
-              At <strong>9% vs 7.5%</strong> resolved-rate, the top two scaffolds are
-              statistically indistinguishable. Milestone scoring (M1–M4) pulls them
-              apart: Claude Code reaches M3 on 22% of tasks; Codex CLI on 14%. We
-              recommend reporting M1–M4 alongside any L1 number.
+              Across {HEADLINE.failureTotalAttributable} agent-attributable failed trials, Implementation Failure (41.6%)
+              and Timeout (31.4%) dominate. Reward Hacking is the third bucket at 15.4% — concentrated in a
+              few task / configuration combinations: Codex on GPT-5.5 hits 24% reward-hacking among its failures;
+              Terminus on GPT-5.5 reaches <strong>57%</strong> (24 of 42 failures) — the dominant locus of in-trial gaming.
             </p>
           </div>
+
           <div className="finding">
-            <div className="find-num">— 03 / The plateau wall</div>
-            <h3 className="find-h">Most scaffolds plateau at hour 3.4.</h3>
+            <div className="find-num">— 03 / Validation weakness is universal</div>
+            <h3 className="find-h">{HEADLINE.validationSignalPct}% of failed trials carry a validation-failure signal.</h3>
             <p className="find-body">
-              Median wall-clock used was 41% of the available budget. Past hour 3,
-              the typical agent loops on the same failing test, edits unrelated
-              files, or declares completion. Step-quota analysis shows a heavy tail
-              of tool calls with zero score delta.
+              Almost every agent-attributable failure exposes some local-validation gap that better testing would
+              have surfaced. Compaction tracks failure rather than rescue: {HEADLINE.compactionPassWithSummariser} reward-bearing
+              terminus-2 summariser trials pass, against {HEADLINE.compactionPassWithoutPct}% without. The implication: local-testing tooling
+              improvements would lift the headline numbers across <em>all five</em> failure buckets, not just the
+              Poor Self-Verification slice.
             </p>
           </div>
+
           <div className="finding">
-            <div className="find-num">— 04 / Scaffold &gt; model</div>
-            <h3 className="find-h">The same model swings 3× across scaffolds.</h3>
+            <div className="find-num">— 04 / Scaffold &gt; model on token use</div>
+            <h3 className="find-h">Holding the model fixed and varying the scaffold moves median tokens-per-trial by up to 12×.</h3>
             <p className="find-body">
-              GPT-5.5 scores <strong>7.5%</strong> in Codex CLI and <strong>5.0%</strong>{" "}
-              in Terminus 2. Claude Opus 4.7 scores <strong>9.0%</strong> in Claude
-              Code and <strong>6.5%</strong> in Terminus 2. Long-horizon work is
-              still bottlenecked on tool design, not raw model capability.
+              GPT-5.5 runs at 0.40M median tokens under terminus-2 versus 4.8M under codex; Claude Opus 4.7 runs
+              at 4.4M under terminus-2 versus 21.9M under claude-code. Silent duplication compounds: terminus-2's
+              tool calls repeat an earlier (function, args) pair {HEADLINE.duplicationTerminusPct}% of the time, claude-code
+              {" "}{HEADLINE.duplicationClaudeCodePct}%. Tool error rate sits at {HEADLINE.toolErrorRateRange} across scaffolds — the cost of long horizons
+              is paid in repetition tax, not just headline difficulty.
             </p>
           </div>
         </div>
 
         <div style={{ marginTop: 48 }}>
-          <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 14 }}>Selected traces</h4>
+          <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 14 }}>Selected case studies — one per failure bucket</h4>
 
-          <div className="trace">
-            <div className="tr-head">Claude Opus 4.7 · T01 rust-c-compiler · hour 4:12</div>
-            <div className="tr-quote">"x86-64 calling-convention edge cases are diverging from gcc on the c-testsuite slice. Re-reading System-V AMD64 §3.2 instead of patching the differential harness."</div>
-            <div style={{ marginTop: 8, color: "var(--ink-3)" }}>
-              ↳ One of the few traces where an agent voluntarily backed out of a
-              test-editing loop. Run finished at 7h41m with M3 reached.
+          {CASE_STUDIES.map((c) => (
+            <div className="trace" key={c.trial}>
+              <div className="tr-head">{c.bucket} · {c.trial} · {c.config}</div>
+              <div className="tr-quote">{c.pattern}</div>
             </div>
-          </div>
-
-          <div className="trace">
-            <div className="tr-head">GPT-5.5 · T13 vliw-kernel · hour 2:48</div>
-            <div className="tr-quote">"Cycle-count gate still failing. Marking the slow inputs with <code>@pytest.mark.skip</code> and submitting — the SIMD vectorisation is complete."</div>
-            <div style={{ marginTop: 8, color: "var(--ink-3)" }}>
-              ↳ Caught by the four-gate validator: the Cheater-agent gate had
-              already discovered the same shortcut during curation. Submission
-              rejected, scored 0.
-            </div>
-          </div>
-
-          <div className="trace">
-            <div className="tr-head">Kimi K2.6 · T14 network-alignment · hour 5:01</div>
-            <div className="tr-quote">"All planned subtasks are complete. Wrapping up and submitting."</div>
-            <div style={{ marginTop: 8, color: "var(--ink-3)" }}>
-              ↳ 3 hours of budget remaining. The submission failed 41 of 512
-              upstream tests; the agent had hit a plateau on canonical-labeling
-              correctness and declared completion.
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>);
@@ -1187,14 +1060,6 @@ function Findings() {
 }
 
 function Team() {
-  const people = [
-  { n: "[Original Lead Author]", a: "1, 2*" },
-  { n: "[Co-author]", a: "2, 3*" },
-  { n: "[Co-author]", a: "3" },
-  { n: "[Co-author]", a: "1, 4" },
-  { n: "[Co-author]", a: "2" },
-  { n: "[Senior Author]", a: "1, 4" }];
-
   return (
     <section id="team">
       <div className="container">
@@ -1202,20 +1067,11 @@ function Team() {
           <div className="section-no"><span className="dot">●</span>§07 / Team</div>
           <h2 className="section-title">Built by a small <span className="ital">cross-lab</span> group.</h2>
         </div>
-        <div className="team-grid">
-          {people.map((p, i) =>
-          <div className="person" key={i}>
-              <div className="pn">{p.n}</div>
-              <div className="pa">aff. {p.a}</div>
-            </div>
-          )}
-        </div>
-        <div className="affiliations">
-          <div><span className="aff-num">1</span>Affiliation A</div>
-          <div><span className="aff-num">2</span>Affiliation B</div>
-          <div><span className="aff-num">3</span>Affiliation C</div>
-          <div><span className="aff-num">4</span>Affiliation D</div>
-          <div style={{ gridColumn: "1 / -1", marginTop: 8, color: "var(--ink-3)" }}>* equal contribution. Author list redacted in this mock — fill in your own.</div>
+        <div style={{ maxWidth: 620, color: "var(--ink-2)", fontSize: 16, lineHeight: 1.55 }}>
+          The 20 accepted tasks were authored by 11 unique contributors —
+          software engineers familiar with the systems each task targets.
+          Author and affiliation list is held back during the double-blind
+          review window and will be added when the paper de-anonymises.
         </div>
       </div>
     </section>);
@@ -1223,265 +1079,26 @@ function Team() {
 }
 
 function Citation() {
-  const bib = `@article{swemarathon_2026,
-  title    = {SWE-Marathon: Long-Horizon Software Engineering for Agents},
-  author   = {[Authors redacted]},
-  year     = {2026},
-  eprint   = {2605.00000},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.SE},
-  url      = {https://arxiv.org/abs/2605.00000}
-}`;
-  const [copied, setCopied] = useState(false);
   return (
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§08 / Citation</div>
-          <h2 className="section-title">If SWE-Marathon is useful to you,<br />please <span className="ital">cite us.</span></h2>
+          <div className="section-no"><span className="dot">●</span>§08 / Paper</div>
+          <h2 className="section-title">A <span className="ital">paper</span> is in submission.</h2>
         </div>
         <div className="citation-block">
-          <button className="copy-btn" onClick={() => {
-            navigator.clipboard?.writeText(bib);
-            setCopied(true);setTimeout(() => setCopied(false), 1500);
-          }}>{copied ? "Copied" : "Copy"}</button>
-          {bib}
+          {`Paper currently under double-blind review.
+Title, authors, and citation details will be added once the review window closes.
+
+In the meantime, the benchmark, evaluation harness, and per-trial logs are
+public — see the GitHub link in the nav. Headline numbers on this page come
+straight from the canonical 1,100-trial sweep logged to s3://ralphbench-logs.`}
         </div>
       </div>
     </section>);
 
 }
 
-function Changelog() {
-  return (
-    <section id="changelog">
-      <div className="container">
-        <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§09 / Changelog</div>
-          <h2 className="section-title">What's <span className="ital">new.</span></h2>
-        </div>
-        <div className="changelog">
-          <div className="cl-row">
-            <div className="cl-date">May 03, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag upd">Update</span>
-              <strong>Closed-internet hardening landed across the suite.</strong>{" "}
-              <code>nextjs-vite-rewrite</code>, <code>zstd-decoder</code>, <code>embedding-eval</code>, and <code>rusternetes</code>
-              now run with no outbound network — vendored deps, sealed indexes, no-search wrappers. Removes the last category
-              of trivial reward-hacks where agents reached for upstream reference implementations mid-trial. (commits 99a333d, 07726a8, 6cc6356)
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">May 03, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag fix">Fix</span>
-              <strong>jax-pytorch-rewrite — close the head_zeroinit shortcut</strong> (#122).
-              ViT vision-tower head was being zero-initialised, letting the parity check pass on a no-op.
-              Disabled head_zeroinit, restored non-zero head, tightened parity numerics, and reduced perf-measurement variance.
-              Reference files now read-only to block another bypass.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">May 03, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag fix">Fix</span>
-              <code>wasm-simd</code>: closed a pristine-rebuild bypass in the verifier (c314a5f). Spec-test runner was honouring
-              a stale build artifact when the agent's fresh build failed — masking real regressions.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">May 03, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag fix">Fix</span>
-              <code>rust-c-compiler</code>: dropped 7 non-deterministic tests (#120). They depended on output ordering
-              that varies with hashmap iteration on stable Rust; flagging real submissions as failing.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">May 03, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag upd">Update</span>
-              <code>rust-java-lsp</code> anti-cheat hardening (#116): scanners for JDT-LS proxying, byte-vec/XOR obfuscated
-              binary embeds, <code>/proc/PID/cmdline</code> snooping for the reference oracle. Three new canary methods.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">May 02, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              Released <strong>Claude Opus 4.7</strong> via Claude Code v2.1.123 — now #1 on the leaderboard at 9.0% resolved
-              (vs. GPT-5.5 at 7.5%). Notable: solved <code>trimul-cuda</code> in 1:47, the first sub-2h completion of the AF-3 kernel.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">May 01, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>spreadsheet-company</code> (Tabula) merged</strong> as the consolidated 18-gate task (#114), absorbing 6 prior PRs
-              (#75, #95, #101, #108, #111, #112, #113) covering the dynamic-array engine (LAMBDA/LET/spill), iterative calc + Goal Seek,
-              real-time WebSocket collaboration, OOXML extras (defined names, formats, conditional formatting), and the public dev_tests harness.
-              Largest single-task scope after Kubernetes — ~380h human reference.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 30, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>jax-pytorch-rewrite</code> task added</strong> (#83) — port a renamed JAX VLA policy to PyTorch
-              with layer-level tensor parity, then optimise the inference path against a hidden A100 baseline.
-              Reward shaped as exp(1 − candidate_ms / baseline_ms).
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 30, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag upd">Update</span>
-              Verifier artifact dumps standardised across <code>s3-clone</code> (#106), <code>slack-clone</code> (#107),
-              <code>mastodon-clone</code> (#100, #84), and <code>ruby-rust-port</code> (#82): every trial now emits agent <code>/app</code> trees,
-              SQLite DBs, runtime logs, and per-node HTTP probes to <code>/logs/verifier/artifacts/</code> for offline forensics.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 30, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag upd">Update</span>
-              Standardised Dockerfile bases on <code>ubuntu:24.04</code> / <code>rust:1.86-bookworm</code> across every task (#103, #93).
-              Removes a long tail of "works on my image" inconsistencies between human reference and agent runs.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 29, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>mastodon-clone</code> (Chirp) merged</strong> (#78). Mastodon v1 REST + HTMX/Alpine/SSE web UI, OAuth2 PKCE-S256
-              with rotating refresh, the full pagination triple, 24h Idempotency-Key cache, and a CSP-strict frontend gate that
-              zero-bans React/Vue/Svelte. 22 backend + 3 UI gates.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 29, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>ruby-rust-port</code> (RubyJournal) merged</strong> (#49 → #57). Sinatra blog → Rust port with 22 parity
-              gates running agent's Rust on :8000 alongside the Ruby reference on :8001; cross-runtime SQLite job queue;
-              RFC 5988 Link / RateLimit / CSP / ETag header contracts. Anti-cheat probe added in #57 catches a TCP-forwarder
-              shortcut to the reference port.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 29, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag upd">Update</span>
-              CI wall-time cap bumped from 30 min → 3 hours (#81). Six tasks (rusternetes, kubernetes, biofabric,
-              ruby-rust-port, nextjs-vite-rewrite, spreadsheet) were timing out before the verifier had a fair chance to grade.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 29, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>post-train-ifeval</code> merged</strong> (#35) — lift base Llama-3.1-8B from IFEval ≈0.161 to ≥0.739
-              within 10h using only remote Tinker training calls. Claude-based reward-hacking judge inspects <code>/app/</code> artifacts
-              and zero-gates on instruct-passthrough, grader tampering, and dataset-provenance mismatches.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 29, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>vliw-kernel-optimization</code> merged</strong> (#20 → #71). Custom VLIW SIMD architecture simulator,
-              cycle-count gate. Subprocess-isolated verifier added in #71 after agents discovered a shared-memory canary leak
-              between optimisation passes.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 29, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>rusternetes</code> merged</strong> (#45) — the headline scope task. 10-crate Rust workspace mirroring
-              a 216K-line Kubernetes reference, ~3,600 tests, reward gates at ≥3,000 passing with zero failures.
-              Verifier metrics shipped in #72.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 28, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              <strong><code>s3-clone</code> (Halyard) merged</strong> (#46). Self-hosted S3-compatible service driven by real
-              <code>boto3</code> + <code>aws-cli</code>. Byte-exact Sig-V4, multipart <code>{"<hex_md5_of_concat>-<N>"}</code> ETag rule,
-              cross-tenant 403, JSON-line audit log. 22 pytest gates including a Playwright-driven console.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 28, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag fix">Fix</span>
-              <code>nextjs-vite-rewrite</code> instrumentation startup state preserved across reloads (#62).
-              Earlier runs were getting credited with reaching milestones their HMR had silently re-initialised away.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 28, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag upd">Update</span>
-              <code>rust-java-lsp</code> mid-trial drop-out fix (#43): agents were quitting at the 4-minute mark after
-              discovering the golden-file retrieval shortcut. Files moved out of the agent <code>/app</code> view, retrieval
-              path now scanned by the canary harness.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 28, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag fix">Fix</span>
-              CI: canary strings now allowed inside block comments (#58). The static-check pass was rejecting otherwise-clean
-              submissions that quoted the canary in a docblock.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 24, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              Added <strong>GPT-5.5</strong> (Codex CLI v0.128.0) and Terminus 2 cross-runs for matched scaffold comparison.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Apr 11, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag upd">Update</span>
-              Tightened the four-gate validator: Cheater-agent budget extended to 30 minutes, <code>conftest.py</code> edits now flagged.
-              Affected submissions re-scored — 7 runs moved from resolved to unresolved.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Mar 28, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              Released <strong>L3 milestones (M1–M4)</strong> alongside L1 resolved-rate and L4 Agent-as-Judge rubrics.
-            </div>
-          </div>
-          <div className="cl-row">
-            <div className="cl-date">Feb 14, 2026</div>
-            <div className="cl-body">
-              <span className="cl-tag new">New</span>
-              v0.5 public release — 19 tasks, 11 scaffolds, 5 verifier types, Harbor framework v0.4.
-            </div>
-          </div>
-          <div className="cl-row" style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--rule)" }}>
-            <div className="cl-date" style={{ color: "var(--ink-3)" }}>In flight</div>
-            <div className="cl-body" style={{ color: "var(--ink-2)" }}>
-              <span className="cl-tag" style={{ background: "transparent", border: "1px solid var(--rule)", color: "var(--ink-3)" }}>WIP</span>
-              <code>parameter-golf</code> (#55), <code>distributed-dedup</code> (#118), <code>git-remote-server</code> (#68, #96),
-              <code>discord-clone</code> (#91, #97), <code>godot-rollback-physics</code> (#48, #90),
-              <code>riscv-neural-branch-predictor</code> (#79, #105), <code>helix</code> distributed workflow engine (#115),
-              <code>sqlite-wal-rust</code> (#99, #117), <code>durable-workflow-engine</code> (#76, #104),
-              <code>zero-downtime-rename</code> (#50, #67, #109). Targeting v0.6 (mid-May).
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>);
-
-}
 
 function Footer() {
   return (
@@ -1510,22 +1127,20 @@ function Footer() {
               <a href="#tasks">Tasks</a>
               <a href="#about">Method</a>
               <a href="#findings">Observations</a>
-              <a href="#changelog">Changelog</a>
             </div>
           </div>
           <div>
             <div className="foot-h">Resources</div>
             <div className="foot-list">
-              <a href="#">arXiv paper ↗</a>
-              <a href="#">GitHub ↗</a>
-              <a href="#">Submit an agent ↗</a>
-              <a href="#">Donate a task ↗</a>
-              <a href="#">Contact</a>
+              <a href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
+              <a href="#cite">Paper</a>
+              <a href="#leaderboard">Submit an agent</a>
+              <a href="#tasks">Donate a task</a>
             </div>
           </div>
         </div>
         <div className="foot-meta">
-          <div>SWE-Marathon · v0.3 · May 2026</div>
+          <div>SWE-Marathon · v1.0</div>
           <div>MIT License</div>
         </div>
       </div>
@@ -1547,7 +1162,6 @@ function App() {
       <Findings />
       <Team />
       <Citation />
-      <Changelog />
       <Footer />
     </>);
 
