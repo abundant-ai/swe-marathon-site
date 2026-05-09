@@ -594,18 +594,22 @@ function Leaderboard() {
         </div>
 
         <div className="lb-controls">
-          <span className="lb-label">Filter</span>
-          {TASK_FAMILIES.map((f) =>
-          <button
-            key={f.id}
-            className={"pill " + (fam === f.id ? "active" : "")}
-            onClick={() => setFam(f.id)}>
-            {f.label}</button>
-          )}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+            <span className="lb-label">Filter</span>
+            {TASK_FAMILIES.map((f) =>
+            <button
+              key={f.id}
+              className={"pill " + (fam === f.id ? "active" : "")}
+              onClick={() => setFam(f.id)}>
+              {f.label}</button>
+            )}
+          </div>
           <span style={{ flex: 1 }}></span>
-          <span className="lb-label">View</span>
-          <button className={"pill " + (view === "summary" ? "active" : "")} onClick={() => setView("summary")}>Summary</button>
-          <button className={"pill " + (view === "full" ? "active" : "")} onClick={() => setView("full")}>All families</button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            <span className="lb-label">View</span>
+            <button className={"pill " + (view === "summary" ? "active" : "")} onClick={() => setView("summary")}>Summary</button>
+            <button className={"pill " + (view === "full" ? "active" : "")} onClick={() => setView("full")}>All families</button>
+          </div>
         </div>
 
         <div style={{ overflowX: "auto" }}>
