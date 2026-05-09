@@ -15,234 +15,54 @@ const Analysis = lazy(() => import("./analysis.jsx"));
 
 const TASK_FAMILIES = CATEGORIES;
 
-// Synthetic monotone "pace" curve for the leaderboard sparkline: each row
-// ramps from 0 to its real pass@1 over 9 budget tick-points. We don't have
-// hour-by-hour test-pass-rate data per config, so this is a visual cue only.
-function makePace(pass1) {
-  const target = pass1 / 100;
-  const k = 5; // shape constant — soft-ramp to asymptote
-  return Array.from({ length: 9 }, (_, i) => {
-    const t = i / 8;
-    return +(target * (1 - Math.exp(-k * t))).toFixed(3);
-  });
-}
-const PACED_LEADERBOARD = LEADERBOARD.map((r) => ({
-  ...r,
-  pace: r.pass1 != null ? makePace(r.pass1) : null,
-}));
-
-
-
-
-
-/* ---------------- GRAPHICS ---------------- */
-
-// Hero "course profile" — REAL data: y-elevation = mean resolved-rate of
-// the top-5 leaderboard scaffolds at each hour of the 8h budget. Reads as
-// "how high is the field at hour H?" — a sparkline disguised as a course map.
-function CourseMap() {
-  const W = 880,H = 140;
-  const padL = 20,padR = 20;
-  const baseY = 122; // ground line
-  const peakY = 22; // max elevation
-  const usableW = W - padL - padR;
-
-  // Average synthetic pace curve across the top-5 (non-ref) leaderboard scaffolds.
-  // We don't have hour-by-hour test-pass-rate per config; the curve asymptotes
-  // to each model's real pass@1 (see makePace).
-  const top5 = PACED_LEADERBOARD.filter((r) => !r.ref).slice(0, 5);
-  const mean = Array.from({ length: 9 }, (_, h) =>
-  top5.reduce((s, r) => s + r.pace[h], 0) / top5.length
+// Per-config tokens-per-trial vs pass@1 — both real numbers from the
+// canonical sweep. Section §04's token-usage story.
+function TokenUsageBars() {
+  const rows = LEADERBOARD
+    .filter((r) => !r.ref && r.tokAvg != null)
+    .slice()
+    .sort((a, b) => b.tokAvg - a.tokAvg);
+  const maxTok = Math.max(...rows.map((r) => r.tokAvg));
+  return (
+    <div style={{
+      border: "1px solid var(--rule)",
+      background: "var(--bg)",
+      padding: "16px 18px 14px",
+      fontFamily: "var(--mono)",
+      fontSize: 11,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+        <span>Mean tokens / trial · per (model, scaffold)</span>
+        <span>pass@1 marker on right</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(200px, 240px) 1fr 60px", gap: 12, alignItems: "center", rowGap: 6 }}>
+        {rows.map((r) => (
+          <React.Fragment key={r.id}>
+            <div style={{ fontFamily: "var(--sans)", fontSize: 12, color: "var(--ink-2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {r.name} · <span style={{ color: "var(--ink-3)" }}>{r.scaffold}</span>
+            </div>
+            <div style={{ position: "relative", height: 14, background: "var(--rule2, #ebe6d7)" }}>
+              <div style={{
+                position: "absolute", left: 0, top: 0, bottom: 0,
+                width: `${(r.tokAvg / maxTok) * 100}%`,
+                background: r.highlight ? "var(--accent)" : "var(--ink)",
+                opacity: r.highlight ? 0.9 : 0.55,
+              }} />
+              <span style={{ position: "absolute", right: 6, top: 0, bottom: 0, display: "flex", alignItems: "center", color: "var(--ink-2)", fontSize: 10 }}>
+                {r.tokAvg.toFixed(1)}M
+              </span>
+            </div>
+            <div style={{ textAlign: "right", color: r.highlight ? "var(--accent)" : "var(--ink)", fontWeight: 600 }}>
+              {r.pass1.toFixed(1)}%
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
   );
-  const maxPace = Math.max(...mean);
-
-  // Build the path: 9 hour-points (0..8), elevation scaled to the visual range
-  const pts = mean.map((v, i) => ({
-    x: padL + i / 8 * usableW,
-    y: baseY - v / maxPace * (baseY - peakY),
-    pace: v,
-    hour: i
-  }));
-
-  // Smooth Bezier path through the points
-  const linePath = pts.reduce((acc, p, i, arr) => {
-    if (i === 0) return `M ${p.x} ${p.y}`;
-    const prev = arr[i - 1];
-    const cx1 = prev.x + (p.x - prev.x) * 0.5;
-    const cx2 = p.x - (p.x - prev.x) * 0.5;
-    return acc + ` C ${cx1} ${prev.y}, ${cx2} ${p.y}, ${p.x} ${p.y}`;
-  }, "");
-  const fillPath = linePath + ` L ${pts[pts.length - 1].x} ${baseY} L ${pts[0].x} ${baseY} Z`;
-
-  // Checkpoint annotations — show real % at each labeled hour
-  const checkpoints = [
-  { hour: 0, name: "Start" },
-  { hour: 1, name: "Explore" },
-  { hour: 3, name: "First diff" },
-  { hour: 5, name: "Tests green" },
-  { hour: 7, name: "Drift" },
-  { hour: 8, name: "Submit" }].
-  map((c) => ({ ...c, ...pts[c.hour] }));
-
-  return (
-    <div className="course-map">
-      <div className="course-map-label">
-        <span>Top-5 scaffolds · synthetic pace ramp to real pass@1</span>
-        <span>peak {(maxPace * 100).toFixed(0)}%</span>
-      </div>
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
-        {/* hour grid ticks */}
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
-          const x = padL + i / 8 * usableW;
-          return (
-            <g key={i}>
-              <line x1={x} y1={baseY} x2={x} y2={baseY + 4}
-              stroke="var(--ink-3)" strokeWidth="0.5" />
-              <text x={x} y={baseY + 16} textAnchor="middle"
-              className="km-marker">{i}h</text>
-            </g>);
-
-        })}
-        {/* baseline */}
-        <line x1={padL} y1={baseY} x2={W - padR} y2={baseY}
-        stroke="var(--ink-3)" strokeWidth="0.5" />
-        {/* peak reference */}
-        <line x1={padL} y1={peakY + 8} x2={W - padR} y2={peakY + 8}
-        stroke="var(--ink-3)" strokeWidth="0.5" strokeDasharray="2 4" opacity="0.4" />
-        <text x={padL + 4} y={peakY + 4} className="km-marker"
-        style={{ fontSize: 9 }}>{(maxPace * 100).toFixed(0)}% ceiling</text>
-
-        {/* elevation fill + line */}
-        <path d={fillPath} className="course-elev" />
-        <path d={linePath} className="course-elev-line" />
-
-        {/* checkpoints */}
-        {checkpoints.map((c, i) =>
-        <g key={i}>
-            <circle cx={c.x} cy={c.y} r="4"
-          className={"checkpoint-dot " + (i === 0 ? "start" : "") + (i === checkpoints.length - 1 ? "finish" : "")} />
-            <text x={c.x} y={c.y - 10}
-          className={"km-marker " + (i === checkpoints.length - 1 ? "active" : "")}
-          textAnchor="middle">{(c.pace * 100).toFixed(0)}%</text>
-          </g>
-        )}
-
-        {/* finish line stripes */}
-        <g transform={`translate(${W - padR - 6},${peakY - 10})`}>
-          <rect width="3" height="14" fill="var(--ink)" />
-          <rect x="3" width="3" height="14" fill="var(--bg)" />
-          <rect x="6" width="3" height="14" fill="var(--ink)" />
-        </g>
-      </svg>
-    </div>);
-
 }
 
-// Tiny sparkline for an agent's "pace" — score vs. wall-clock hour
-function PaceSpark({ profile, isRef }) {
-  // profile: array of normalized values 0..1
-  const W = 96,H = 18,P = 1.5;
-  const pts = profile.map((v, i) => {
-    const x = P + i / (profile.length - 1) * (W - P * 2);
-    const y = H - P - v * (H - P * 2);
-    return [x, y];
-  });
-  const d = pts.map((p, i) => (i === 0 ? "M" : "L") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
-  const last = pts[pts.length - 1];
-  return (
-    <svg className="pace-spark" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
-      <line x1="0" y1={H - P} x2={W} y2={H - P} className="pace-baseline" />
-      <path d={d} className={"pace-line " + (isRef ? "ref" : "")} />
-      {!isRef && <circle cx={last[0]} cy={last[1]} r="1.8" className="pace-dot" />}
-    </svg>);
 
-}
-
-// Course profile — multi-agent ramp chart. Each trail is a synthetic
-// soft-ramp asymptoting to that scaffold's real pass@1 (we do not log
-// hour-by-hour pass-rate per config, so the curve shape is illustrative;
-// the asymptote is the canonical sweep number).
-function CourseProfile() {
-  const W = 860, H = 280;
-  const padL = 36, padR = 16, padT = 16, padB = 28;
-  const innerW = W - padL - padR;
-  const innerH = H - padT - padB;
-
-  const HMAX = HEADLINE.agentBudgetMaxH; // 10
-  const hours = Array.from({ length: HMAX + 1 }, (_, i) => i);
-  const top5 = LEADERBOARD.filter((r) => !r.ref).slice(0, 5);
-  const colors = ["oklch(0.55 0.15 35)", "oklch(0.45 0.13 250)", "oklch(0.55 0.12 145)", "oklch(0.55 0.13 70)", "oklch(0.50 0.10 290)"];
-  const agents = top5.map((row, i) => ({
-    name: `${row.name} · ${row.scaffold}`,
-    color: colors[i],
-    trail: hours.map((h) => [h, row.pass1 * (1 - Math.exp(-5 * (h / HMAX)))]),
-  }));
-
-  const yMax = Math.max(20, Math.ceil(top5[0].pass1 / 5) * 5);
-  const yTicks = Array.from({ length: yMax / 5 + 1 }, (_, i) => i * 5);
-  const xScale = (h) => padL + h / HMAX * innerW;
-  const yScale = (s) => padT + innerH - s / yMax * innerH;
-
-  return (
-    <div className="course-profile">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
-        <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-          Pass@1 ramp · top-5 scaffolds across the 2–10h budget
-        </div>
-        <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)" }}>asymptote = canonical sweep · n = 100 trials / config</div>
-      </div>
-
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <g className="course-axis">
-          {yTicks.map((t) =>
-          <g key={t}>
-              <line x1={padL} y1={yScale(t)} x2={W - padR} y2={yScale(t)} />
-              <text x={padL - 6} y={yScale(t) + 3} textAnchor="end">{t}</text>
-            </g>
-          )}
-          {hours.map((h) =>
-          <g key={h}>
-              <line x1={xScale(h)} y1={padT + innerH} x2={xScale(h)} y2={padT + innerH + 4} />
-              <text x={xScale(h)} y={padT + innerH + 16} textAnchor="middle">{h}h</text>
-            </g>
-          )}
-        </g>
-
-        <line x1={xScale(HMAX)} y1={padT} x2={xScale(HMAX)} y2={padT + innerH}
-          stroke="var(--accent)" strokeWidth="1" strokeDasharray="2 3" opacity="0.5" />
-        <text x={xScale(HMAX) - 4} y={padT + 10} textAnchor="end"
-          style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--accent)" }}>budget cap</text>
-
-        <line x1={padL} y1={yScale(yMax)} x2={W - padR} y2={yScale(yMax)}
-          stroke="var(--ink-3)" strokeWidth="0.8" strokeDasharray="3 4" />
-        <text x={W - padR - 4} y={yScale(yMax) - 4} textAnchor="end"
-          style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--ink-3)" }}>{yMax}% frontier ceiling</text>
-
-        {agents.map((a, i) => {
-          const d = a.trail.map((p, j) =>
-          (j === 0 ? "M" : "L") + xScale(p[0]).toFixed(1) + " " + yScale(p[1]).toFixed(1)
-          ).join(" ");
-          const last = a.trail[a.trail.length - 1];
-          return (
-            <g key={i}>
-              <path d={d} className="agent-trail" stroke={a.color} />
-              <circle cx={xScale(last[0])} cy={yScale(last[1])} r="3.5"
-                fill={a.color} className="agent-dot" />
-            </g>);
-        })}
-      </svg>
-
-      <div className="agent-legend">
-        {agents.map((a, i) =>
-        <div key={i}>
-            <span className="swatch" style={{ background: a.color }}></span>
-            {a.name} · {top5[i].pass1.toFixed(1)}%
-          </div>
-        )}
-      </div>
-    </div>);
-
-}
 
 /* ---------------- COMPONENTS ---------------- */
 
@@ -740,7 +560,6 @@ function Hero() {
           <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
         </div>
         <StatStrip />
-        <CourseMap />
       </div>
     </header>);
 
@@ -756,7 +575,7 @@ function Leaderboard() {
   };
 
   const sorted = useMemo(() => {
-    return [...PACED_LEADERBOARD].sort((a, b) => {
+    return [...LEADERBOARD].sort((a, b) => {
       if (a.ref && !b.ref) return 1;
       if (b.ref && !a.ref) return -1;
       return scoreFor(b, fam) - scoreFor(a, fam);
@@ -794,9 +613,7 @@ function Leaderboard() {
           <thead>
             <tr>
               <th style={{ width: 36 }}>#</th>
-              <th>Agent</th>
-              <th>Scaffold</th>
-              <th style={{ width: 110 }}>Pace</th>
+              <th>Agent · Scaffold</th>
               <th className="num">Pass@1</th>
               {(view === "full" ? allCatCols : cols).map((c) =>
                 <th key={c} className="num">{CAT_LABEL[c]}</th>
@@ -815,10 +632,9 @@ function Leaderboard() {
                       </span>
                     </td>
                     <td>
-                      <span className="agent-name">{row.name}</span>
+                      <div className="agent-name">{row.name}</div>
+                      <div className="scaffold" style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 2 }}>{row.scaffold}</div>
                     </td>
-                    <td className="scaffold">{row.scaffold}</td>
-                    <td>{row.pace ? <PaceSpark profile={row.pace} isRef={row.ref} /> : null}</td>
                     <td className="num score-bar-cell">
                       <span className={"score-bar " + (row.ref ? "ref" : "")}
                         style={{ width: `${Math.min(100, row.pass1 / 25 * 100)}%` }}></span>
@@ -912,15 +728,15 @@ function CourseProfileSection() {
             <div className="label-row">Compaction<span>Tracks failure rather than rescue: 0 / 71 reward-bearing terminus-2 summariser trials pass.</span></div>
           </div>
           <div>
-            <p style={{ fontSize: 15, color: "var(--ink-2)", margin: "0 0 22px", maxWidth: 600 }}>
+            <p style={{ fontSize: 15, color: "var(--ink-2)", margin: "0 0 18px", maxWidth: 600 }}>
               SWE-Marathon trials run for hours. Cumulative input across API
               calls reaches millions to hundreds of millions of tokens — far
               past what any single context window holds. Holding the model
               fixed and varying the scaffold moves median tokens-per-trial
               by up to 12×.
             </p>
-            <CourseProfile />
-            <div className="split-chips">
+            <TokenUsageBars />
+            <div className="split-chips" style={{ marginTop: 18 }}>
               <div className="split-chip">Median tokens / trial: <strong>{HEADLINE.medianTokensPerTrialM}M</strong></div>
               <div className="split-chip">Mean tokens / trial: <strong>{HEADLINE.avgTokensPerTrialM}M</strong></div>
               <div className="split-chip">Right-tail max: <strong>{HEADLINE.maxTokensPerTrialM}M</strong></div>
@@ -964,22 +780,36 @@ function About() {
               the minimum across stages so a UI regression floors the score even
               when every deterministic gate passes.
             </p>
-            <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 32, marginBottom: 18 }}>The pipeline · five stages</h4>
-            <div className="bib-row">
-              {PIPELINE.map((p) => (
-                <div className="bib" key={p.num}>
-                  <div className="bib-top">
-                    <div className="bib-num">{p.num}</div>
-                    <div className="bib-km">STAGE</div>
-                  </div>
-                  <div className="bib-body">
-                    <div className="bib-title">{p.t}</div>
-                    <div className="bib-desc">{p.d}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
+        </div>
+
+        <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 40, marginBottom: 18 }}>The pipeline · five stages</h4>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {PIPELINE.map((p) => (
+            <div key={p.num} style={{
+              display: "grid",
+              gridTemplateColumns: "112px 1fr",
+              border: "1px solid var(--rule)",
+              background: "var(--bg)",
+            }}>
+              <div style={{
+                background: "var(--ink)",
+                color: "var(--bg)",
+                padding: "14px 16px",
+                borderRight: "2px solid var(--accent)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}>
+                <div style={{ fontFamily: "var(--mono)", fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>{p.num}</div>
+                <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "rgba(250,247,240,0.6)", textTransform: "uppercase", letterSpacing: "0.12em" }}>STAGE</div>
+              </div>
+              <div style={{ padding: "14px 18px 16px" }}>
+                <div style={{ fontFamily: "var(--serif)", fontSize: 19, lineHeight: 1.15, marginBottom: 6 }}>{p.t}</div>
+                <div style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.55 }}>{p.d}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>);
