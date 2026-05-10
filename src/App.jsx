@@ -914,21 +914,33 @@ function Team() {
 }
 
 function Citation() {
+  const bib = `@misc{swemarathon_2026,
+  title        = {SWE-Marathon: Long-Horizon Software Engineering for Agents},
+  author       = {{SWE-Marathon Authors}},
+  year         = {2026},
+  howpublished = {\\url{https://github.com/abundant-ai/long-horizon}},
+  note         = {Benchmark and evaluation code; preprint forthcoming.}
+}`;
+  const [copied, setCopied] = useState(false);
   return (
     <section id="cite">
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§08 / Paper</div>
-          <h2 className="section-title">A <span className="ital">paper</span> is in submission.</h2>
+          <h2 className="section-title">If SWE-Marathon is useful,<br />please <span className="ital">cite us.</span></h2>
         </div>
+        <p style={{ maxWidth: 620, color: "var(--ink-2)", margin: "0 0 18px", fontSize: 15, lineHeight: 1.55 }}>
+          Paper currently in submission; an arXiv preprint will follow shortly.
+          Until then, please cite the benchmark via the entry below — we'll
+          update the title, authors, and a canonical <code>@article</code>
+          entry once the preprint is posted.
+        </p>
         <div className="citation-block">
-          {`Paper currently in submission. We plan to post an arXiv preprint
-shortly — once it's up, the title, authors, and a canonical bibtex
-entry will appear here.
-
-In the meantime, the benchmark and evaluation harness are public; see
-the GitHub link in the nav. Headline numbers on this page come straight
-from the canonical 1,100-trial sweep.`}
+          <button className="copy-btn" onClick={() => {
+            navigator.clipboard?.writeText(bib);
+            setCopied(true); setTimeout(() => setCopied(false), 1500);
+          }}>{copied ? "Copied" : "Copy"}</button>
+          {bib}
         </div>
       </div>
     </section>);
