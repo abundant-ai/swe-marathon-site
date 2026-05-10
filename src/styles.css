@@ -10,7 +10,7 @@
     --accent-bg: oklch(0.95 0.03 60);
     --pos: oklch(0.50 0.10 145);      /* muted moss */
     --warn: oklch(0.55 0.13 70);      /* burnt amber */
-    --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
     --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
   }
@@ -258,21 +258,22 @@
     gap: 0;
     margin-top: 64px;
     border-top: 1px solid var(--rule);
+    padding-top: 4px;
   }
   .stat {
-    padding: 22px 0 0;
+    padding: 28px 24px 8px 0;
     border-right: 1px solid var(--rule-2);
-    padding-right: 18px;
   }
+  .stat + .stat { padding-left: 24px; }
   .stat:last-child { border-right: none; }
   .stat-num {
-    font-family: var(--serif); font-size: 38px; line-height: 1; color: var(--ink);
-    margin-bottom: 8px;
+    font-family: var(--serif); font-weight: 400; font-size: 44px; line-height: 1;
+    color: var(--ink); margin-bottom: 14px; letter-spacing: -0.005em;
   }
-  .stat-num .unit { font-size: 18px; color: var(--ink-3); margin-left: 4px; }
+  .stat-num .unit { font-size: 20px; color: var(--ink-3); margin-left: 4px; font-weight: 400; }
   .stat-label {
     font-family: var(--mono); font-size: 11px; color: var(--ink-3);
-    text-transform: uppercase; letter-spacing: 0.1em;
+    text-transform: uppercase; letter-spacing: 0.14em;
   }
 
   /* Section scaffolding */
