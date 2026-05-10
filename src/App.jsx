@@ -915,7 +915,7 @@ function Team() {
 
 function Citation() {
   const bib = `@misc{swemarathon_2026,
-  title        = {SWE-Marathon: Long-Horizon Software Engineering for Agents},
+  title        = {{SWE-Marathon: Can Agents Autonomously Complete Ultra-Long-Horizon Software Work?}},
   author       = {{SWE-Marathon Authors}},
   year         = {2026},
   howpublished = {\\url{https://github.com/abundant-ai/long-horizon}},
