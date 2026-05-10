@@ -289,7 +289,7 @@ function TimeHorizonChart() {
       <div className="anal-card-head">
         <div>
           <div className="anal-card-no">FIG · TIME HORIZON</div>
-          <h3 className="anal-card-title">How <em>long</em> a task can each agent handle?</h3>
+          <h3 className="anal-card-title">How long a task can each agent handle?</h3>
           <p className="anal-card-sub">
             Each dot is one of the 20 SWE-Marathon tasks; x-axis is the expert
             estimate (40–400h, log scale). Curve is a logistic fit over the
@@ -522,7 +522,7 @@ function FamilyHeatmap() {
       <div className="anal-card-head">
         <div>
           <div className="anal-card-no">FIG · HEATMAP</div>
-          <h3 className="anal-card-title">Where each config <em>actually</em> scores.</h3>
+          <h3 className="anal-card-title">Where each config actually scores.</h3>
           <p className="anal-card-sub">
             Pass@1 (%) by task family. ML engineering is the only column with
             non-trivial scores across configs; library reproductions, product
@@ -636,7 +636,7 @@ function TaskDistribution() {
       <div className="anal-card-head">
         <div>
           <div className="anal-card-no">FIG · DISTRIBUTION</div>
-          <h3 className="anal-card-title">The <em>20-task</em> course at a glance.</h3>
+          <h3 className="anal-card-title">The 20-task course at a glance.</h3>
           <p className="anal-card-sub">
             Family mix on the left; expert-estimate spread on the right.
             Tasks span library reproductions (8), product clones (5), ML
@@ -661,7 +661,7 @@ function Analysis() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§02 / Analysis</div>
-          <h2 className="section-title">Time-horizons, <span className="ital">Pareto</span> frontiers, where it breaks.</h2>
+          <h2 className="section-title">Time-horizons, Pareto frontiers, where it breaks.</h2>
         </div>
 
         <div className="anal-tabs">

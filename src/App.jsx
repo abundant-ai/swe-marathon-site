@@ -590,7 +590,7 @@ function Leaderboard() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§01 / Leaderboard</div>
-          <h2 className="section-title">Pass@1 <span className="ital">across 20 long-horizon tasks.</span></h2>
+          <h2 className="section-title">Pass@1 across 20 long-horizon tasks.</h2>
         </div>
 
         <div className="lb-controls">
@@ -671,7 +671,7 @@ function Tasks() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§03 / Tasks</div>
-          <h2 className="section-title">Four families. Twenty <span className="ital">marathons.</span></h2>
+          <h2 className="section-title">Four families. Twenty marathons.</h2>
         </div>
 
         <div className="section-body" style={{ marginBottom: 28 }}>
@@ -723,7 +723,7 @@ function CourseProfileSection() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§04 / The course</div>
-          <h2 className="section-title">Multi-hour rollouts, <span className="ital">millions of tokens.</span></h2>
+          <h2 className="section-title">Multi-hour rollouts, millions of tokens.</h2>
         </div>
         <div className="section-body" style={{ marginBottom: 28 }}>
           <div className="sb-side">
@@ -759,7 +759,7 @@ function About() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§05 / Method</div>
-          <h2 className="section-title">A <span className="ital">marathon</span>, not a sprint.</h2>
+          <h2 className="section-title">A marathon, not a sprint.</h2>
         </div>
 
         <div className="section-body">
@@ -826,7 +826,7 @@ function Findings() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§06 / Observations</div>
-          <h2 className="section-title">Where agents <span className="ital">cheat</span>, drift, and stall.</h2>
+          <h2 className="section-title">Where agents cheat, drift, and stall.</h2>
         </div>
 
         <div className="findings">
@@ -900,7 +900,7 @@ function Team() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§07 / Team</div>
-          <h2 className="section-title">Built by a small <span className="ital">cross-lab</span> group.</h2>
+          <h2 className="section-title">Built by a small cross-lab group.</h2>
         </div>
         <div style={{ maxWidth: 620, color: "var(--ink-2)", fontSize: 16, lineHeight: 1.55 }}>
           The 20 accepted tasks were authored by 11 unique contributors —
@@ -927,7 +927,7 @@ function Citation() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§08 / Paper</div>
-          <h2 className="section-title">If SWE-Marathon is useful,<br />please <span className="ital">cite us.</span></h2>
+          <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
         <p style={{ maxWidth: 620, color: "var(--ink-2)", margin: "0 0 18px", fontSize: 15, lineHeight: 1.55 }}>
           Paper currently in submission; an arXiv preprint will follow shortly.
