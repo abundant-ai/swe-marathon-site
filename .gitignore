@@ -1,6 +1,8 @@
 node_modules
 dist
 .artifacts
+artifacts/**/.smoke-data
+artifacts/**/data
 .vercel
 .DS_Store
 npm-debug.log*

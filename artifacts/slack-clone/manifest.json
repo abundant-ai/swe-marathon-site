@@ -1,0 +1,26 @@
+{
+  "task": "slack-clone",
+  "artifacts": [
+    {
+      "id": "trial-1",
+      "root": "artifacts/slack-clone/trial-1",
+      "sourceTrial": "slack-clone-217",
+      "localUrl": "http://127.0.0.1:8000/",
+      "railwayUrl": "https://swe-marathon-slack-trial-1-production.up.railway.app/"
+    },
+    {
+      "id": "trial-2",
+      "root": "artifacts/slack-clone/trial-2",
+      "sourceTrial": "slack-clone-236",
+      "localUrl": "http://127.0.0.1:8010/",
+      "railwayUrl": "https://swe-marathon-slack-trial-2-production.up.railway.app/"
+    },
+    {
+      "id": "trial-3",
+      "root": "artifacts/slack-clone/trial-3",
+      "sourceTrial": "slack-clone-234",
+      "localUrl": "http://127.0.0.1:8020/",
+      "railwayUrl": "https://swe-marathon-slack-trial-3-production.up.railway.app/"
+    }
+  ]
+}
