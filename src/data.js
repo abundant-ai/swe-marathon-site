@@ -268,7 +268,7 @@ export const TASKS = [
     pass1: 0.0, exploit: 0.0, succ: 0 },
 
   { id: "slack-clone", cat: "clone",
-    title: "Slack-style chat cluster",
+    title: "Clone Slack",
     desc: "Build a Slack-like team chat cluster with a browser app, REST and realtime APIs, IRC bridging, workspaces, channels, DMs, messages, threads, reactions, files, search, slash commands, mentions, read state, user groups, invitations, roles, durable event ordering, replay, and failure recovery.",
     verifier: "HTTP/WebSocket/IRC/resilience tests + CUA browser UI rubric",
     humanH: 60, agentH: 3,
@@ -346,56 +346,126 @@ export const TASK_DETAILS = {
   "slack-clone": {
     taskNo: "T12",
     slug: "slack-clone",
-    title: "Slack-style chat cluster",
+    title: "Clone Slack",
     kicker: "Product clone · CUA verified",
     summary:
-      "Agents must build a Slack-like team chat system that works both as a backend service cluster and as a realistic browser application. The task is scored by deterministic protocol tests and a black-box computer-use verifier that drives the final UI like a real user.",
+      "Agents must build a Slack-like team chat platform that works both as a backend service cluster and as a realistic browser application. The task is scored by unit tests and a computer-use agent verifier that operates the final UI like a real user.",
     results: [
       { label: "Agent pass@1", value: "0.0%", note: "0 / 55 canonical agent trials passed the full binary verifier" },
       { label: "Best partial", value: "0.60", note: "best agent trial: 0.2 correctness partial + 1.0 UX partial" },
-      { label: "Oracle", value: "5 / 5", note: "held-out reference solution passes" },
-      { label: "NOP", value: "0 / 5", note: "empty baseline fails" },
     ],
-    sections: [
-      {
-        title: "Background",
-        body:
-          "Slack clone is deliberately broader than a chat toy. A passing solution needs durable ordering, multi-workspace identity, channel and DM semantics, reactions, threads, search, files, realtime updates, IRC bridging, and recovery behavior that still holds under failure-oriented verifier cases.",
-      },
-      {
-        title: "Task",
-        body:
-          "The build agent starts from a Dockerized scaffold and must ship a working chat cluster. The browser app is part of the assignment, not a demo skin: sign-up/sign-in, workspace and channel navigation, persistent messages, edit/delete flows, threaded replies, reactions, validation feedback, and Slack-like information architecture are all inspected.",
-      },
-      {
-        title: "Evaluation",
-        body:
-          "The final score combines correctness gates for HTTP, WebSocket, IRC, persistence, ordering, replay, and resilience with a CUA verifier for UI/UX. For visibility the logs expose partial scores, but binary task success still requires the full verifier to pass.",
-      },
-      {
-        title: "Environment",
-        body:
-          "Runs are executed in Modal sandboxes through Harbor with a 3-hour agent budget. The submitted container state is started, exercised by deterministic tests, then driven in a browser by the CUA verifier.",
-      },
-    ],
-    verifier: {
-      deterministic: [
-        "HTTP API and auth behavior",
-        "WebSocket realtime delivery",
-        "IRC bridge compatibility",
-        "Persistence, replay, ordering, and recovery",
-        "Cross-stage integrity checks",
-      ],
-      ux: [
-        "Validated sign-up and sign-in",
-        "Channel creation and switching",
-        "Message post/edit/delete with reload persistence",
-        "Thread panel and reply count behavior",
-        "Emoji picker reactions",
-        "Slack-like layout, hover states, and empty states",
+    sections: [],
+    sample: {
+      title: "What the task asked agents to build.",
+      tabs: [
+        {
+          id: "prompt",
+          label: "Prompt",
+          blocks: [
+            {
+              title: "Verbatim prompt excerpt · launch contract",
+              body:
+                "Build a Slack-like team chat system at /app. The verifier launches /app/start.sh and expects three HTTP nodes, an IRC gateway, and a browser UI served from GET /.",
+            },
+            {
+              title: "Verbatim prompt excerpt · product surface",
+              body:
+                "Registration/login, profiles, workspaces, invitations, roles, channels, DMs, messages, threads, reactions, pins, files, search, slash commands, mentions, read state, settings, and a single-page UI.",
+            },
+            {
+              title: "Verbatim prompt excerpt · resilience",
+              body:
+                "Durable channel events from any HTTP node or IRC must share dense per-channel sequence numbers, replay correctly after reconnect, and continue through node or broadcast-component failure.",
+            },
+          ],
+        },
+        {
+          id: "files",
+          label: "Task files",
+          files: [
+            {
+              kind: "prompt",
+              path: "instruction.md",
+              description: "The task prompt given to agents. This is the source of the Prompt tab excerpts.",
+              snippet:
+                "Build a Slack-like team chat system at `/app`. The verifier launches the service by executing `/app/start.sh`; that command must stay in the foreground and the system must keep serving while it is alive.",
+            },
+            {
+              kind: "config",
+              path: "task.toml",
+              description: "Task metadata, verifier declarations, resource limits, CUA settings, and scoring configuration.",
+              snippet:
+                "[[verifiers]]\nname = \"correctness\"\ntype = \"shell\"\nweight = 0.5\nrequired = true\n\n[[verifiers]]\nname = \"ux\"\ntype = \"cua\"\nweight = 0.5\nrequired = true",
+            },
+            {
+              kind: "environment",
+              path: "environment/Dockerfile",
+              description: "Builds the container image used for agents and verifiers, including Python, SQLite, Redis, Chromium, and desktop tooling.",
+              snippet:
+                "FROM ubuntu:24.04\nENV VIRTUAL_ENV=/opt/venv \\\n    PATH=\"/opt/venv/bin:...\"\nRUN apt-get update && apt-get install -y ... redis-server ... xvfb",
+            },
+            {
+              kind: "verifier",
+              path: "tests/test.sh",
+              description: "Correctness-stage verifier entrypoint. It starts the agent submission and runs API, cluster, crash, IRC, chaos, and frontend gates.",
+              snippet:
+                "# Gate 1: API pytest suite\n# Gate 1b: Crash tolerance\n# Gate 1c: IRC bridge\n# Gate 1d: Pub/sub chaos\n# Gate 2: Frontend structure + Playwright E2E",
+            },
+            {
+              kind: "rubric",
+              path: "tests/rubric.json",
+              description: "CUA verifier rubric for browser UX and Slack realism.",
+              snippet:
+                "\"auth\": sign up + sign in is a complete, validated flow\n\"channels\": channel listing, creation, and switching\n\"messaging\": post + edit + delete + persistence\n\"threads\": real thread panel",
+            },
+            {
+              kind: "tests",
+              path: "tests/test_api.py",
+              description: "Core REST API behavior: auth, workspaces, channels, messages, reactions, search, and error handling.",
+            },
+            {
+              kind: "tests",
+              path: "tests/test_cluster.py",
+              description: "Cross-node behavior and realtime fan-out across the three HTTP nodes.",
+            },
+            {
+              kind: "tests",
+              path: "tests/test_crash.py",
+              description: "Crash tolerance: one HTTP node can be killed while the others continue serving and the supervisor respawns it.",
+            },
+            {
+              kind: "tests",
+              path: "tests/test_irc.py",
+              description: "IRC gateway behavior and bidirectional bridging between IRC and web messages.",
+            },
+            {
+              kind: "tests",
+              path: "tests/test_chaos.py",
+              description: "Pub/sub outage handling: cross-node propagation must survive redis/broadcast failure via SQLite fallback.",
+            },
+            {
+              kind: "oracle",
+              path: "solution/",
+              description: "Held-out reference implementation used to validate that the task is solvable.",
+            },
+          ],
+        },
+        {
+          id: "rubric",
+          label: "Rubric",
+          rubric: [
+            { criterion: "Auth: sign-up rejects invalid input, valid account auto-logs in, logout/login restores the same workspace", score: "Required" },
+            { criterion: "Channels: #general is visible, a new channel can be created, duplicate names validate, switching updates the pane", score: "Required" },
+            { criterion: "Messaging: messages post with author/timestamp, persist across reload, edit with indicator, and delete cleanly", score: "Required" },
+            { criterion: "Threads and reactions: dedicated thread panel, reply count, emoji picker, persistent reaction badges", score: "Required" },
+            { criterion: "Backend cluster: HTTP/WebSocket/IRC APIs, durable dense event ordering, replay, and failure recovery", score: "Required" },
+            { criterion: "Visual realism: Slack-like sidebar, channel header, message rows, composer, hover affordances, and empty states", score: "Required" },
+          ],
+        },
       ],
     },
-    verifierTitle: "Two surfaces: protocol correctness and browser realism.",
+    verifier: null,
+    verifierTitle: "How the task verifier scores submissions.",
     bestTrial: {
       trial: "slack-clone-217",
       agent: "Claude Code",
@@ -411,7 +481,7 @@ export const TASK_DETAILS = {
       note:
         "This was the strongest artifact class: full UX pass from the CUA verifier, but only one deterministic correctness gate passed, so it remains a failed trial under binary scoring.",
     },
-    resultTitle: "The best agent artifact passes the UI judge, but not the whole task.",
+    resultTitle: "What the agent trials actually produced.",
     artifacts: {
       title: "Live artifacts: compare real agent submissions",
       intro:
@@ -425,6 +495,7 @@ export const TASK_DETAILS = {
           model: "Claude Opus 4.7",
           liveUrl: "https://swe-marathon-slack-trial-1-production.up.railway.app/",
           healthUrl: "https://swe-marathon-slack-trial-1-production.up.railway.app/api/health",
+          trajectoryUrl: "/trajectories/slack-clone-217.json",
           sourcePath: "swe-marathon-site/.artifacts/slack-clone-217/source",
           launchCommand: "./run-local.sh",
           tokens: "14.7M",
@@ -433,6 +504,19 @@ export const TASK_DETAILS = {
           stages: "1 / 5 correctness gates · 1.0 CUA UX",
           note:
             "Full CUA UI pass from a Claude Code run, but only one deterministic correctness gate passed.",
+          trajectory: [
+            { step: 3, kind: "Bash", text: "Inspect /app and check Python/aiohttp availability" },
+            { step: 4, kind: "Bash", text: "List available Python packages" },
+            { step: 5, kind: "Bash", text: "Install aiohttp and aiosqlite" },
+            { step: 13, kind: "Bash", text: "Create directory layout" },
+            { step: 14, kind: "Write", text: "/app/start.sh" },
+            { step: 17, kind: "TaskCreate", text: "SQLite schema, ids, events table for fan-out, helpers for users/workspaces/channels/messages/etc." },
+            { step: 18, kind: "TaskCreate", text: "aiohttp app with all REST routes, WebSocket, file upload" },
+            { step: 19, kind: "TaskCreate", text: "TCP IRC server bridging messages with HTTP nodes" },
+            { step: 20, kind: "TaskCreate", text: "Cross-node broadcast component plus a fallback DB poll loop for resilience" },
+            { step: 21, kind: "TaskCreate", text: "Spawns nodes, IRC, broker; restarts killed processes within 60s" },
+            { step: 22, kind: "TaskCreate", text: "Single-page app with all data-testids, three-pane layout, threads, reactions, etc." },
+          ],
         },
         {
           id: "slack-clone-236",
@@ -442,6 +526,7 @@ export const TASK_DETAILS = {
           model: "Claude Opus 4.7",
           liveUrl: "https://swe-marathon-slack-trial-2-production.up.railway.app/",
           healthUrl: "https://swe-marathon-slack-trial-2-production.up.railway.app/api/health",
+          trajectoryUrl: "/trajectories/slack-clone-236.json",
           sourcePath: "swe-marathon-site/.artifacts/slack-clone-236/source",
           launchCommand: "./run-local.sh",
           tokens: "14.2M",
@@ -450,6 +535,20 @@ export const TASK_DETAILS = {
           stages: "1 / 5 correctness gates · 1.0 CUA UX",
           note:
             "Another independently generated Claude Code submission with the same visible UX score but a distinct implementation.",
+          trajectory: [
+            { step: 3, kind: "Bash", text: "List /app contents" },
+            { step: 4, kind: "Bash", text: "Inspect environment" },
+            { step: 5, kind: "Bash", text: "Check installed Python packages" },
+            { step: 7, kind: "Bash", text: "Try installing aiohttp" },
+            { step: 11, kind: "Bash", text: "Create directory structure" },
+            { step: 14, kind: "Write", text: "/app/start.sh" },
+            { step: 16, kind: "TaskCreate", text: "Build supervisor that spawns and restarts 3 HTTP nodes, IRC gateway, and broker, runs in foreground." },
+            { step: 17, kind: "TaskCreate", text: "Shared SQLite-based store: schema, atomic per-channel seq allocation, all CRUD helpers." },
+            { step: 18, kind: "TaskCreate", text: "TCP fan-out broker process: nodes connect, publish events, broker rebroadcasts to other nodes. Nodes also poll DB events table when broker is down." },
+            { step: 19, kind: "TaskCreate", text: "aiohttp REST API + WebSocket on each node implementing all endpoints in spec." },
+            { step: 20, kind: "TaskCreate", text: "IRC gateway on :6667 with PASS/NICK/USER/JOIN/PRIVMSG/PING/QUIT/NAMES/WHO/LIST/TOPIC/MODE and bridging to web." },
+            { step: 21, kind: "TaskCreate", text: "Single-page UI HTML/CSS/JS with all required data-testid hooks, three-pane layout, and full flows." },
+          ],
         },
         {
           id: "slack-clone-234",
@@ -459,6 +558,7 @@ export const TASK_DETAILS = {
           model: "Claude Opus 4.7",
           liveUrl: "https://swe-marathon-slack-trial-3-production.up.railway.app/",
           healthUrl: "https://swe-marathon-slack-trial-3-production.up.railway.app/api/health",
+          trajectoryUrl: "/trajectories/slack-clone-234.json",
           sourcePath: "swe-marathon-site/.artifacts/slack-clone-234/source",
           launchCommand: "./run-local.sh",
           tokens: "9.8M",
@@ -467,6 +567,21 @@ export const TASK_DETAILS = {
           stages: "1 / 5 correctness gates · 1.0 CUA UX",
           note:
             "A lower-token Claude Code run that still produced a CUA-passing browser artifact.",
+          trajectory: [
+            { step: 3, kind: "Bash", text: "List /app directory contents" },
+            { step: 4, kind: "Bash", text: "Check environment" },
+            { step: 5, kind: "Bash", text: "Check installed Python packages" },
+            { step: 9, kind: "Bash", text: "Install aiohttp" },
+            { step: 15, kind: "Bash", text: "Create server directory structure" },
+            { step: 16, kind: "TaskCreate", text: "SQLite schema and core data access functions for users, workspaces, channels, messages, threads, reactions, files, groups, invitations, read state. Support dense per-channel seq." },
+            { step: 17, kind: "TaskCreate", text: "aiohttp app implementing all REST endpoints, WebSocket /api/ws with subscribe/resume, JSON envelopes, stable resource ids, UTC timestamps, all status codes per contract." },
+            { step: 18, kind: "TaskCreate", text: "A killable TCP relay that fans out events between nodes. Each node falls back to DB polling if relay is down so fan-out continues with dense seq within 5s." },
+            { step: 19, kind: "TaskCreate", text: "IRC gateway subset with PASS/NICK/USER, JOIN/PART, PRIVMSG, PING/PONG, QUIT, NAMES, WHO, LIST, TOPIC, MODE, numerics, and bidirectional bridging." },
+            { step: 20, kind: "TaskCreate", text: "Single HTML page with all required testid selectors, three-pane layout, sign-up/login, channel sidebar, message pane, thread panel, emoji picker, settings." },
+            { step: 21, kind: "TaskCreate", text: "Foreground supervisor that launches 3 HTTP nodes, IRC gateway, broadcast relay; respawns within 60s on crash." },
+            { step: 25, kind: "Write", text: "/app/server/schema.sql" },
+            { step: 26, kind: "Write", text: "/app/server/store.py" },
+          ],
         },
       ],
       rubric: [
@@ -518,6 +633,51 @@ export const TASK_DETAILS = {
           "Compiler bugs often hide in interactions between type conversions, lvalues, stack layout, calling conventions, control flow, and preprocessor expansion. The task rewards sustained semantic coverage rather than isolated patches.",
       },
     ],
+    sample: {
+      title: "Prompt, trajectory, and rubric for a near-miss compiler run.",
+      note:
+        "The full agent log is very large, so this panel shows a compact representative task view with the key prompt, environment, trajectory, and verifier outcome.",
+      tabs: [
+        {
+          id: "prompt",
+          label: "Prompt",
+          blocks: [
+            { title: "Primary goal", body: "Implement a C compiler in Rust that accepts targeted C programs and emits x86-64 assembly with correct executable behavior." },
+            { title: "Required pipeline", body: "Preprocessor, lexer, recursive-descent parser, semantic analyzer, IR lowering, and System V AMD64 code generation." },
+            { title: "Output contract", body: "The produced compiler must build in the provided Rust workspace and pass the official compile-and-run verifier corpus." },
+          ],
+        },
+        {
+          id: "world",
+          label: "World",
+          blocks: [
+            { title: "Workspace", body: "Rust project scaffold with visible tests and a hidden compiler-verifier corpus." },
+            { title: "Verifier", body: "Runs hundreds of generated and curated C programs, comparing compile success, process exit, and output behavior." },
+            { title: "Scoring", body: "Binary reward with partial pass-rate exposed for analysis." },
+          ],
+        },
+        {
+          id: "trajectory",
+          label: "Trajectory",
+          steps: [
+            { label: "Implementation", body: "The best run built most of the compiler pipeline and covered nearly all target language features." },
+            { label: "Local progress", body: "The final artifact passed 888 out of 894 official verifier cases." },
+            { label: "Failure mode", body: "Six remaining corner cases kept the binary reward at zero despite a 99.3% partial score." },
+          ],
+        },
+        {
+          id: "rubric",
+          label: "Rubric",
+          rubric: [
+            { criterion: "Compiler builds and runs under the Rust workspace", score: "Yes" },
+            { criterion: "Frontend handles most targeted C syntax and semantic checks", score: "Yes" },
+            { criterion: "Generated x86-64 programs match expected behavior on 888 cases", score: "Yes" },
+            { criterion: "All 894 required verifier cases pass", score: "No" },
+            { criterion: "Binary task reward earned", score: "No" },
+          ],
+        },
+      ],
+    },
     verifier: {
       groups: [
         {
@@ -606,6 +766,50 @@ export const TASK_DETAILS = {
           "The search space is combinatorial and sparse: improving one region of the mapping can damage another, and naive greedy choices get trapped quickly. Successful agents need a robust anytime optimizer and careful output formatting.",
       },
     ],
+    sample: {
+      title: "Prompt, trajectory, and rubric for a successful alignment run.",
+      note:
+        "This task has no browser product; the artifact is the optimizer output. The sample view focuses on the problem instance, search behavior, and threshold rubric.",
+      tabs: [
+        {
+          id: "prompt",
+          label: "Prompt",
+          blocks: [
+            { title: "Primary goal", body: "Find high-quality injective alignments between protein-protein interaction networks." },
+            { title: "Objective", body: "Optimize structural S3 conservation and, for the yeast benchmark, NC agreement with a reference biological alignment." },
+            { title: "Submission", body: "Write solution files in the expected format so the verifier can score each graph pair." },
+          ],
+        },
+        {
+          id: "world",
+          label: "World",
+          blocks: [
+            { title: "Inputs", body: "Two benchmark graph pairs, including DMelanogaster to HSapiens and Yeast2KReduced to SC." },
+            { title: "Constraints", body: "Mappings must be injective and satisfy output-format requirements." },
+            { title: "Budget", body: "Five-hour agent budget for search, tuning, and verification." },
+          ],
+        },
+        {
+          id: "trajectory",
+          label: "Trajectory",
+          steps: [
+            { label: "Search strategy", body: "The successful run produced alignments strong enough to clear all published verifier thresholds." },
+            { label: "Primary graph pair", body: "Observed S3 reached 0.323 against a 0.320 target." },
+            { label: "Yeast graph pair", body: "Observed S3 reached 0.564 and NC reached 0.305, clearing both yeast thresholds." },
+          ],
+        },
+        {
+          id: "rubric",
+          label: "Rubric",
+          rubric: [
+            { criterion: "Primary DMelanogaster → HSapiens S3 >= 0.320", score: "Yes" },
+            { criterion: "Yeast2KReduced → SC S3 >= 0.550", score: "Yes" },
+            { criterion: "Yeast NC agreement >= 0.300", score: "Yes" },
+            { criterion: "All required alignment thresholds met", score: "Yes" },
+          ],
+        },
+      ],
+    },
     verifier: {
       groups: [
         {

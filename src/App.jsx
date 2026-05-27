@@ -722,13 +722,36 @@ function Tasks() {
 function SlackArtifact({ artifacts }) {
   const [activeId, setActiveId] = useState(artifacts.trials[0].id);
   const [loadedFor, setLoadedFor] = useState(null);
+  const [trajectoryRows, setTrajectoryRows] = useState([]);
+  const [trajectoryStatus, setTrajectoryStatus] = useState("loading");
   const active = artifacts.trials.find((t) => t.id === activeId) || artifacts.trials[0];
+
+  useEffect(() => {
+    let cancelled = false;
+    setTrajectoryStatus("loading");
+    setTrajectoryRows([]);
+    fetch(active.trajectoryUrl)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled) {
+          setTrajectoryRows(data.rows || []);
+          setTrajectoryStatus("loaded");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setTrajectoryStatus("error");
+      });
+    return () => { cancelled = true; };
+  }, [active.trajectoryUrl]);
 
   return (
     <div className="artifact-card">
       <div className="artifact-head">
         <div>
-          <div className="artifact-kicker">Real agent trial artifacts</div>
+          <div className="artifact-kicker">Restored agent trial artifacts</div>
           <h3>{artifacts.title}</h3>
         </div>
         <div className={"artifact-status " + (loadedFor === active.id ? "live" : "")}>
@@ -764,6 +787,26 @@ function SlackArtifact({ artifacts }) {
         <div><span>Stages</span><b>{active.stages}</b></div>
       </div>
       <p className="artifact-note">{active.note}</p>
+
+      <div className="artifact-trajectory">
+        <div className="tr-head">Full agent tool trajectory · {active.label}</div>
+        {trajectoryStatus === "loading" && <div className="trajectory-loading">Loading trajectory…</div>}
+        {trajectoryStatus === "error" && <div className="trajectory-loading">Could not load trajectory JSON.</div>}
+        {trajectoryRows.length > 0 && (
+          <div className="trajectory-list">
+            {trajectoryRows.map((row, i) => (
+              <details className="trajectory-row" key={`${active.id}-${row.step}-${row.call}-${row.kind}`}>
+                <summary>
+                  <span>{String(i + 1).padStart(3, "0")} · step {row.step}</span>
+                  <b>{row.kind}</b>
+                  <p>{row.title}</p>
+                </summary>
+                <pre>{row.detail}</pre>
+              </details>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="live-artifact-frame">
         <div className="iframe-toolbar">
@@ -828,6 +871,89 @@ function TaskEvidence({ evidence }) {
   );
 }
 
+function SampleTask({ sample }) {
+  const [activeId, setActiveId] = useState(sample?.tabs?.[0]?.id);
+  const [selectedFilePath, setSelectedFilePath] = useState(null);
+  if (!sample) return null;
+  const active = sample.tabs.find((tab) => tab.id === activeId) || sample.tabs[0];
+  const selectedFile = active.files?.find((file) => file.path === selectedFilePath) || active.files?.[0];
+
+  return (
+    <div className="sample-task">
+      <div className="sample-tabs">
+        {sample.tabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={"sample-tab " + (tab.id === active.id ? "active" : "")}
+            onClick={() => setActiveId(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      {sample.note && <p className="sample-note">{sample.note}</p>}
+
+      <div className="sample-panel">
+        {active.blocks?.map((block) => (
+          <div className="sample-block" key={block.title}>
+            <div className="sample-block-title">{block.title}</div>
+            <p>{block.body}</p>
+          </div>
+        ))}
+
+        {active.files && (
+          <div className="task-files-view">
+            <div className="file-tree">
+              {active.files.map((file) => (
+                <button
+                  type="button"
+                  className={selectedFile?.path === file.path ? "active" : ""}
+                  onClick={() => setSelectedFilePath(file.path)}
+                  key={file.path}
+                >
+                  <span>{file.kind}</span>
+                  <b>{file.path}</b>
+                </button>
+              ))}
+            </div>
+            <div className="file-snippets">
+              {selectedFile && (
+                <div className="file-card">
+                  <div className="file-card-head">
+                    <span>{selectedFile.kind}</span>
+                    <b>{selectedFile.path}</b>
+                  </div>
+                  <p>{selectedFile.description}</p>
+                  {selectedFile.snippet && <pre>{selectedFile.snippet}</pre>}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {active.steps?.map((step, i) => (
+          <div className="trajectory-step" key={`${step.label}-${i}`}>
+            <div className="trajectory-label">{step.label}</div>
+            <div className={step.mono ? "trajectory-body mono" : "trajectory-body"}>{step.body}</div>
+          </div>
+        ))}
+
+        {active.rubric && (
+          <div className="rubric-table">
+            <div className="rubric-head"><span>Criterion</span><span>Score</span></div>
+            {active.rubric.map((row) => (
+              <div className={"rubric-row " + (row.score === "No" || row.score === "Fail" ? "bad" : "good")} key={row.criterion}>
+                <span>{row.criterion}</span>
+                <b>{row.score}</b>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function TaskDetailPage({ taskId }) {
   const detail = TASK_DETAILS[taskId];
   const task = TASKS.find((t) => t.id === taskId);
@@ -880,42 +1006,58 @@ function TaskDetailPage({ taskId }) {
         </div>
       </section>
 
-      <section className="task-page">
-        <div className="container">
-          {detail.sections.map((s) => (
-            <div className="task-detail-section" key={s.title}>
-              <div className="section-no"><span className="dot">●</span>{s.title}</div>
-              <p>{s.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="task-page">
-        <div className="container">
-          <div className="section-head">
-            <div className="section-no"><span className="dot">●</span>Verifier</div>
-            <h2 className="section-title">{detail.verifierTitle}</h2>
-          </div>
-          <div className="verifier-grid">
-            {(detail.verifier.groups || [
-              { title: "Deterministic gates", items: detail.verifier.deterministic },
-              { title: "CUA browser rubric", items: detail.verifier.ux },
-            ]).map((group) => (
-              <div key={group.title}>
-                <h3>{group.title}</h3>
-                {group.items.map((v) => <div className="check-row" key={v}>{v}</div>)}
+      {detail.sections?.length > 0 && (
+        <section className="task-page">
+          <div className="container">
+            {detail.sections.map((s) => (
+              <div className="task-detail-section" key={s.title}>
+                <div className="section-no"><span className="dot">●</span>{s.title}</div>
+                <p>{s.body}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {detail.sample && (
+        <section className="task-page">
+          <div className="container">
+            <div className="section-head">
+              <div className="section-no"><span className="dot">●</span>Task specification</div>
+              <h2 className="section-title">{detail.sample.title}</h2>
+            </div>
+            <SampleTask sample={detail.sample} />
+          </div>
+        </section>
+      )}
+
+      {detail.verifier && (
+        <section className="task-page">
+          <div className="container">
+            <div className="section-head">
+              <div className="section-no"><span className="dot">●</span>Task verifier</div>
+              <h2 className="section-title">{detail.verifierTitle}</h2>
+            </div>
+            <div className="verifier-grid">
+              {(detail.verifier.groups || [
+                { title: "Deterministic gates", items: detail.verifier.deterministic },
+                { title: "CUA browser rubric", items: detail.verifier.ux },
+              ]).map((group) => (
+                <div key={group.title}>
+                  <h3>{group.title}</h3>
+                  {group.items.map((v) => <div className="check-row" key={v}>{v}</div>)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {(detail.artifacts || detail.evidence) && (
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>{detail.artifacts ? "Artifact" : "Result"}</div>
+              <div className="section-no"><span className="dot">●</span>{detail.artifacts ? "Agent trials" : "Result"}</div>
               <h2 className="section-title">{detail.resultTitle}</h2>
             </div>
             {detail.bestTrial && (
