@@ -8,6 +8,7 @@ import {
   LEADERBOARD,
   PIPELINE,
   RH_BY_MODEL,
+  TASK_DETAILS,
   TASKS,
 } from "./data.js";
 
@@ -694,7 +695,7 @@ function Tasks() {
 
         <div className="tasks-grid">
           {TASKS.map((t, i) =>
-          <div className="task" key={t.id}>
+          <a className={"task task-link " + (TASK_DETAILS[t.id] ? "has-detail" : "")} href={`#task/${t.id}`} key={t.id}>
               <div className="task-head">
                 <div className="task-id">T{String(i + 1).padStart(2, "0")} · {CAT_LABEL[t.cat]}</div>
                 <div className="task-budget">{t.humanH}h human · {t.agentH}h agent</div>
@@ -708,13 +709,235 @@ function Tasks() {
                 {t.exploit > 0 && (
                   <div><span className="k">exploit</span><span className="v">{t.exploit.toFixed(1)}% attempts · {t.succ} succ.</span></div>
                 )}
+                <div><span className="k">open</span><span className="v">{TASK_DETAILS[t.id] ? "task page" : "overview"}</span></div>
               </div>
-            </div>
+            </a>
           )}
         </div>
       </div>
     </section>);
 
+}
+
+function SlackArtifact({ artifacts }) {
+  const [activeId, setActiveId] = useState(artifacts.trials[0].id);
+  const [loadedFor, setLoadedFor] = useState(null);
+  const active = artifacts.trials.find((t) => t.id === activeId) || artifacts.trials[0];
+
+  return (
+    <div className="artifact-card">
+      <div className="artifact-head">
+        <div>
+          <div className="artifact-kicker">Real agent trial artifacts</div>
+          <h3>{artifacts.title}</h3>
+        </div>
+        <div className={"artifact-status " + (loadedFor === active.id ? "live" : "")}>
+          {loadedFor === active.id ? "IFRAME LOADED" : "LOCAL SERVICE"}
+        </div>
+      </div>
+      <p className="artifact-intro">{artifacts.intro}</p>
+
+      <div className="artifact-selector">
+        {artifacts.trials.map((trial) => (
+          <button
+            key={trial.id}
+            className={"artifact-option " + (trial.id === active.id ? "active" : "")}
+            onClick={() => {
+              setActiveId(trial.id);
+              setLoadedFor(null);
+            }}
+          >
+            <span>{trial.label}</span>
+            <b>{trial.label}</b>
+            <em>{trial.agent} · {trial.model}</em>
+            <small>{trial.result}</small>
+          </button>
+        ))}
+      </div>
+
+      <div className="selected-artifact-meta">
+        <div><span>Artifact</span><b>{active.label}</b></div>
+        <div><span>Agent</span><b>{active.agent} · {active.model}</b></div>
+        <div><span>Tokens</span><b>{active.tokens}</b></div>
+        <div><span>Cost</span><b>{active.cost}</b></div>
+        <div><span>Partial score</span><b>{active.result}</b></div>
+        <div><span>Stages</span><b>{active.stages}</b></div>
+      </div>
+      <p className="artifact-note">{active.note}</p>
+
+      <div className="live-artifact-frame">
+        <div className="iframe-toolbar">
+          <div>
+            <span>Artifact URL</span>
+            <b>{active.liveUrl}</b>
+          </div>
+          <a className="btn ghost" href={active.liveUrl} target="_blank" rel="noreferrer">Open full app ↗</a>
+        </div>
+        <iframe
+          key={active.id}
+          title={`Interactive Slack clone artifact ${active.trial}`}
+          src={active.liveUrl}
+          onLoad={() => setLoadedFor(active.id)}
+          sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
+        />
+      </div>
+
+    </div>
+  );
+}
+
+function TaskEvidence({ evidence }) {
+  if (!evidence) return null;
+
+  return (
+    <div className="evidence-card">
+      <div className="artifact-head">
+        <div>
+          <div className="artifact-kicker">{evidence.kicker}</div>
+          <h3>{evidence.title}</h3>
+        </div>
+        <div className="artifact-status live">{evidence.status}</div>
+      </div>
+      <p className="artifact-intro">{evidence.intro}</p>
+
+      <div className="selected-artifact-meta">
+        {evidence.stats.map((s) => (
+          <div key={s.label}><span>{s.label}</span><b>{s.value}</b></div>
+        ))}
+      </div>
+
+      {evidence.metrics && (
+        <div className="metric-grid">
+          {evidence.metrics.map((m) => (
+            <div className="metric-card" key={m.label}>
+              <div className="metric-label">{m.label}</div>
+              <div className="metric-value">{m.value}</div>
+              <p>{m.note}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {evidence.notes?.map((note) => (
+        <div className="trace" key={note.head}>
+          <div className="tr-head">{note.head}</div>
+          <div className="tr-quote">{note.body}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TaskDetailPage({ taskId }) {
+  const detail = TASK_DETAILS[taskId];
+  const task = TASKS.find((t) => t.id === taskId);
+
+  if (!task) {
+    return (
+      <section className="task-page">
+        <div className="container">
+          <a className="back-link" href="#tasks">← Back to tasks</a>
+          <h1 className="task-page-title">Task not found.</h1>
+        </div>
+      </section>
+    );
+  }
+
+  if (!detail) {
+    return (
+      <section className="task-page">
+        <div className="container">
+          <a className="back-link" href="#tasks">← Back to tasks</a>
+          <div className="eyebrow">{CAT_LABEL[task.cat]} · {task.id}</div>
+          <h1 className="task-page-title">{task.title}</h1>
+          <p className="task-page-lede">{task.desc}</p>
+          <div className="detail-placeholder">
+            Detailed task page coming next. Slack clone is implemented first with a CUA artifact replay.
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      <section className="task-page hero task-hero">
+        <div className="container">
+          <a className="back-link" href="#tasks">← Back to all tasks</a>
+          <div className="eyebrow">{detail.taskNo} · {detail.kicker}</div>
+          <h1 className="title">{detail.title}</h1>
+          <p className="lede">{detail.summary}</p>
+
+          <div className="task-result-grid">
+            {detail.results.map((r) => (
+              <div className="task-result" key={r.label}>
+                <div className="task-result-value">{r.value}</div>
+                <div className="task-result-label">{r.label}</div>
+                <p>{r.note}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="task-page">
+        <div className="container">
+          {detail.sections.map((s) => (
+            <div className="task-detail-section" key={s.title}>
+              <div className="section-no"><span className="dot">●</span>{s.title}</div>
+              <p>{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="task-page">
+        <div className="container">
+          <div className="section-head">
+            <div className="section-no"><span className="dot">●</span>Verifier</div>
+            <h2 className="section-title">{detail.verifierTitle}</h2>
+          </div>
+          <div className="verifier-grid">
+            {(detail.verifier.groups || [
+              { title: "Deterministic gates", items: detail.verifier.deterministic },
+              { title: "CUA browser rubric", items: detail.verifier.ux },
+            ]).map((group) => (
+              <div key={group.title}>
+                <h3>{group.title}</h3>
+                {group.items.map((v) => <div className="check-row" key={v}>{v}</div>)}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {(detail.artifacts || detail.evidence) && (
+        <section className="task-page">
+          <div className="container">
+            <div className="section-head">
+              <div className="section-no"><span className="dot">●</span>{detail.artifacts ? "Artifact" : "Result"}</div>
+              <h2 className="section-title">{detail.resultTitle}</h2>
+            </div>
+            {detail.bestTrial && (
+              <>
+                <div className="trial-strip">
+                  <div><span>Trial</span><b>{detail.bestTrial.trial}</b></div>
+                  <div><span>Agent</span><b>{detail.bestTrial.agent} · {detail.bestTrial.model}</b></div>
+                  <div><span>Tokens</span><b>{detail.bestTrial.tokens}</b></div>
+                  <div><span>Cost</span><b>{detail.bestTrial.cost}</b></div>
+                  <div><span>Result</span><b>{detail.bestTrial.partialScore} · {detail.bestTrial.reward}</b></div>
+                  <div><span>Stages</span><b>{detail.bestTrial.correctness} · {detail.bestTrial.ux}</b></div>
+                </div>
+                <p className="trial-note">{detail.bestTrial.note}</p>
+              </>
+            )}
+            {detail.artifacts && <SlackArtifact artifacts={detail.artifacts} />}
+            {detail.evidence && <TaskEvidence evidence={detail.evidence} />}
+          </div>
+        </section>
+      )}
+    </>
+  );
 }
 
 function CourseProfileSection() {
@@ -905,8 +1128,7 @@ function Team() {
         <div style={{ maxWidth: 620, color: "var(--ink-2)", fontSize: 16, lineHeight: 1.55 }}>
           The 20 accepted tasks were authored by 11 unique contributors —
           software engineers familiar with the systems each task targets.
-          Author and affiliation list is held back during the double-blind
-          review window and will be added when the paper de-anonymises.
+          Author and affiliation details will be added with the public release.
         </div>
       </div>
     </section>);
@@ -919,7 +1141,7 @@ function Citation() {
   author       = {{SWE-Marathon Authors}},
   year         = {2026},
   howpublished = {\\url{https://github.com/abundant-ai/long-horizon}},
-  note         = {Benchmark and evaluation code; preprint forthcoming.}
+  note         = {Benchmark and evaluation code.}
 }`;
   const [copied, setCopied] = useState(false);
   return (
@@ -930,10 +1152,8 @@ function Citation() {
           <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
         <p style={{ maxWidth: 620, color: "var(--ink-2)", margin: "0 0 18px", fontSize: 15, lineHeight: 1.55 }}>
-          Paper currently in submission; an arXiv preprint will follow shortly.
-          Until then, please cite the benchmark via the entry below — we'll
-          update the title, authors, and a canonical <code>@article</code>
-          entry once the preprint is posted.
+          Please cite the benchmark via the entry below for now. We'll update
+          this section with the canonical paper citation when it is available.
         </p>
         <div className="citation-block">
           <button className="copy-btn" onClick={() => {
@@ -965,7 +1185,7 @@ function Footer() {
             </div>
             <p style={{ maxWidth: 380, color: "var(--ink-2)", fontSize: 13, margin: 0 }}>
               A long-horizon software engineering benchmark. Open-source under
-              MIT. We welcome new tasks, new agents, and new judges.
+              Apache 2.0. We welcome new tasks, new agents, and new judges.
             </p>
           </div>
           <div>
@@ -989,7 +1209,7 @@ function Footer() {
         </div>
         <div className="foot-meta">
           <div>SWE-Marathon · v1.0</div>
-          <div>MIT License</div>
+          <div>Apache 2.0 License</div>
         </div>
       </div>
     </footer>);
@@ -997,6 +1217,24 @@ function Footer() {
 }
 
 function App() {
+  const [hash, setHash] = useState(() => window.location.hash);
+
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  const taskMatch = hash.match(/^#task\/(.+)$/);
+  if (taskMatch) {
+    return (
+      <>
+        <TaskDetailPage taskId={decodeURIComponent(taskMatch[1])} />
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Hero />

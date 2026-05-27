@@ -641,7 +641,8 @@ function TaskDistribution() {
             Family mix on the left; expert-estimate spread on the right.
             Tasks span library reproductions (8), product clones (5), ML
             engineering (5), and algorithmic optimisation (2) — agent budgets
-            of 2–10h against expert estimates of 40–400h.
+            of {HEADLINE.agentBudgetMinH}–{HEADLINE.agentBudgetMaxH}h against
+            expert estimates of {HEADLINE.humanEstMinH}–{HEADLINE.humanEstMaxH}h.
           </p>
         </div>
       </div>

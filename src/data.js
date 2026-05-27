@@ -250,35 +250,35 @@ export const TASKS = [
     title: "Excel-style spreadsheet (Tabula)",
     desc: "Build a persistent Excel-style spreadsheet with efficient formula recomputation, modern dynamic arrays, broad function coverage, copy/fill/sort/filter workflows, CSV and OOXML import/export, browser editing, real-time collaboration, analyst features, locale support, data validation, iterative calculation, and Goal Seek.",
     verifier: "pytest API/engine/OOXML/collab/perf gates + Playwright UI checks",
-    humanH: 380, agentH: 8,
+    humanH: 380, agentH: 4,
     pass1: 0.0, exploit: 0.0, succ: 0 },
 
   { id: "mastodon-clone", cat: "clone",
     title: "Mastodon-compatible service (Chirp)",
     desc: "Build a self-hosted Mastodon-compatible service with REST API support, server-rendered social UI, OAuth and session authentication, timelines, follows, boosts, favourites, notifications, search, media, polls, lists, admin surfaces, pagination, scopes, idempotency, and strict browser security.",
     verifier: "19 correctness pytest gates + CUA browser realism/UX rubric",
-    humanH: 75, agentH: 10,
+    humanH: 75, agentH: 3,
     pass1: 0.0, exploit: 0.0, succ: 0 },
 
   { id: "s3-clone", cat: "clone",
     title: "S3-compatible object storage (Halyard)",
     desc: "Build a durable multi-tenant S3-compatible object store for standard SDK clients, including signature authentication, bucket and object operations, multipart upload, presigned URLs, copy, versioning, tagging, multi-delete, CORS, lifecycle rules, bucket policies, notifications, quotas, administration, audit logging, and a web console.",
     verifier: "SDK data-plane, admin, audit, load, and browser console UX tests",
-    humanH: 60, agentH: 8,
+    humanH: 60, agentH: 4,
     pass1: 0.0, exploit: 0.0, succ: 0 },
 
   { id: "slack-clone", cat: "clone",
     title: "Slack-style chat cluster",
     desc: "Build a Slack-like team chat cluster with a browser app, REST and realtime APIs, IRC bridging, workspaces, channels, DMs, messages, threads, reactions, files, search, slash commands, mentions, read state, user groups, invitations, roles, durable event ordering, replay, and failure recovery.",
     verifier: "HTTP/WebSocket/IRC/resilience tests + CUA browser UI rubric",
-    humanH: 60, agentH: 8,
+    humanH: 60, agentH: 3,
     pass1: 0.0, exploit: 0.0, succ: 0 },
 
   { id: "stripe-clone", cat: "clone",
     title: "Stripe-compatible payments API",
     desc: "Build an offline Stripe-compatible payments API for the standard SDK, covering customers, payment methods, payment intents, charges, refunds, products, prices, subscriptions, invoices, events, webhook endpoints, restricted keys, Stripe-shaped errors, idempotency, webhook delivery, and recurring billing behavior.",
     verifier: "Stripe SDK wire-compatibility tests",
-    humanH: 50, agentH: 8,
+    humanH: 50, agentH: 4,
     pass1: 0.0, exploit: 0.0, succ: 0 },
 
   // ML engineering (5)
@@ -309,7 +309,7 @@ export const TASKS = [
     title: "AlphaFold-3 TriMul Triton kernel",
     desc: "Implement and optimize the AlphaFold-3 outgoing Triangle Multiplicative Update as a Triton kernel, preserving the full mathematical operation while meeting strict correctness and H100 latency targets.",
     verifier: "correctness across supported inputs + max median ≤10,400 µs on 10 H100 cases",
-    humanH: 40, agentH: 4,
+    humanH: 40, agentH: 7,
     pass1: 0.0, exploit: 9.1, succ: 0,
     fails: { PT: 2, IF: 30, RH: 12, PSV: 2, TO: 4 } },
 
@@ -317,7 +317,7 @@ export const TASKS = [
     title: "Train compact GPT in ≤32 MB checkpoint",
     desc: "Train the best compact WikiText language model possible under a 32 MB compressed-checkpoint cap, balancing model quality, quantization, and loadability while preserving a real autoregressive language-model interface.",
     verifier: "32 MB checkpoint cap + held-out WikiText val_bpb < 0.983",
-    humanH: 50, agentH: 6,
+    humanH: 50, agentH: 5,
     pass1: 77.8, exploit: 1.9, succ: 1,
     fails: { PT: 3, IF: 2,  RH: 0,  PSV: 1, TO: 0 } },
 
@@ -338,6 +338,325 @@ export const TASKS = [
     pass1: 0.0, exploit: 9.1, succ: 0,
     fails: { PT: 8, IF: 33, RH: 5,  PSV: 0, TO: 12 } },
 ];
+
+/* ---------------- Task detail pages ----------------
+   Start with slack-clone: a task-specific page inspired by FrontierSWE task
+   writeups, plus one compact artifact from the strongest CUA-verified trial. */
+export const TASK_DETAILS = {
+  "slack-clone": {
+    taskNo: "T12",
+    slug: "slack-clone",
+    title: "Slack-style chat cluster",
+    kicker: "Product clone · CUA verified",
+    summary:
+      "Agents must build a Slack-like team chat system that works both as a backend service cluster and as a realistic browser application. The task is scored by deterministic protocol tests and a black-box computer-use verifier that drives the final UI like a real user.",
+    results: [
+      { label: "Agent pass@1", value: "0.0%", note: "0 / 55 canonical agent trials passed the full binary verifier" },
+      { label: "Best partial", value: "0.60", note: "best agent trial: 0.2 correctness partial + 1.0 UX partial" },
+      { label: "Oracle", value: "5 / 5", note: "held-out reference solution passes" },
+      { label: "NOP", value: "0 / 5", note: "empty baseline fails" },
+    ],
+    sections: [
+      {
+        title: "Background",
+        body:
+          "Slack clone is deliberately broader than a chat toy. A passing solution needs durable ordering, multi-workspace identity, channel and DM semantics, reactions, threads, search, files, realtime updates, IRC bridging, and recovery behavior that still holds under failure-oriented verifier cases.",
+      },
+      {
+        title: "Task",
+        body:
+          "The build agent starts from a Dockerized scaffold and must ship a working chat cluster. The browser app is part of the assignment, not a demo skin: sign-up/sign-in, workspace and channel navigation, persistent messages, edit/delete flows, threaded replies, reactions, validation feedback, and Slack-like information architecture are all inspected.",
+      },
+      {
+        title: "Evaluation",
+        body:
+          "The final score combines correctness gates for HTTP, WebSocket, IRC, persistence, ordering, replay, and resilience with a CUA verifier for UI/UX. For visibility the logs expose partial scores, but binary task success still requires the full verifier to pass.",
+      },
+      {
+        title: "Environment",
+        body:
+          "Runs are executed in Modal sandboxes through Harbor with a 3-hour agent budget. The submitted container state is started, exercised by deterministic tests, then driven in a browser by the CUA verifier.",
+      },
+    ],
+    verifier: {
+      deterministic: [
+        "HTTP API and auth behavior",
+        "WebSocket realtime delivery",
+        "IRC bridge compatibility",
+        "Persistence, replay, ordering, and recovery",
+        "Cross-stage integrity checks",
+      ],
+      ux: [
+        "Validated sign-up and sign-in",
+        "Channel creation and switching",
+        "Message post/edit/delete with reload persistence",
+        "Thread panel and reply count behavior",
+        "Emoji picker reactions",
+        "Slack-like layout, hover states, and empty states",
+      ],
+    },
+    verifierTitle: "Two surfaces: protocol correctness and browser realism.",
+    bestTrial: {
+      trial: "slack-clone-217",
+      agent: "Claude Code",
+      model: "Claude Opus 4.7",
+      startedAt: "2026-05-19 00:57 UTC",
+      duration: "45m 19s end-to-end",
+      tokens: "14.7M",
+      cost: "$12.56",
+      reward: "0.0 binary",
+      partialScore: "0.60 partial",
+      correctness: "1 / 5 correctness gates",
+      ux: "1.0 CUA UX reward",
+      note:
+        "This was the strongest artifact class: full UX pass from the CUA verifier, but only one deterministic correctness gate passed, so it remains a failed trial under binary scoring.",
+    },
+    resultTitle: "The best agent artifact passes the UI judge, but not the whole task.",
+    artifacts: {
+      title: "Live artifacts: compare real agent submissions",
+      intro:
+        "Each card below is a restored submission from an actual agent trial, not a mockup. Pick a trial to load that submitted app in the iframe and judge the product yourself.",
+      trials: [
+        {
+          id: "slack-clone-217",
+          label: "Agent trial 1",
+          trial: "slack-clone-217",
+          agent: "Claude Code",
+          model: "Claude Opus 4.7",
+          liveUrl: "http://127.0.0.1:8000/",
+          healthUrl: "http://127.0.0.1:8000/api/health",
+          sourcePath: "swe-marathon-site/.artifacts/slack-clone-217/source",
+          launchCommand: "./run-local.sh",
+          tokens: "14.7M",
+          cost: "$12.56",
+          result: "0.60 partial",
+          stages: "1 / 5 correctness gates · 1.0 CUA UX",
+          note:
+            "Full CUA UI pass from a Claude Code run, but only one deterministic correctness gate passed.",
+        },
+        {
+          id: "slack-clone-236",
+          label: "Agent trial 2",
+          trial: "slack-clone-236",
+          agent: "Claude Code",
+          model: "Claude Opus 4.7",
+          liveUrl: "http://127.0.0.1:8010/",
+          healthUrl: "http://127.0.0.1:8010/api/health",
+          sourcePath: "swe-marathon-site/.artifacts/slack-clone-236/source",
+          launchCommand: "./run-local.sh",
+          tokens: "14.2M",
+          cost: "$11.20",
+          result: "0.60 partial",
+          stages: "1 / 5 correctness gates · 1.0 CUA UX",
+          note:
+            "Another independently generated Claude Code submission with the same visible UX score but a distinct implementation.",
+        },
+        {
+          id: "slack-clone-234",
+          label: "Agent trial 3",
+          trial: "slack-clone-234",
+          agent: "Claude Code",
+          model: "Claude Opus 4.7",
+          liveUrl: "http://127.0.0.1:8020/",
+          healthUrl: "http://127.0.0.1:8020/api/health",
+          sourcePath: "swe-marathon-site/.artifacts/slack-clone-234/source",
+          launchCommand: "./run-local.sh",
+          tokens: "9.8M",
+          cost: "$9.71",
+          result: "0.60 partial",
+          stages: "1 / 5 correctness gates · 1.0 CUA UX",
+          note:
+            "A lower-token Claude Code run that still produced a CUA-passing browser artifact.",
+        },
+      ],
+      rubric: [
+        { id: "auth", label: "Auth", score: "PASS" },
+        { id: "channels", label: "Channels", score: "PASS" },
+        { id: "messaging", label: "Messaging", score: "PASS" },
+        { id: "threads", label: "Threads", score: "PASS" },
+        { id: "reactions", label: "Reactions", score: "PASS" },
+        { id: "validation", label: "Validation", score: "PASS" },
+        { id: "polish", label: "Polish", score: "PASS" },
+        { id: "realism", label: "Slack realism", score: "PASS" },
+        { id: "layout", label: "Layout", score: "PASS" },
+      ],
+    },
+  },
+
+  "rust-c-compiler": {
+    taskNo: "T05",
+    slug: "rust-c-compiler",
+    title: "C compiler from scratch in Rust",
+    kicker: "Library / repro · compiler toolchain",
+    summary:
+      "Agents must implement a multi-pass C compiler in Rust: preprocessing, lexing, parsing, semantic analysis, IR lowering, and x86-64 System V code generation. The verifier compiles and runs a broad C test corpus, so near-misses still fail under binary scoring.",
+    results: [
+      { label: "Agent pass@1", value: "0.0%", note: "0 / 55 canonical agent trials passed the binary verifier" },
+      { label: "Best partial", value: "99.3%", note: "best agent trial passed 888 / 894 verifier cases" },
+      { label: "Oracle", value: "1 / 1", note: "held-out reference solution passes" },
+      { label: "NOP", value: "0 / 1", note: "empty baseline fails" },
+    ],
+    sections: [
+      {
+        title: "Background",
+        body:
+          "This task asks for a real compiler rather than a parser exercise. A passing solution needs to preserve C semantics through a complete frontend and produce runnable x86-64 assembly that agrees with gcc across targeted language features.",
+      },
+      {
+        title: "Task",
+        body:
+          "The agent starts from a Rust workspace and must build a C99-ish compiler pipeline: preprocessor, lexer, recursive-descent parser, semantic checks, IR lowering, and code generation following the System V AMD64 ABI.",
+      },
+      {
+        title: "Evaluation",
+        body:
+          "The verifier runs hundreds of compile-and-execute tests drawn from c-testsuite, WACC-style programs, and gcc-torture cases. Scoring is binary: one unsupported language corner can zero the task even when the visible pass rate is very high.",
+      },
+      {
+        title: "Why It Is Hard",
+        body:
+          "Compiler bugs often hide in interactions between type conversions, lvalues, stack layout, calling conventions, control flow, and preprocessor expansion. The task rewards sustained semantic coverage rather than isolated patches.",
+      },
+    ],
+    verifier: {
+      groups: [
+        {
+          title: "Compiler coverage",
+          items: [
+            "Preprocessor, lexer, parser, and semantic analyzer",
+            "Integer and pointer operations, casts, arrays, structs, and control flow",
+            "Function calls and System V AMD64 ABI behavior",
+            "Assembly generation and executable behavior",
+          ],
+        },
+        {
+          title: "Scoring surface",
+          items: [
+            "894 new verifier cases in the best-trial metrics",
+            "Binary reward despite partial pass-rate reporting",
+            "Differential-style checks against expected C behavior",
+            "Regression/canary coverage to catch shortcut outputs",
+          ],
+        },
+      ],
+    },
+    verifierTitle: "Compiler correctness is measured by executable behavior, not surface coverage.",
+    resultTitle: "The best agent got extremely close, but binary scoring still failed it.",
+    evidence: {
+      kicker: "Best observed agent result",
+      title: "888 / 894 compiler tests passed",
+      status: "0.993 partial",
+      intro:
+        "The strongest agent run was a Codex / GPT-5.5 trial that passed nearly the entire compiler suite, but missed six verifier cases. Because this task is binary-scored, the final reward remained zero.",
+      stats: [
+        { label: "Agent", value: "Codex · GPT-5.5" },
+        { label: "Tokens", value: "0.81M" },
+        { label: "Cost", value: "$1.70" },
+        { label: "Reward", value: "0.0 binary" },
+        { label: "Partial", value: "0.993" },
+        { label: "Verifier cases", value: "888 / 894" },
+      ],
+      metrics: [
+        { label: "New tests", value: "888 / 894", note: "Best trial pass count from verifier metrics." },
+        { label: "Pass rate", value: "99.3%", note: "Partial score is exposed for visibility only." },
+        { label: "Binary reward", value: "0.0", note: "Any remaining failing required case zeros the task." },
+      ],
+      notes: [
+        {
+          head: "Takeaway",
+          body:
+            "Rust C compiler illustrates how long-horizon tasks can look almost solved by partial metrics while still missing correctness requirements that matter under full benchmark scoring.",
+        },
+      ],
+    },
+  },
+
+  "find-network-alignments": {
+    taskNo: "T19",
+    slug: "find-network-alignments",
+    title: "Network-alignment SA solver",
+    kicker: "Algorithmic / optimization",
+    summary:
+      "Agents must produce high-quality injective alignments between protein-protein interaction networks. The task rewards search strategy, objective engineering, and practical optimization rather than API or UI completeness.",
+    results: [
+      { label: "Agent pass@1", value: "5.5%", note: "mean pass@1 across canonical agent configurations" },
+      { label: "Best partial", value: "1.00", note: "multiple agent trials met all alignment thresholds" },
+      { label: "Objective", value: "S3 + NC", note: "structural conservation and biological reference agreement" },
+      { label: "Budget", value: "5h", note: "agent wall-clock budget" },
+    ],
+    sections: [
+      {
+        title: "Background",
+        body:
+          "Network alignment asks for an injective mapping between two biological graphs that preserves as much interaction structure as possible. Good solutions need to balance local edge conservation with global assignment constraints.",
+      },
+      {
+        title: "Task",
+        body:
+          "The agent must write an optimizer that searches alignments for two benchmark pairs, including a yeast pair with a reference biological alignment. Simulated annealing, local search, restarts, and scoring heuristics are all viable strategies.",
+      },
+      {
+        title: "Evaluation",
+        body:
+          "The verifier computes structural S3 scores for aligned graph edges and, for the yeast benchmark, an NC score against the reference alignment. A submission passes only when every required threshold is met.",
+      },
+      {
+        title: "Why It Is Hard",
+        body:
+          "The search space is combinatorial and sparse: improving one region of the mapping can damage another, and naive greedy choices get trapped quickly. Successful agents need a robust anytime optimizer and careful output formatting.",
+      },
+    ],
+    verifier: {
+      groups: [
+        {
+          title: "Primary alignment",
+          items: [
+            "D. melanogaster to H. sapiens graph alignment",
+            "Injective node mapping",
+            "S3 structural-conservation threshold",
+          ],
+        },
+        {
+          title: "Yeast alignment",
+          items: [
+            "Yeast2KReduced to SC graph alignment",
+            "S3 structural-conservation threshold",
+            "NC agreement threshold against reference biology",
+          ],
+        },
+      ],
+    },
+    verifierTitle: "Verifier thresholds measure structural conservation and biological agreement.",
+    resultTitle: "Unlike most tasks, this one has successful agent submissions.",
+    evidence: {
+      kicker: "Best observed agent result",
+      title: "All alignment thresholds met",
+      status: "1.00 partial",
+      intro:
+        "The best displayed agent result is a Terminus 2 / Gemini 3.1 Pro trial that cleared both the primary Drosophila-human S3 threshold and the yeast S3/NC thresholds.",
+      stats: [
+        { label: "Agent", value: "Terminus 2 · Gemini 3.1 Pro" },
+        { label: "Tokens", value: "6.7M" },
+        { label: "Cost", value: "$3.68" },
+        { label: "Reward", value: "1.0" },
+        { label: "Partial", value: "1.00" },
+        { label: "Verifier", value: "2 / 2 alignments" },
+      ],
+      metrics: [
+        { label: "Primary S3", value: "0.323", note: "Target: 0.320 on DMelanogaster → HSapiens." },
+        { label: "Yeast S3", value: "0.564", note: "Target: 0.550 on Yeast2KReduced → SC." },
+        { label: "Yeast NC", value: "0.305", note: "Target: 0.300 agreement with reference alignment." },
+      ],
+      notes: [
+        {
+          head: "Takeaway",
+          body:
+            "This page should feel different from the compiler page: the task is still long-horizon, but a strong heuristic optimizer can produce a measurable artifact that clears the hidden thresholds.",
+        },
+      ],
+    },
+  },
+};
 
 /* ---------------- Per-model reward-hacking incidence (paper Table 9) ---------------- */
 export const RH_BY_MODEL = [
