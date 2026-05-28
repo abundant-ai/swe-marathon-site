@@ -788,8 +788,11 @@ function SlackArtifact({ artifacts }) {
       </div>
       <p className="artifact-note">{active.note}</p>
 
-      <div className="artifact-trajectory">
-        <div className="tr-head">Full agent tool trajectory · {active.label}</div>
+      <details className="artifact-trajectory">
+        <summary className="artifact-trajectory-summary">
+          <span>Full agent tool trajectory · {active.label}</span>
+          <b>{trajectoryRows.length || "…" } tool calls</b>
+        </summary>
         {trajectoryStatus === "loading" && <div className="trajectory-loading">Loading trajectory…</div>}
         {trajectoryStatus === "error" && <div className="trajectory-loading">Could not load trajectory JSON.</div>}
         {trajectoryRows.length > 0 && (
@@ -806,7 +809,7 @@ function SlackArtifact({ artifacts }) {
             ))}
           </div>
         )}
-      </div>
+      </details>
 
       <div className="live-artifact-frame">
         <div className="iframe-toolbar">
@@ -871,12 +874,52 @@ function TaskEvidence({ evidence }) {
   );
 }
 
+function TaskLeaderboard({ leaderboard }) {
+  if (!leaderboard) return null;
+  const maxPartial = Math.max(...leaderboard.rows.map((r) => r.partial || 0), 0.001);
+
+  return (
+    <div className="task-lb-card">
+      <p className="task-lb-note">{leaderboard.note}</p>
+      <div className="task-lb-list">
+        {leaderboard.rows.map((row) => (
+          <div className={"task-lb-row " + (row.rank === 1 ? "top" : "")} key={`${row.rank}-${row.agent}-${row.model}`}>
+            <div className="task-lb-main">
+              <span className="rank-badge">{row.rank}</span>
+              <div>
+                <div className="task-lb-name">{row.model}</div>
+                <div className="task-lb-agent">{row.agent} · n={row.n}</div>
+              </div>
+              <div className="task-lb-score">{row.partial.toFixed(3)}</div>
+            </div>
+            <div className="task-lb-bar-track">
+              <div className="task-lb-bar" style={{ width: `${(row.partial / maxPartial) * 100}%` }} />
+            </div>
+            <div className="task-lb-metrics">
+              <span><b>Binary</b> {row.binary}</span>
+              <span><b>Best</b> {row.best.toFixed(3)}</span>
+              <span><b>Correct</b> {row.correctness.toFixed(3)}</span>
+              <span><b>UX</b> {row.ux.toFixed(3)}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SampleTask({ sample }) {
   const [activeId, setActiveId] = useState(sample?.tabs?.[0]?.id);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
   if (!sample) return null;
   const active = sample.tabs.find((tab) => tab.id === activeId) || sample.tabs[0];
   const selectedFile = active.files?.find((file) => file.path === selectedFilePath) || active.files?.[0];
+  const renderMarkdownish = (text) => String(text).split("\n").map((line, i) => {
+    if (line.startsWith("## ")) return <h4 key={i}>{line.slice(3)}</h4>;
+    if (line.startsWith("- ")) return <li key={i}>{line.slice(2)}</li>;
+    if (line.trim() === "") return <br key={i} />;
+    return <p key={i}>{line}</p>;
+  });
 
   return (
     <div className="sample-task">
@@ -897,7 +940,7 @@ function SampleTask({ sample }) {
         {active.blocks?.map((block) => (
           <div className="sample-block" key={block.title}>
             <div className="sample-block-title">{block.title}</div>
-            <p>{block.body}</p>
+            <div className="sample-markdown">{renderMarkdownish(block.body)}</div>
           </div>
         ))}
 
@@ -928,6 +971,22 @@ function SampleTask({ sample }) {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {active.groups && (
+          <div className="verifier-groups">
+            {active.groups.map((group) => (
+              <div className="verifier-group" key={group.title}>
+                <h4>{group.title}</h4>
+                {group.intro && <p>{group.intro}</p>}
+                <div className="verifier-group-rows">
+                  {group.rows.map((row) => (
+                    <div className="verifier-group-row" key={row}>{row}</div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -1049,6 +1108,18 @@ function TaskDetailPage({ taskId }) {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {detail.leaderboard && (
+        <section className="task-page">
+          <div className="container">
+            <div className="section-head">
+              <div className="section-no"><span className="dot">●</span>Leaderboard</div>
+              <h2 className="section-title">{detail.leaderboard.title}</h2>
+            </div>
+            <TaskLeaderboard leaderboard={detail.leaderboard} />
           </div>
         </section>
       )}

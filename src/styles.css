@@ -605,12 +605,29 @@
     letter-spacing: 0.1em;
     margin-bottom: 8px;
   }
-  .sample-block p {
+  .sample-markdown p {
     margin: 0;
     max-width: 760px;
     color: var(--ink);
     font-size: 15px;
     line-height: 1.55;
+  }
+  .sample-markdown h4 {
+    margin: 18px 0 8px;
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.1;
+    font-weight: 400;
+  }
+  .sample-markdown h4:first-child {
+    margin-top: 0;
+  }
+  .sample-markdown li {
+    margin: 4px 0 4px 18px;
+    max-width: 760px;
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.5;
   }
   .task-files-view {
     display: grid;
@@ -696,6 +713,50 @@
     line-height: 1.45;
     white-space: pre-wrap;
     overflow-x: auto;
+  }
+  .verifier-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+  .verifier-group {
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 22px 24px;
+    background: var(--bg);
+  }
+  .verifier-group h4 {
+    margin: 0 0 10px;
+    font-family: var(--serif);
+    font-size: 28px;
+    line-height: 1.1;
+    font-weight: 400;
+  }
+  .verifier-group > p {
+    margin: 0 0 16px;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  .verifier-group-rows {
+    display: flex;
+    flex-direction: column;
+  }
+  .verifier-group-row {
+    border-top: 1px solid var(--rule-2);
+    padding: 9px 0 9px 22px;
+    color: var(--ink-2);
+    font-size: 13px;
+    line-height: 1.45;
+    position: relative;
+  }
+  .verifier-group-row::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--pos);
+    font-family: var(--mono);
   }
   .trajectory-step {
     padding: 18px 26px;
@@ -918,6 +979,39 @@
     padding: 14px 16px 16px;
     margin: 16px 0;
   }
+  .artifact-trajectory-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    cursor: pointer;
+    list-style: none;
+  }
+  .artifact-trajectory-summary::-webkit-details-marker { display: none; }
+  .artifact-trajectory-summary span {
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .artifact-trajectory-summary span::before {
+    content: "+";
+    color: var(--accent);
+    margin-right: 8px;
+  }
+  .artifact-trajectory[open] .artifact-trajectory-summary span::before {
+    content: "−";
+  }
+  .artifact-trajectory-summary b {
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
   .trajectory-list {
     display: grid;
     grid-template-columns: 1fr;
@@ -1021,6 +1115,83 @@
     color: var(--ink-2);
     font-size: 12px;
     line-height: 1.45;
+  }
+  .task-lb-card {
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    padding: 16px 18px 18px;
+  }
+  .task-lb-note {
+    max-width: 720px;
+    margin: 0 0 16px;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  .task-lb-list { display: flex; flex-direction: column; gap: 6px; }
+  .task-lb-row {
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    padding: 9px 12px;
+  }
+  .task-lb-row.top {
+    background: linear-gradient(90deg, rgba(181,102,54,0.08), transparent 70%), var(--accent-bg);
+  }
+  .task-lb-main {
+    display: grid;
+    grid-template-columns: 26px minmax(180px, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+  }
+  .task-lb-name {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .task-lb-agent {
+    margin-top: 2px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .task-lb-score {
+    font-family: var(--serif);
+    font-size: 24px;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .task-lb-bar-track {
+    height: 5px;
+    background: var(--rule-2);
+    margin: 7px 0 7px 36px;
+    overflow: hidden;
+  }
+  .task-lb-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), oklch(0.72 0.14 75));
+  }
+  .task-lb-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-left: 36px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-2);
+  }
+  .task-lb-metrics span {
+    padding: 0;
+    background: transparent;
+  }
+  .task-lb-metrics b {
+    display: inline;
+    color: var(--ink-3);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 4px;
   }
   .live-artifact-frame {
     border: 1px solid var(--rule);
@@ -1570,9 +1741,11 @@
     .tasks-grid { grid-template-columns: 1fr; }
     .sample-tabs { display: flex; flex-wrap: wrap; }
     .task-files-view { grid-template-columns: 1fr; }
+    .verifier-groups { grid-template-columns: 1fr; }
     .file-tree { border-right: none; border-bottom: 1px solid var(--rule); }
     .rubric-head, .rubric-row { grid-template-columns: 1fr 64px; }
     .trajectory-row summary { grid-template-columns: 1fr; gap: 4px; }
+    .task-lb-metrics { grid-template-columns: 1fr 1fr; }
     .artifact-selector, .selected-artifact-meta, .metric-grid { grid-template-columns: 1fr; }
     .pipeline { grid-template-columns: 1fr; }
     .pipe-step::after { display: none; }

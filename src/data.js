@@ -363,109 +363,68 @@ export const TASK_DETAILS = {
           label: "Prompt",
           blocks: [
             {
-              title: "Verbatim prompt excerpt · launch contract",
+              title: "Full task prompt",
               body:
-                "Build a Slack-like team chat system at /app. The verifier launches /app/start.sh and expects three HTTP nodes, an IRC gateway, and a browser UI served from GET /.",
-            },
-            {
-              title: "Verbatim prompt excerpt · product surface",
-              body:
-                "Registration/login, profiles, workspaces, invitations, roles, channels, DMs, messages, threads, reactions, pins, files, search, slash commands, mentions, read state, settings, and a single-page UI.",
-            },
-            {
-              title: "Verbatim prompt excerpt · resilience",
-              body:
-                "Durable channel events from any HTTP node or IRC must share dense per-channel sequence numbers, replay correctly after reconnect, and continue through node or broadcast-component failure.",
-            },
-          ],
-        },
-        {
-          id: "files",
-          label: "Task files",
-          files: [
-            {
-              kind: "prompt",
-              path: "instruction.md",
-              description: "The task prompt given to agents. This is the source of the Prompt tab excerpts.",
-              snippet:
-                "Build a Slack-like team chat system at `/app`. The verifier launches the service by executing `/app/start.sh`; that command must stay in the foreground and the system must keep serving while it is alive.",
-            },
-            {
-              kind: "config",
-              path: "task.toml",
-              description: "Task metadata, verifier declarations, resource limits, CUA settings, and scoring configuration.",
-              snippet:
-                "[[verifiers]]\nname = \"correctness\"\ntype = \"shell\"\nweight = 0.5\nrequired = true\n\n[[verifiers]]\nname = \"ux\"\ntype = \"cua\"\nweight = 0.5\nrequired = true",
-            },
-            {
-              kind: "environment",
-              path: "environment/Dockerfile",
-              description: "Builds the container image used for agents and verifiers, including Python, SQLite, Redis, Chromium, and desktop tooling.",
-              snippet:
-                "FROM ubuntu:24.04\nENV VIRTUAL_ENV=/opt/venv \\\n    PATH=\"/opt/venv/bin:...\"\nRUN apt-get update && apt-get install -y ... redis-server ... xvfb",
-            },
-            {
-              kind: "verifier",
-              path: "tests/test.sh",
-              description: "Correctness-stage verifier entrypoint. It starts the agent submission and runs API, cluster, crash, IRC, chaos, and frontend gates.",
-              snippet:
-                "# Gate 1: API pytest suite\n# Gate 1b: Crash tolerance\n# Gate 1c: IRC bridge\n# Gate 1d: Pub/sub chaos\n# Gate 2: Frontend structure + Playwright E2E",
-            },
-            {
-              kind: "rubric",
-              path: "tests/rubric.json",
-              description: "CUA verifier rubric for browser UX and Slack realism.",
-              snippet:
-                "\"auth\": sign up + sign in is a complete, validated flow\n\"channels\": channel listing, creation, and switching\n\"messaging\": post + edit + delete + persistence\n\"threads\": real thread panel",
-            },
-            {
-              kind: "tests",
-              path: "tests/test_api.py",
-              description: "Core REST API behavior: auth, workspaces, channels, messages, reactions, search, and error handling.",
-            },
-            {
-              kind: "tests",
-              path: "tests/test_cluster.py",
-              description: "Cross-node behavior and realtime fan-out across the three HTTP nodes.",
-            },
-            {
-              kind: "tests",
-              path: "tests/test_crash.py",
-              description: "Crash tolerance: one HTTP node can be killed while the others continue serving and the supervisor respawns it.",
-            },
-            {
-              kind: "tests",
-              path: "tests/test_irc.py",
-              description: "IRC gateway behavior and bidirectional bridging between IRC and web messages.",
-            },
-            {
-              kind: "tests",
-              path: "tests/test_chaos.py",
-              description: "Pub/sub outage handling: cross-node propagation must survive redis/broadcast failure via SQLite fallback.",
-            },
-            {
-              kind: "oracle",
-              path: "solution/",
-              description: "Held-out reference implementation used to validate that the task is solvable.",
+                "Build a Slack-like team chat system at `/app`.\n\n## Launch contract\n\n- The verifier launches the service by executing `/app/start.sh`.\n- `start.sh` must stay in the foreground and keep serving while alive.\n- Expose HTTP nodes on `127.0.0.1:8000`, `:8001`, and `:8002`.\n- Expose an IRC gateway on `:6667`.\n- Serve the browser UI from `GET /`.\n- The service must be self-contained: no remote services, no Docker-in-Docker.\n\n## Product surface\n\nThe product covers registration/login, profiles, workspaces, invitations, roles, public/private channels, DMs, messages, threads, reactions, pins, files, search, user groups, slash commands, mentions, read state, workspace/channel settings, and a single-page UI that supports the same flows.\n\nThe HTTP API uses REST + bearer-token auth, JSON resource envelopes, stable resource ids, and UTC timestamps. The UI must be drivable by automated browsers through stable semantic elements and form names.\n\n## UI expectations\n\nThe UI is graded by a Computer-Use agent driving Chromium against the SPA at 1280x900. It checks, end-to-end in the browser:\n\n- Sign-up form surfaces visible errors and auto-logs in on success.\n- Logout/login with the same credentials restores the same workspace.\n- Channel listing, creation, switching, and duplicate-name validation work.\n- Messages can be posted, edited, deleted, and survive hard reload.\n- Threads open in a dedicated right-side panel and update reply counts.\n- Reactions use an emoji picker grid, not a `prompt()` dialog.\n- Empty-message validation prevents blank posts.\n- The app has a three-pane Slack-like layout with sidebar, channel header, message rows, and composer.\n\n## Cluster and protocol requirements\n\nDurable channel events from any HTTP node or the IRC gateway must share a dense per-channel sequence, replay correctly after reconnecting to a different node, and fan out across the cluster.\n\nKilling one HTTP node must not stop reads, writes, WebSocket delivery, replay, or IRC bridging on the other two. Killing the local cross-node-broadcast component must not stop cross-node event fan-out either — writes must still propagate, with `seq` still dense, within five seconds of the outage.\n\nThe IRC gateway supports token login, nick registration, join/names, ping, privmsg, quit, required numeric replies, and bidirectional bridging with web messages.",
             },
           ],
         },
         {
           id: "rubric",
-          label: "Rubric",
-          rubric: [
-            { criterion: "Auth: sign-up rejects invalid input, valid account auto-logs in, logout/login restores the same workspace", score: "Required" },
-            { criterion: "Channels: #general is visible, a new channel can be created, duplicate names validate, switching updates the pane", score: "Required" },
-            { criterion: "Messaging: messages post with author/timestamp, persist across reload, edit with indicator, and delete cleanly", score: "Required" },
-            { criterion: "Threads and reactions: dedicated thread panel, reply count, emoji picker, persistent reaction badges", score: "Required" },
-            { criterion: "Backend cluster: HTTP/WebSocket/IRC APIs, durable dense event ordering, replay, and failure recovery", score: "Required" },
-            { criterion: "Visual realism: Slack-like sidebar, channel header, message rows, composer, hover affordances, and empty states", score: "Required" },
+          label: "Verifier",
+          groups: [
+            {
+              title: "CUA rubric",
+              intro: "A computer-use agent drives Chromium like a real user and grades whether the submitted browser app feels like a usable Slack alternative.",
+              rows: [
+                "Sign up + sign in is a complete, validated flow.",
+                "Channel listing, creation, and switching work from visible UI controls.",
+                "Messaging supports post, reload persistence, edit, and delete.",
+                "Threaded replies render in a dedicated thread panel and update parent reply count.",
+                "Emoji reactions use a real picker UI and render reaction badges.",
+                "Forms give immediate visible validation feedback.",
+                "Micro-interactions feel real: hover toolbars, hover states, loading or empty states, composer behavior.",
+                "Visual fidelity to Slack: colored sidebar, workspace identity, #channels, channel header, message rows, bottom composer.",
+                "Information architecture is correct: sidebar, main message pane, and optional right thread panel.",
+              ],
+            },
+            {
+              title: "Unit test categories",
+              intro: "The shell verifier checks backend, protocol, cluster, and frontend correctness with deterministic tests.",
+              rows: [
+                "REST API: auth, profiles, workspaces, channels, messages, threads, reactions, files, search, roles, groups, invitations, read state.",
+                "Realtime cluster: WebSocket fan-out, dense per-channel sequence numbers, replay/resume across node reconnects.",
+                "Load and ordering: concurrent posts across nodes preserve delivery latency and event ordering.",
+                "Crash tolerance: SIGKILL one HTTP node; remaining nodes continue serving and supervisor respawns the dead child.",
+                "IRC bridge: RFC 2812 subset plus bidirectional IRC/web message bridging into the same event stream.",
+                "Pub/sub chaos: kill the broadcast/redis layer; SQLite-backed fallback continues propagation within five seconds.",
+                "Frontend gates: Playwright structure checks and end-to-end browser journeys.",
+              ],
+            },
           ],
         },
       ],
     },
     verifier: null,
     verifierTitle: "How the task verifier scores submissions.",
+    leaderboard: {
+      title: "Slack clone leaderboard",
+      note:
+        "Binary score is the official task outcome. Partial score is an uncalibrated verifier metric from metrics.json, shown only to compare failed submissions.",
+      rows: [
+        { rank: 1, agent: "Claude Code", model: "Claude Opus 4.7", n: 5, binary: "0 / 5", partial: 0.600, best: 0.600, correctness: 0.200, ux: 1.000 },
+        { rank: 2, agent: "Terminus 2", model: "Claude Opus 4.7", n: 5, binary: "0 / 5", partial: 0.580, best: 0.600, correctness: 0.160, ux: 1.000 },
+        { rank: 3, agent: "Terminus 2", model: "GPT-5.5", n: 5, binary: "0 / 5", partial: 0.501, best: 0.600, correctness: 0.040, ux: 0.963 },
+        { rank: 4, agent: "Codex", model: "GPT-5.5", n: 5, binary: "0 / 5", partial: 0.500, best: 0.500, correctness: 0.000, ux: 1.000 },
+        { rank: 5, agent: "Terminus 2", model: "DeepSeek V4 Pro", n: 5, binary: "0 / 5", partial: 0.499, best: 0.569, correctness: 0.080, ux: 0.919 },
+        { rank: 6, agent: "Terminus 2", model: "MiniMax M2.7", n: 5, binary: "0 / 5", partial: 0.247, best: 0.453, correctness: 0.000, ux: 0.494 },
+        { rank: 7, agent: "Terminus 2", model: "Gemini 3.1 Pro", n: 5, binary: "0 / 5", partial: 0.214, best: 0.445, correctness: 0.000, ux: 0.428 },
+        { rank: 8, agent: "Gemini CLI", model: "Gemini 3.1 Pro", n: 5, binary: "0 / 5", partial: 0.204, best: 0.569, correctness: 0.040, ux: 0.369 },
+        { rank: 9, agent: "Kimi CLI", model: "Kimi K2.6", n: 5, binary: "0 / 5", partial: 0.111, best: 0.289, correctness: 0.000, ux: 0.222 },
+        { rank: 10, agent: "Terminus 2", model: "Kimi K2.6", n: 5, binary: "0 / 5", partial: 0.088, best: 0.422, correctness: 0.000, ux: 0.175 },
+        { rank: 11, agent: "Terminus 2", model: "GLM 5.1", n: 5, binary: "0 / 5", partial: 0.000, best: 0.000, correctness: 0.000, ux: 0.000 },
+      ],
+    },
     bestTrial: {
       trial: "slack-clone-217",
       agent: "Claude Code",
