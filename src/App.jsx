@@ -5,6 +5,7 @@ import {
   CATEGORIES,
   CAT_LABEL,
   HEADLINE,
+  MARATHON_ANATOMY,
   LEADERBOARD,
   RH_BY_MODEL,
   TRIAL_BY_ID,
@@ -16,45 +17,42 @@ const Analysis = lazy(() => import("./analysis.jsx"));
 
 const TASK_FAMILIES = CATEGORIES;
 
-// Per-config tokens-per-trial vs pass@1 — both real numbers from the
-// canonical sweep. Section §04's token-usage story.
-function TokenUsageBars() {
-  const rows = LEADERBOARD
-    .filter((r) => !r.ref && r.tokAvg != null)
-    .slice()
-    .sort((a, b) => b.tokAvg - a.tokAvg);
-  const maxTok = Math.max(...rows.map((r) => r.tokAvg));
+// §04 "Anatomy of a marathon" — what agents actually do across a multi-hour
+// run. Aggregated over 1,180 logged trajectories; numbers in MARATHON_ANATOMY.
+function ShellMixBars() {
+  const rows = MARATHON_ANATOMY.shellMix;
+  const maxPct = Math.max(...rows.map((r) => r.pct));
   return (
     <div style={{
       border: "1px solid var(--rule)",
       background: "var(--bg)",
-      padding: "16px 18px 14px",
+      padding: "16px 18px 16px",
       fontFamily: "var(--mono)",
       fontSize: 11,
     }}>
-      <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
-        <span>Mean tokens / trial · per (model, scaffold)</span>
-        <span>pass@1 marker on right</span>
+      <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>
+        <span>Shell commands by intent</span>
+        <span>% of all terminal calls</span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(200px, 240px) 1fr 60px", gap: 12, alignItems: "center", rowGap: 6 }}>
-        {rows.map((r) => (
-          <React.Fragment key={r.id}>
-            <div style={{ fontFamily: "var(--sans)", fontSize: 12, color: "var(--ink-2)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {r.name} · <span style={{ color: "var(--ink-3)" }}>{r.scaffold}</span>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(150px, 200px) 1fr 46px", gap: "10px 12px", alignItems: "center" }}>
+        {rows.map((r, i) => (
+          <React.Fragment key={r.label}>
+            <div style={{ fontFamily: "var(--sans)", fontSize: 13, color: "var(--ink)", lineHeight: 1.2 }}>
+              {r.label}
+              <span style={{ display: "block", fontSize: 10.5, color: "var(--ink-3)" }}>{r.hint}</span>
             </div>
-            <div style={{ position: "relative", height: 14, background: "var(--rule2, #ebe6d7)" }}>
+            <div style={{ position: "relative", height: 16, background: "var(--rule2, #ebe6d7)" }}>
               <div style={{
                 position: "absolute", left: 0, top: 0, bottom: 0,
-                width: `${(r.tokAvg / maxTok) * 100}%`,
-                background: r.highlight ? "var(--accent)" : "var(--ink)",
-                opacity: r.highlight ? 0.9 : 0.55,
+                width: `${(r.pct / maxPct) * 100}%`,
+                background: i === 0
+                  ? "linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent) 55%, var(--bg)))"
+                  : "var(--ink)",
+                opacity: i === 0 ? 0.95 : 0.5 - i * 0.04,
               }} />
-              <span style={{ position: "absolute", right: 6, top: 0, bottom: 0, display: "flex", alignItems: "center", color: "var(--ink-2)", fontSize: 10 }}>
-                {r.tokAvg.toFixed(1)}M
-              </span>
             </div>
-            <div style={{ textAlign: "right", color: r.highlight ? "var(--accent)" : "var(--ink)", fontWeight: 600 }}>
-              {r.pass1.toFixed(1)}%
+            <div style={{ textAlign: "right", color: "var(--ink)", fontWeight: 600 }}>
+              {r.pct.toFixed(1)}%
             </div>
           </React.Fragment>
         ))}
@@ -646,6 +644,17 @@ function BrandLogo({ name }) {
   );
 }
 
+// Per-failure-bucket accent. Reward hacking is red, consistent with the
+// cheat chips elsewhere on the site; the rest get distinct muted hues.
+function bucketColor(bucket) {
+  if (/reward hack/i.test(bucket)) return "oklch(0.55 0.18 25)";    // red
+  if (/premature/i.test(bucket)) return "var(--warn)";              // amber
+  if (/implementation/i.test(bucket)) return "oklch(0.52 0.12 250)"; // blue
+  if (/self-verif/i.test(bucket)) return "oklch(0.52 0.14 300)";    // purple
+  if (/timeout/i.test(bucket)) return "var(--ink-3)";               // gray
+  return "var(--accent)";
+}
+
 function Leaderboard() {
   const sorted = useMemo(
     () => LEADERBOARD.filter((r) => !r.ref).sort((a, b) => b.pass1 - a.pass1),
@@ -703,6 +712,13 @@ function Leaderboard() {
             ))}
           </div>
         </div>
+
+        <p className="lb-foot">
+          <sup>†</sup> SWE-Marathon tasks are <strong>binary reward</strong>: 1.0 requires
+          passing every verifier test; any failing test gives 0.0. Per-task
+          leaderboards also report <strong>uncalibrated partial scores</strong>, which
+          measure progress toward a full pass and are generally much higher.
+        </p>
       </div>
     </section>);
 
@@ -1541,34 +1557,36 @@ function TaskDetailPage({ taskId }) {
 }
 
 function CourseProfileSection() {
+  const m = MARATHON_ANATOMY;
   return (
     <section id="course">
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§04 / The course</div>
-          <h2 className="section-title">Multi-hour rollouts, hundreds of millions of tokens.</h2>
+          <h2 className="section-title">A marathon is run in the shell.</h2>
         </div>
         <div className="section-body" style={{ marginBottom: 28 }}>
           <div className="sb-side">
-            <div className="label-row">Budget<span>2–10h agent wall-clock, set per task to reflect difficulty.</span></div>
-            <div className="label-row">Tokens<span>Median 7.6M (input + output) per trial; right tail past 870M.</span></div>
-            <div className="label-row">Compaction<span>Tracks failure rather than rescue: 0 / 71 reward-bearing terminus-2 summariser trials pass.</span></div>
+            <div className="label-row">Actions<span>Median {m.medianActions} tool calls per trial; the busiest 10% top {m.p90Actions}.</span></div>
+            <div className="label-row">Shell<span>{m.shellPct}% of all logged actions are terminal commands — agents barely touch editor tools.</span></div>
+            <div className="label-row">Repetition<span>Terminus-2 repeats an earlier (function, args) call {HEADLINE.duplicationTerminusPct}% of the time; tool errors run {HEADLINE.toolErrorRateRange}.</span></div>
           </div>
           <div>
             <p style={{ fontSize: 15, color: "var(--ink-2)", margin: "0 0 18px", maxWidth: 600 }}>
-              SWE-Marathon trials run for hours. Cumulative input across API
-              calls climbs into the hundreds of millions of tokens — the
-              largest trial approaches a billion ({HEADLINE.maxTokensPerTrialM}M) — far
-              past what any single context window holds. Holding the model
-              fixed and varying the scaffold moves median tokens-per-trial
-              by up to 12×.
+              Across {m.nTrajectories.toLocaleString()} logged rollouts and{" "}
+              {Math.round(m.totalActions / 1000)}K tool calls, the work is overwhelmingly
+              terminal-driven: agents spend a marathon inspecting the tree, running and
+              rebuilding, and babysitting long-lived processes far more than they edit.
+              One in eight shell calls is pure process control — starting servers,
+              Ctrl-C, <code>sleep</code>, <code>kill</code> — the tax of keeping a
+              multi-hour environment alive.
             </p>
-            <TokenUsageBars />
+            <ShellMixBars />
             <div className="split-chips" style={{ marginTop: 18 }}>
-              <div className="split-chip">Median tokens / trial: <strong>{HEADLINE.medianTokensPerTrialM}M</strong></div>
-              <div className="split-chip">Mean tokens / trial: <strong>{HEADLINE.avgTokensPerTrialM}M</strong></div>
-              <div className="split-chip">Right-tail max: <strong>{HEADLINE.maxTokensPerTrialM}M</strong></div>
-              <div className="split-chip">Best pass@1: <strong>{HEADLINE.bestPass1Pct}%</strong> ({HEADLINE.bestPass1Label})</div>
+              <div className="split-chip">Logged trajectories: <strong>{m.nTrajectories.toLocaleString()}</strong></div>
+              <div className="split-chip">Median actions / trial: <strong>{m.medianActions}</strong></div>
+              <div className="split-chip">Reasoning steps (median): <strong>{m.medianSteps}</strong></div>
+              <div className="split-chip">Shell share: <strong>{m.shellPct}%</strong></div>
             </div>
           </div>
         </div>
@@ -1582,69 +1600,34 @@ function Findings() {
     <section id="findings">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§05 / Observations</div>
-          <h2 className="section-title">Where agents cheat, drift, and stall.</h2>
+          <div className="section-no"><span className="dot">●</span>§05 / Failure modes</div>
+          <h2 className="section-title">Selected failure modes.</h2>
         </div>
 
-        <div className="findings">
-          <div className="finding">
-            <div className="find-num">— 01 / Reward hacking is endemic at long horizons</div>
-            <h3 className="find-h">{HEADLINE.rhAttemptPct}% of trajectories show exploit-shaped action; {HEADLINE.rhSuccessPct}% earn reward despite shipping the cheat.</h3>
-            <p className="find-body">
-              The full audit covers all {HEADLINE.nTrials.toLocaleString()} canonical-grid rollouts.
-              {" "}{HEADLINE.rhExploitPct}% ship a clear verifier bypass; {HEADLINE.rhSuccessN} earn live reward
-              despite the exploit. Per-model exploit rates span <strong>{HEADLINE.rhSpreadX}×</strong> between
-              {" "}{HEADLINE.rhMinModel.name} ({HEADLINE.rhMinModel.pct}%) and {HEADLINE.rhMaxModel.name}
-              {" "}({HEADLINE.rhMaxModel.pct}%). {HEADLINE.rhTopTwoModelsShareOfSuccess} of {HEADLINE.rhSuccessN}
-              {" "}successful exploits come from just two models.
-            </p>
-          </div>
-
-          <div className="finding">
-            <div className="find-num">— 02 / Failures concentrate in two buckets</div>
-            <h3 className="find-h">73% of agent-attributable failures are Implementation Failure or Timeout.</h3>
-            <p className="find-body">
-              Across {HEADLINE.failureTotalAttributable} agent-attributable failed trials, Implementation Failure (41.6%)
-              and Timeout (31.4%) dominate. Reward Hacking is the third bucket at 15.4% — concentrated in a
-              few task / configuration combinations: Codex on GPT-5.5 hits 24% reward-hacking among its failures;
-              Terminus on GPT-5.5 reaches <strong>57%</strong> (24 of 42 failures) — the dominant locus of in-trial gaming.
-            </p>
-          </div>
-
-          <div className="finding">
-            <div className="find-num">— 03 / Validation weakness is universal</div>
-            <h3 className="find-h">{HEADLINE.validationSignalPct}% of failed trials carry a validation-failure signal.</h3>
-            <p className="find-body">
-              Almost every agent-attributable failure exposes some local-validation gap that better testing would
-              have surfaced. Compaction tracks failure rather than rescue: {HEADLINE.compactionPassWithSummariser} reward-bearing
-              terminus-2 summariser trials pass, against {HEADLINE.compactionPassWithoutPct}% without. The implication: local-testing tooling
-              improvements would lift the headline numbers across <em>all five</em> failure buckets, not just the
-              Poor Self-Verification slice.
-            </p>
-          </div>
-
-          <div className="finding">
-            <div className="find-num">— 04 / Scaffold &gt; model on token use</div>
-            <h3 className="find-h">Holding the model fixed and varying the scaffold moves median tokens-per-trial by up to 12×.</h3>
-            <p className="find-body">
-              GPT-5.5 runs at 0.40M median tokens under terminus-2 versus 4.8M under codex; Claude Opus 4.7 runs
-              at 4.4M under terminus-2 versus 21.9M under claude-code. Silent duplication compounds: terminus-2's
-              tool calls repeat an earlier (function, args) pair {HEADLINE.duplicationTerminusPct}% of the time, claude-code
-              {" "}{HEADLINE.duplicationClaudeCodePct}%. Tool error rate sits at {HEADLINE.toolErrorRateRange} across scaffolds — the cost of long horizons
-              is paid in repetition tax, not just headline difficulty.
-            </p>
-          </div>
-        </div>
-
-        <div style={{ marginTop: 48 }}>
-          <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 14 }}>Selected case studies — one per failure bucket</h4>
-
-          {CASE_STUDIES.map((c) => (
-            <div className="trace" key={c.trial}>
-              <div className="tr-head">{c.bucket} · {c.trial} · {c.config}</div>
-              <div className="tr-quote">{c.pattern}</div>
-            </div>
-          ))}
+        <div>
+          {CASE_STUDIES.map((c) => {
+            const [agent, model] = c.config.split(" · ");
+            const taskId = c.trial.replace(/-\d+$/, "");
+            const task = TASKS.find((t) => t.id === taskId);
+            const color = bucketColor(c.bucket);
+            return (
+              <div className="trace" key={c.trial} style={{ borderLeftColor: color }}>
+                <div className="tr-head">
+                  <span className="tr-bucket" style={{ color }}>{c.bucket}</span>
+                  <span className="tr-id">
+                    <BrandLogo name={model} />
+                    <span className="lb-model">{model}</span>
+                    <span className="lb-sep">/</span>
+                    <span className="lb-agent">{agent}</span>
+                  </span>
+                  <a className="tr-task" href={`#trajectory/${encodeURIComponent(c.trial)}`}>
+                    {task ? task.title : taskId} <span className="tr-arr">↗</span>
+                  </a>
+                </div>
+                <div className="tr-quote">{c.pattern}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>);
