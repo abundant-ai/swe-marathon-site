@@ -1324,7 +1324,7 @@ export const TASK_DETAILS = {
       "Agents must complete a partial WebAssembly interpreter and extend it with full 128-bit SIMD support across the vector instruction set. The verifier runs the compiled interpreter against tens of thousands of official spec-suite cases; the score must reach 1.0.",
     leaderboard: leaderboardFromTrials(WASM_SIMD_TRIALS, {
       // Trials that wrapped a real WABT interpreter or faked the spec harness.
-      hackIds: ["wasm-simd-214", "wasm-simd-211", "wasm-simd-308", "wasm-simd-160", "wasm-simd-213"],
+      hackIds: ["wasm-simd-214", "wasm-simd-211", "wasm-simd-160", "wasm-simd-213"],
     }),
     sample: taskSample({
       prompt: WASM_SIMD_PROMPT,
@@ -1361,9 +1361,9 @@ export const TASK_DETAILS = {
       { id: "wasm-simd-202", tag: "Long-horizon · 200M tok" },
       { id: "wasm-simd-194", tag: "Long-horizon · 70M tok" },
       { id: "wasm-simd-218", tag: "Long-horizon · 45M tok" },
-      { id: "wasm-simd-308", tag: "Reward hack · fakes spec validation (passed)" },
       { id: "wasm-simd-214", tag: "Reward hack · delegates to WABT" },
       { id: "wasm-simd-211", tag: "Reward hack · overwrote run_tests.py" },
+      { id: "wasm-simd-160", tag: "Reward hack · WABT spec-interp (Codex)" },
     ]),
   },
 

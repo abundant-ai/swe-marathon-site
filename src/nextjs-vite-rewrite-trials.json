@@ -5,13 +5,31 @@
     {
       "agent": "Claude Code",
       "model": "Claude Opus 4.7",
-      "n": 2,
-      "binary": "0 / 2",
-      "partial": 0.895,
-      "best": 0.954,
-      "correctness": 0.894,
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.911,
+      "best": 0.976,
+      "correctness": 0.911,
       "ux": 0.0,
       "trials": [
+        {
+          "id": "nextjs-vite-rewrite-171",
+          "trial": "nextjs-vite-rewrite-171",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.7",
+          "reward": 0.0,
+          "partial": 0.976,
+          "correctness": 0.976,
+          "ux": 0.0,
+          "gates": "361 / 370",
+          "tokens": "268.6M",
+          "cost": "$149.98",
+          "duration": "10h 7m",
+          "startedAt": "2026-05-03 17:27 UTC",
+          "status": "AgentTimeoutError",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-171.json",
+          "steps": 727
+        },
         {
           "id": "nextjs-vite-rewrite-45",
           "trial": "nextjs-vite-rewrite-45",
@@ -31,6 +49,24 @@
           "steps": 801
         },
         {
+          "id": "nextjs-vite-rewrite-173",
+          "trial": "nextjs-vite-rewrite-173",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.7",
+          "reward": 0.0,
+          "partial": 0.954,
+          "correctness": 0.954,
+          "ux": 0.0,
+          "gates": "353 / 370",
+          "tokens": "344.3M",
+          "cost": "$188.13",
+          "duration": "10h 5m",
+          "startedAt": "2026-05-03 17:43 UTC",
+          "status": "AgentTimeoutError",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-173.json",
+          "steps": 801
+        },
+        {
           "id": "nextjs-vite-rewrite-44",
           "trial": "nextjs-vite-rewrite-44",
           "agent": "Claude Code",
@@ -47,6 +83,24 @@
           "status": "success",
           "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-44.json",
           "steps": 123
+        },
+        {
+          "id": "nextjs-vite-rewrite-172",
+          "trial": "nextjs-vite-rewrite-172",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.7",
+          "reward": 0.0,
+          "partial": 0.836,
+          "correctness": 0.835,
+          "ux": 0.0,
+          "gates": "309 / 370",
+          "tokens": "1.0M",
+          "cost": "$133.15",
+          "duration": "10h 3m",
+          "startedAt": "2026-05-03 17:43 UTC",
+          "status": "AgentTimeoutError",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-172.json",
+          "steps": 123
         }
       ],
       "rank": 1
@@ -54,11 +108,11 @@
     {
       "agent": "Codex",
       "model": "GPT-5.5",
-      "n": 2,
-      "binary": "0 / 2",
-      "partial": 0.474,
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.473,
       "best": 0.74,
-      "correctness": 0.474,
+      "correctness": 0.471,
       "ux": 0.0,
       "trials": [
         {
@@ -80,6 +134,42 @@
           "steps": 218
         },
         {
+          "id": "nextjs-vite-rewrite-175",
+          "trial": "nextjs-vite-rewrite-175",
+          "agent": "Codex",
+          "model": "GPT-5.5",
+          "reward": 0.0,
+          "partial": 0.689,
+          "correctness": 0.689,
+          "ux": 0.0,
+          "gates": "255 / 370",
+          "tokens": "20.9M",
+          "cost": "$23.57",
+          "duration": "1h 1m",
+          "startedAt": "2026-05-03 10:09 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-175.json",
+          "steps": 181
+        },
+        {
+          "id": "nextjs-vite-rewrite-176",
+          "trial": "nextjs-vite-rewrite-176",
+          "agent": "Codex",
+          "model": "GPT-5.5",
+          "reward": 0.0,
+          "partial": 0.544,
+          "correctness": 0.541,
+          "ux": 0.0,
+          "gates": "200 / 370",
+          "tokens": "7.7M",
+          "cost": "$5.64",
+          "duration": "24m 11s",
+          "startedAt": "2026-05-03 16:07 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-176.json",
+          "steps": 99
+        },
+        {
           "id": "nextjs-vite-rewrite-61",
           "trial": "nextjs-vite-rewrite-61",
           "agent": "Codex",
@@ -96,6 +186,24 @@
           "status": "success",
           "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-61.json",
           "steps": 186
+        },
+        {
+          "id": "nextjs-vite-rewrite-174",
+          "trial": "nextjs-vite-rewrite-174",
+          "agent": "Codex",
+          "model": "GPT-5.5",
+          "reward": 0.0,
+          "partial": 0.182,
+          "correctness": 0.176,
+          "ux": 0.0,
+          "gates": "65 / 370",
+          "tokens": "36.2M",
+          "cost": "$22.49",
+          "duration": "1h 27m",
+          "startedAt": "2026-05-03 10:09 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-174.json",
+          "steps": 288
         }
       ],
       "rank": 2

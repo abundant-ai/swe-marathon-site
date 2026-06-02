@@ -249,12 +249,57 @@ def convert_trajectory(raw: dict) -> list[dict]:
     return rows
 
 
+def _canonical_attempt_names(trial_dir: pathlib.Path) -> list[str]:
+    """Attempt-dir basenames the run's result.json marks as the real trial(s)."""
+    rj = trial_dir / "result.json"
+    if not rj.exists():
+        return []
+    try:
+        r = json.loads(rj.read_text())
+    except Exception:
+        return []
+    names: list[str] = []
+    for ev in r.get("stats", {}).get("evals", {}).values():
+        for lst in ev.get("reward_stats", {}).get("reward", {}).values():
+            if isinstance(lst, list):
+                names += [str(x) for x in lst]
+    return names
+
+
 def attempt_dir(trial_dir: pathlib.Path, meta: dict) -> pathlib.Path | None:
+    """Locate the attempt directory holding the agent trajectory.
+
+    Harbor lays out each trial as one or more attempt subdirs. Their names vary
+    ("task-<task>__<hash>" or a bare "<task>__<hash>"), and retried trials carry
+    several — only one of which actually persisted a trajectory. We therefore
+    pick among the subdirs that contain agent/trajectory.json, preferring the
+    canonical attempt recorded in result.json, then one with verifier metrics,
+    then the most recent. Globbing only "task-*" silently dropped the bare-named
+    and retried attempts, so whole trials went missing from the leaderboard.
+    """
     cand = meta.get("canonical_attempt_dir")
-    if cand and (trial_dir / cand).is_dir():
+    if cand and (trial_dir / cand / "agent" / "trajectory.json").exists():
         return trial_dir / cand
-    hits = sorted(trial_dir.glob("task-*"))
-    return hits[0] if hits else None
+    # Backward-compatible: the original glob took the first "task-*" attempt, so
+    # keep that selection for every trial it already resolved (don't perturb the
+    # committed CUA trajectories). Only fall through when no task-* attempt holds
+    # a trajectory — that's the bare-named / retried case that went missing.
+    for d in sorted(trial_dir.glob("task-*")):
+        if (d / "agent" / "trajectory.json").exists():
+            return d
+    have_traj = [d for d in trial_dir.iterdir()
+                 if d.is_dir() and (d / "agent" / "trajectory.json").exists()]
+    if not have_traj:
+        return None
+    if len(have_traj) == 1:
+        return have_traj[0]
+    canon = set(_canonical_attempt_names(trial_dir))
+    for d in have_traj:
+        if d.name in canon:
+            return d
+    with_metrics = [d for d in have_traj if (d / "verifier" / "metrics.json").exists()]
+    pool = with_metrics or have_traj
+    return max(pool, key=lambda d: (d / "agent" / "trajectory.json").stat().st_mtime)
 
 
 def build_task(task: str, logs_root: pathlib.Path, out_traj: pathlib.Path) -> None:
