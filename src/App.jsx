@@ -1580,7 +1580,7 @@ function Findings() {
     <section id="findings">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§06 / Observations</div>
+          <div className="section-no"><span className="dot">●</span>§05 / Observations</div>
           <h2 className="section-title">Where agents cheat, drift, and stall.</h2>
         </div>
 
@@ -1662,7 +1662,7 @@ function Citation() {
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§08 / Paper</div>
+          <div className="section-no"><span className="dot">●</span>§06 / Paper</div>
           <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
         <div className="citation-block">
