@@ -26,8 +26,28 @@ import datetime as dt
 import json
 import os
 import pathlib
+import re
 
 SITE = pathlib.Path(__file__).resolve().parent.parent
+
+
+def load_metrics_tolerant(path: pathlib.Path) -> dict:
+    """Load a metrics.json, repairing a few malformed-but-recoverable cases.
+
+    Some verifier runs emit non-standard JSON (e.g. a bare ``.674`` float with
+    no leading zero). Try strict parse first, then a minimal regex repair.
+    """
+    text = path.read_text()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # ": .674" / "[.5," -> add the leading zero JSON requires.
+        repaired = re.sub(r"([:\[,]\s*)(\.\d)", r"\g<1>0\g<2>", text)
+        try:
+            return json.loads(repaired)
+        except json.JSONDecodeError:
+            print(f"  ! unparseable metrics: {path}")
+            return {}
 
 
 def default_logs() -> pathlib.Path:
@@ -276,7 +296,7 @@ def build_task(task: str, logs_root: pathlib.Path, out_traj: pathlib.Path) -> No
 
         metrics = {}
         if metrics_path.exists():
-            metrics = json.loads(metrics_path.read_text())
+            metrics = load_metrics_tolerant(metrics_path)
 
         # Clean, stable trial id like "rust-c-compiler-210". Prefer a tidy
         # source_trial_name when present; otherwise derive from the manifest
@@ -309,6 +329,8 @@ def build_task(task: str, logs_root: pathlib.Path, out_traj: pathlib.Path) -> No
             gates = f"{metrics.get('gates_passed', 0)} / {metrics.get('gates_total', 0)}"
         elif metrics.get("new_total") is not None:
             gates = f"{metrics.get('new_passed', 0)} / {metrics.get('new_total', 0)}"
+        elif metrics.get("total_tests") is not None:
+            gates = f"{metrics.get('total_passed', 0)} / {metrics.get('total_tests', 0)}"
         else:
             gates = ""
         reward = meta.get("reward") or 0.0

@@ -666,7 +666,7 @@ function Leaderboard() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§01 / Leaderboard</div>
-          <h2 className="section-title">Pass@1 across 20 long-horizon tasks.</h2>
+          <h2 className="section-title">SWE-Marathon Pass@1</h2>
         </div>
 
         <div className="lb-chart">
@@ -1153,6 +1153,10 @@ function TaskLeaderboard({ leaderboard }) {
   // compilers) don't, so drop the column entirely rather than show "0.000".
   const hasUX = leaderboard.rows.some((r) => r.ux > 0);
 
+  // Verified reward-hacking trials get flagged on their config row + trial chip.
+  const hackSet = new Set(leaderboard.hackIds || []);
+  const hasHacks = hackSet.size > 0;
+
   return (
     <div className="task-lb-card">
       <p className="task-lb-note">{leaderboard.note}</p>
@@ -1160,11 +1164,12 @@ function TaskLeaderboard({ leaderboard }) {
         {leaderboard.rows.map((row) => {
           const hasTrials = Array.isArray(row.trials) && row.trials.length > 0;
           const isOpen = openRank === row.rank;
+          const rowHackCount = hasTrials ? row.trials.filter((t) => hackSet.has(t.id)).length : 0;
           return (
           <div className="task-lb-group" key={`${row.rank}-${row.agent}-${row.model}`}>
             <button
               type="button"
-              className={"task-lb-row " + (row.rank === 1 ? "top " : "") + (isOpen ? "open " : "") + (hasTrials ? "clickable" : "")}
+              className={"task-lb-row " + (row.rank === 1 ? "top " : "") + (isOpen ? "open " : "") + (rowHackCount ? "flagged " : "") + (hasTrials ? "clickable" : "")}
               onClick={() => hasTrials && setOpenRank(isOpen ? null : row.rank)}
               aria-expanded={isOpen}
             >
@@ -1172,6 +1177,11 @@ function TaskLeaderboard({ leaderboard }) {
               <div className="task-lb-id">
                 <span className="task-lb-name">{row.model}</span>
                 <span className="task-lb-agent">{row.agent}</span>
+                {rowHackCount > 0 && (
+                  <span className="task-lb-hack" title={`${rowHackCount} trial${rowHackCount > 1 ? "s" : ""} flagged for reward hacking`}>
+                    ⚠ Reward hack{rowHackCount > 1 ? ` ×${rowHackCount}` : ""}
+                  </span>
+                )}
               </div>
               <div className="task-lb-metrics">
                 <span><b>Reward</b> {row.binary}</span>
@@ -1188,8 +1198,11 @@ function TaskLeaderboard({ leaderboard }) {
             {isOpen && hasTrials && (
               <div className="task-lb-trials">
                 {row.trials.map((t) => (
-                  <a className="trial-chip" key={t.id} href={`#trajectory/${encodeURIComponent(t.id)}`}>
-                    <span className="trial-chip-id">{t.trial}</span>
+                  <a className={"trial-chip " + (hackSet.has(t.id) ? "is-hack" : "")} key={t.id} href={`#trajectory/${encodeURIComponent(t.id)}`}>
+                    <span className="trial-chip-id">
+                      {t.trial}
+                      {hackSet.has(t.id) && <span className="trial-chip-hack">⚠ Reward hack</span>}
+                    </span>
                     <span className="trial-chip-metrics">
                       <span><i>partial</i>{t.partial.toFixed(3)}</span>
                       <span><i>tokens</i>{t.tokens}</span>
@@ -1377,7 +1390,6 @@ function TrajectoryPage({ trialId }) {
     { label: "Rank", value: `#${trial.rank}` },
     { label: "Reward", value: trial.reward.toFixed(1) },
     { label: "Partial", value: trial.partial.toFixed(3) },
-    trial.gates && { label: "Unit tests", value: trial.gates },
     trial.ux > 0 && { label: "CUA UX", value: trial.ux.toFixed(3) },
     { label: "Tokens", value: trial.tokens },
     { label: "Cost", value: trial.cost },
@@ -1510,7 +1522,7 @@ function TaskDetailPage({ taskId }) {
             </div>
             <div className="verifier-grid">
               {(detail.verifier.groups || [
-                { title: "Deterministic gates", items: detail.verifier.deterministic },
+                { title: "Deterministic checks", items: detail.verifier.deterministic },
                 { title: "CUA browser rubric", items: detail.verifier.ux },
               ]).map((group) => (
                 <div key={group.title}>
