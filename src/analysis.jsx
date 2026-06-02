@@ -49,6 +49,15 @@ const ANALYSIS_TASKS = TASKS.map((t) => ({
 const FAM_LABEL = CAT_LABEL;
 const FAM_ORDER = ["library", "clone", "ml", "algo"];
 
+/* "Model / Agent" label with version suffixes stripped, so the two
+   same-model configs (e.g. GPT-5.5) are distinguishable in plots. */
+const cfgLabel = (m) => `${m.name} / ${m.scaffold.replace(/\s+v\d[\d.]*$/i, "")}`;
+
+/* Drop in a per-(agent, task) uncalibrated partial-score grid here —
+   shape { [agentId]: { [taskId]: 0..100 } } — to switch the task heatmap
+   to partial scores. Until then it falls back to per-task pass@1. */
+const PER_TASK_PARTIAL = null;
+
 /* ---------- MODELS: 11 real configs from the leaderboard ---------- */
 const ANALYSIS_MODELS = LEADERBOARD
   .filter((r) => !r.ref)
@@ -167,157 +176,127 @@ function useEcharts(buildOption, deps) {
 }
 
 /* ============================================================
-   PLOT 1 — Time-horizon scatter (METR-style)
-   x: human-expert duration (hours, log). y: per-task pass@1.
-   Logistic fit per model + 50%-horizon diamond.
+   PLOT 1 — Compute-horizon scatter
+   x: mean tokens/trial (M, log). y: config pass@1.
+   One point per (model, scaffold); faint connectors join configs
+   of the same model to show that more tokens ≠ higher pass@1.
    ============================================================ */
-function TimeHorizonChart() {
-  const [selectedIds, setSelectedIds] = useState(() =>
-    ANALYSIS_MODELS.slice(0, 4).map((m) => m.id)
-  );
-
+function ComputeHorizonChart() {
   const ref = useEcharts(() => {
-    const series = [];
-    for (const m of ANALYSIS_MODELS) {
-      if (!selectedIds.includes(m.id)) continue;
+    const configs = ANALYSIS_MODELS.filter((m) => m.avgTokensM != null && m.avgTokensM > 0);
+    const maxPass = Math.max(...configs.map((m) => m.pass1));
 
-      const scatterData = ANALYSIS_TASKS.map((t) => {
-        const rate = (PER_TASK_PASS1[m.id]?.[t.id] ?? 0) / 100;
-        return { value: [t.humanHours, +rate.toFixed(3)], rate, task: t };
-      });
-      series.push({
-        name: m.name + " · " + m.scaffold,
-        type: "scatter",
-        data: scatterData,
-        symbolSize: 9,
-        itemStyle: { color: m.color, opacity: 0.85, borderColor: "#fff", borderWidth: 1 },
-        emphasis: { focus: "series", scale: 1.4 },
-        z: 5,
-      });
-
-      // Fit curve
-      const fit = FITS[m.id];
-      const sigm = (z) => 1 / (1 + Math.exp(z));
-      const xs = [];
-      for (let i = 0; i <= 80; i++) {
-        const lx = Math.log(20) + (Math.log(800) - Math.log(20)) * (i / 80);
-        const x = Math.exp(lx);
-        xs.push([x, sigm(fit.slope * (Math.log(x) - Math.log(fit.horizon)))]);
-      }
-      series.push({
-        name: m.name + " · " + m.scaffold + " · fit",
-        type: "line",
-        data: xs,
-        smooth: true,
-        showSymbol: false,
-        lineStyle: { color: m.color, width: 2, opacity: 0.55 },
-        z: 4,
-        tooltip: { show: false },
-      });
-
-      // 50%-horizon diamond, drawn only if it sits inside the visible band
-      if (fit.horizon >= 20 && fit.horizon <= 800) {
-        series.push({
-          name: m.name + " · 50% horizon",
-          type: "scatter",
-          data: [{
-            value: [fit.horizon, 0.5],
-            symbol: "diamond",
-            symbolSize: 14,
-            itemStyle: { color: m.color, borderColor: "#1a1a17", borderWidth: 1.5 },
-          }],
-          z: 6,
+    // Connectors: same model name, ordered by token spend.
+    const byName = {};
+    for (const m of configs) (byName[m.name] = byName[m.name] || []).push(m);
+    const connectors = Object.values(byName)
+      .filter((g) => g.length >= 2)
+      .map((g) => {
+        const pts = g.slice().sort((a, b) => a.avgTokensM - b.avgTokensM);
+        return {
+          name: pts[0].name + " · same model",
+          type: "line",
+          data: pts.map((m) => [m.avgTokensM, m.pass1]),
+          showSymbol: false,
+          smooth: false,
+          lineStyle: { color: pts[0].color, width: 1.5, opacity: 0.35, type: "dashed" },
+          z: 2,
           tooltip: { show: false },
-        });
-      }
-    }
+        };
+      });
+
+    const scatterData = configs.map((m) => ({
+      value: [m.avgTokensM, m.pass1],
+      m,
+      itemStyle: { color: m.color, opacity: 0.95, borderColor: "#1a1a17", borderWidth: 1 },
+    }));
 
     return {
       backgroundColor: "transparent",
-      grid: { left: 60, right: 24, top: 30, bottom: 56 },
+      grid: { left: 60, right: 165, top: 30, bottom: 56 },
       xAxis: {
         ...AXIS_COMMON,
         type: "log",
-        name: "Human-expert duration (hours, log)",
+        name: "Mean tokens per trial (M, log)",
         nameLocation: "middle",
-        nameGap: 32,
-        min: 20,
-        max: 800,
+        nameGap: 34,
+        min: 3,
+        max: 80,
         logBase: 10,
-        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "h" },
+        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "M" },
       },
       yAxis: {
         ...AXIS_COMMON,
         type: "value",
-        name: "Pass@1 per task (mean@5)",
+        name: "Pass@1 (%)",
         nameLocation: "middle",
-        nameGap: 44,
-        min: -0.05,
-        max: 1.05,
-        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => Math.round(v * 100) + "%" },
+        nameGap: 40,
+        min: 0,
+        max: Math.ceil((maxPass + 4) / 5) * 5,
+        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "%" },
       },
       tooltip: {
         ...TOOLTIP_COMMON,
         trigger: "item",
         formatter: (p) => {
-          if (p.seriesType !== "scatter" || !p.data.task) {
-            const x = p.data && p.data[0] != null ? p.data[0] : p.value && p.value[0];
-            const y = p.data && p.data[1] != null ? p.data[1] : p.value && p.value[1];
-            if (x == null) return "";
-            return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${p.seriesName.replace(" · fit","")}</div>
-                    <div><b>${(+x).toFixed(0)}h</b> human task → <b>${Math.round(y * 100)}%</b> predicted</div>`;
-          }
-          const t = p.data.task;
-          return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${p.seriesName}</div>
-                  <div style="font-weight:600;margin-bottom:2px;">${t.title}</div>
-                  <div style="color:${PAPER.ink2};font-size:11px;">${FAM_LABEL[t.cat]} · ${t.humanHours}h human · ${t.agentHours}h agent budget</div>
-                  <div style="margin-top:4px;">Pass@1: <b>${Math.round(p.data.rate * 100)}%</b> (${Math.round(p.data.rate * 5)}/5 trials)</div>`;
+          if (!p.data || !p.data.m) return "";
+          const m = p.data.m;
+          return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${m.name}</div>
+                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${m.scaffold}</div>
+                  <div>Pass@1: <b>${m.pass1.toFixed(1)}%</b></div>
+                  <div>Tokens / trial: <b>${m.avgTokensM.toFixed(1)}M</b></div>
+                  <div>Cost / trial: <b>${m.costPerTrial != null ? "$" + m.costPerTrial.toFixed(2) : "—"}</b></div>`;
         },
       },
       legend: { show: false },
       animation: false,
-      series,
+      series: [
+        ...connectors,
+        {
+          name: "configs",
+          type: "scatter",
+          data: scatterData,
+          symbolSize: 17,
+          z: 5,
+          emphasis: { scale: 1.3 },
+          label: {
+            show: true,
+            position: "right",
+            formatter: (p) => cfgLabel(p.data.m),
+            fontFamily: "IBM Plex Mono, monospace",
+            fontSize: 9,
+            color: PAPER.ink2,
+            distance: 5,
+          },
+          markLine: {
+            silent: true,
+            symbol: "none",
+            lineStyle: { color: PAPER.accent, type: "dashed", width: 1.5, opacity: 0.7 },
+            label: {
+              formatter: `ceiling · ${maxPass.toFixed(0)}%`,
+              color: PAPER.accent,
+              fontFamily: "IBM Plex Mono, monospace",
+              fontSize: 10,
+              position: "insideEndTop",
+            },
+            data: [{ yAxis: maxPass }],
+          },
+        },
+      ],
     };
-  }, [selectedIds]);
-
-  const toggleModel = (id) => {
-    setSelectedIds((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-  };
+  }, []);
 
   return (
     <div className="anal-card">
       <div className="anal-card-head">
         <div>
-          <div className="anal-card-no">FIG · TIME HORIZON</div>
-          <h3 className="anal-card-title">How long a task can each agent handle?</h3>
-          <p className="anal-card-sub">
-            Each dot is one of the 20 SWE-Marathon tasks; x-axis is the expert
-            estimate (40–400h, log scale). Curve is a logistic fit over the
-            (humanHours, pass@1) cloud per config; the diamond, when in range,
-            marks the 50%-horizon. Frontier agents sit nowhere near the
-            multi-day region this benchmark targets.
-          </p>
+          <div className="anal-card-no">FIG · COMPUTE HORIZON</div>
+          <h3 className="anal-card-title">More tokens don't buy more pass@1.</h3>
         </div>
-      </div>
-      <div className="anal-legend">
-        {ANALYSIS_MODELS.map((m) => {
-          const on = selectedIds.includes(m.id);
-          const fit = FITS[m.id];
-          return (
-            <button key={m.id}
-              className={"anal-legend-chip " + (on ? "on" : "")}
-              onClick={() => toggleModel(m.id)}>
-              <span className="leg-dot" style={{ background: m.color, opacity: on ? 1 : 0.3 }}></span>
-              <span className="leg-name">{m.name}</span>
-              <span className="leg-tag">{m.scaffold}</span>
-              <span className="leg-h">{m.pass1.toFixed(1)}%</span>
-            </button>
-          );
-        })}
       </div>
       <div ref={ref} className="anal-chart" style={{ height: 420 }}></div>
       <div className="anal-foot">
-        Pass@1 in the leg chips is the canonical-sweep number (n = 100 trials per config across the 20 tasks).
+        Tokens are mean (input + output) per trial; pass@1 is the canonical sweep (n = 100 trials per config across the 20 tasks).
       </div>
     </div>
   );
@@ -347,7 +326,7 @@ function ParetoChart() {
 
     return {
       backgroundColor: "transparent",
-      grid: { left: 60, right: 24, top: 30, bottom: 56 },
+      grid: { left: 60, right: 165, top: 30, bottom: 56 },
       xAxis: {
         ...AXIS_COMMON,
         type: "value",
@@ -402,9 +381,9 @@ function ParetoChart() {
           label: {
             show: true,
             position: "right",
-            formatter: (p) => p.data.a.m.name.replace(/(.+? \S+).*/, "$1"),
+            formatter: (p) => cfgLabel(p.data.a.m),
             fontFamily: "IBM Plex Mono, monospace",
-            fontSize: 10,
+            fontSize: 9,
             color: PAPER.ink2,
             distance: 4,
           },
@@ -419,13 +398,6 @@ function ParetoChart() {
         <div>
           <div className="anal-card-no">FIG · PARETO</div>
           <h3 className="anal-card-title">Cost-effective configs are not the highest-scoring configs.</h3>
-          <p className="anal-card-sub">
-            Each point is one of the 11 (model × scaffold) configs averaged
-            across its 100-trial canonical sweep. The dashed line is the Pareto
-            frontier — configs below it are strictly dominated. Several
-            cost-effective systems sit near the empirical frontier; the most
-            expensive ones don't always score best.
-          </p>
         </div>
         <div className="anal-controls">
           <button className={"pill " + (xAxis === "cost" ? "active" : "")} onClick={() => setXAxis("cost")}>Cost ($)</button>
@@ -441,23 +413,27 @@ function ParetoChart() {
 }
 
 /* ============================================================
-   PLOT 3 — Family heatmap (config × task family)
+   PLOT 3 — Task heatmap (20 tasks × agents), uncalibrated partial scores.
+   Uses a per-(agent, task) partial-score grid when available; falls back
+   to PER_TASK_PASS1 otherwise. Values are 0–100.
    ============================================================ */
-function FamilyHeatmap() {
+function TaskHeatmap() {
+  const usingPartial = !!PER_TASK_PARTIAL;
   const ref = useEcharts(() => {
+    const grid = PER_TASK_PARTIAL || PER_TASK_PASS1;
     const data = [];
     ANALYSIS_MODELS.forEach((m, mi) => {
-      FAM_ORDER.forEach((fam, fi) => {
-        const rate = m.perCat?.[fam] ?? 0;
-        data.push({ value: [fi, mi, +rate.toFixed(1)], m, fam });
+      ANALYSIS_TASKS.forEach((t, ti) => {
+        const v = grid[m.id]?.[t.id] ?? 0;
+        data.push({ value: [ti, mi, +v.toFixed(0)], m, t });
       });
     });
     return {
       backgroundColor: "transparent",
-      grid: { left: 220, right: 60, top: 50, bottom: 30 },
+      grid: { left: 230, right: 20, top: 150, bottom: 16 },
       xAxis: {
         type: "category",
-        data: FAM_ORDER.map((f) => FAM_LABEL[f]),
+        data: ANALYSIS_TASKS.map((t) => t.title),
         position: "top",
         axisLine: { show: false },
         axisTick: { show: false },
@@ -465,17 +441,16 @@ function FamilyHeatmap() {
         axisLabel: {
           color: PAPER.ink2,
           fontFamily: "IBM Plex Mono, monospace",
-          fontSize: 11,
-          interval: 0,             // force every header to render
+          fontSize: 10,
+          interval: 0,
+          rotate: 50,
           hideOverlap: false,
-          overflow: "break",       // wrap long labels onto two lines
-          width: 110,
-          lineHeight: 13,
+          align: "left",
         },
       },
       yAxis: {
         type: "category",
-        data: ANALYSIS_MODELS.map((m) => m.name + "  ·  " + m.scaffold),
+        data: ANALYSIS_MODELS.map(cfgLabel),
         inverse: true,
         axisLine: { show: false },
         axisTick: { show: false },
@@ -486,29 +461,29 @@ function FamilyHeatmap() {
         ...TOOLTIP_COMMON,
         trigger: "item",
         formatter: (p) => {
-          const m = p.data.m;
-          return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${FAM_LABEL[p.data.fam]}</div>
-                  <div style="font-weight:600">${m.name}</div>
-                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:4px;">${m.scaffold}</div>
-                  <div>Pass@1: <b>${p.value[2]}%</b></div>`;
+          const { m, t } = p.data;
+          return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${cfgLabel(m)}</div>
+                  <div style="font-weight:600;margin-bottom:2px;">${t.title}</div>
+                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:4px;">${FAM_LABEL[t.cat]}</div>
+                  <div>${usingPartial ? "Partial score" : "Pass@1"}: <b>${p.value[2]}${usingPartial ? " / 100" : "%"}</b></div>`;
         },
       },
       visualMap: {
-        min: 0, max: 80,
+        min: 0, max: 100,
         calculable: false,
         show: false,
         inRange: { color: ["#f3efe4", "#e8c9a8", "#d49765", "#b56636", "#8b3d1f"] },
       },
       animation: false,
       series: [{
-        name: "Pass@1",
+        name: "Partial score",
         type: "heatmap",
         data,
         label: {
           show: true,
           color: PAPER.ink,
           fontFamily: "IBM Plex Mono, monospace",
-          fontSize: 11,
+          fontSize: 10,
           formatter: (p) => p.value[2] > 0 ? p.value[2].toFixed(0) : "·",
         },
         itemStyle: { borderColor: "#faf7f0", borderWidth: 2 },
@@ -522,16 +497,15 @@ function FamilyHeatmap() {
       <div className="anal-card-head">
         <div>
           <div className="anal-card-no">FIG · HEATMAP</div>
-          <h3 className="anal-card-title">Where each config actually scores.</h3>
-          <p className="anal-card-sub">
-            Pass@1 (%) by task family. ML engineering is the only column with
-            non-trivial scores across configs; library reproductions, product
-            clones, and algorithmic optimisation are essentially zero for
-            most configs in the canonical sweep.
-          </p>
+          <h3 className="anal-card-title">Every agent against all 20 tasks.</h3>
         </div>
       </div>
-      <div ref={ref} className="anal-chart" style={{ height: 420 }}></div>
+      <div ref={ref} className="anal-chart" style={{ height: 520 }}></div>
+      <div className="anal-foot">
+        {usingPartial
+          ? "Uncalibrated partial scores (0–100), mean over the 5 canonical trials per (agent, task). Tasks ordered by family."
+          : "Per-task pass@1 (%), mean@5 across the 5 canonical trials per (agent, task). Tasks ordered by family."}
+      </div>
     </div>
   );
 }
@@ -637,13 +611,6 @@ function TaskDistribution() {
         <div>
           <div className="anal-card-no">FIG · DISTRIBUTION</div>
           <h3 className="anal-card-title">The 20-task course at a glance.</h3>
-          <p className="anal-card-sub">
-            Family mix on the left; expert-estimate spread on the right.
-            Tasks span library reproductions (8), product clones (5), ML
-            engineering (5), and algorithmic optimisation (2) — agent budgets
-            of {HEADLINE.agentBudgetMinH}–{HEADLINE.agentBudgetMaxH}h against
-            expert estimates of {HEADLINE.humanEstMinH}–{HEADLINE.humanEstMaxH}h.
-          </p>
         </div>
       </div>
       <div ref={ref} className="anal-chart" style={{ height: 320 }}></div>
@@ -662,14 +629,14 @@ function Analysis() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§02 / Analysis</div>
-          <h2 className="section-title">Time-horizons, Pareto frontiers, where it breaks.</h2>
+          <h2 className="section-title">Compute horizons, Pareto frontiers, where it breaks.</h2>
         </div>
 
         <div className="anal-tabs">
           <button className={"anal-tab " + (tab === "horizon" ? "active" : "")} onClick={() => setTab("horizon")}>
             <span className="anal-tab-no">01</span>
-            <span className="anal-tab-t">Time horizon</span>
-            <span className="anal-tab-s">METR-style</span>
+            <span className="anal-tab-t">Compute horizon</span>
+            <span className="anal-tab-s">tokens vs pass@1</span>
           </button>
           <button className={"anal-tab " + (tab === "pareto" ? "active" : "")} onClick={() => setTab("pareto")}>
             <span className="anal-tab-no">02</span>
@@ -678,8 +645,8 @@ function Analysis() {
           </button>
           <button className={"anal-tab " + (tab === "heatmap" ? "active" : "")} onClick={() => setTab("heatmap")}>
             <span className="anal-tab-no">03</span>
-            <span className="anal-tab-t">By domain</span>
-            <span className="anal-tab-s">Heatmap</span>
+            <span className="anal-tab-t">Per-task scores</span>
+            <span className="anal-tab-s">tasks × agents</span>
           </button>
           <button className={"anal-tab " + (tab === "dist" ? "active" : "")} onClick={() => setTab("dist")}>
             <span className="anal-tab-no">04</span>
@@ -689,9 +656,9 @@ function Analysis() {
         </div>
 
         <div className="anal-stage">
-          {tab === "horizon" && <TimeHorizonChart />}
+          {tab === "horizon" && <ComputeHorizonChart />}
           {tab === "pareto"  && <ParetoChart />}
-          {tab === "heatmap" && <FamilyHeatmap />}
+          {tab === "heatmap" && <TaskHeatmap />}
           {tab === "dist"    && <TaskDistribution />}
         </div>
       </div>

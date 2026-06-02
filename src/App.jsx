@@ -518,7 +518,7 @@ function StatStrip() {
   { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
   { num: `${HEADLINE.agentBudgetMinH}–${HEADLINE.agentBudgetMaxH}`, unit: "h", label: "Agent budget" },
   { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Best pass@1" },
-  { num: HEADLINE.nTrials.toLocaleString(), unit: "", label: "Logged trials" }];
+  { num: "1,300", unit: "", label: "Logged trials" }];
 
   return (
     <div className="stats-strip">
@@ -536,7 +536,7 @@ function Hero() {
   return (
     <header className="hero">
       <div className="container">
-        <div className="eyebrow">SWE-MARATHON · 20 LONG-HORIZON TASKS · 1,100 LOGGED TRIALS</div>
+        <div className="eyebrow">SWE-MARATHON · 20 LONG-HORIZON TASKS · 1,300 LOGGED TRIALS</div>
         <h1 className="title">
           Can agents autonomously complete<br />
           <span className="ital">ultra-long-horizon</span> software work?
@@ -1557,7 +1557,7 @@ function CourseProfileSection() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§04 / The course</div>
-          <h2 className="section-title">Multi-hour rollouts, millions of tokens.</h2>
+          <h2 className="section-title">Multi-hour rollouts, hundreds of millions of tokens.</h2>
         </div>
         <div className="section-body" style={{ marginBottom: 28 }}>
           <div className="sb-side">
@@ -1568,7 +1568,8 @@ function CourseProfileSection() {
           <div>
             <p style={{ fontSize: 15, color: "var(--ink-2)", margin: "0 0 18px", maxWidth: 600 }}>
               SWE-Marathon trials run for hours. Cumulative input across API
-              calls reaches millions to hundreds of millions of tokens — far
+              calls climbs into the hundreds of millions of tokens — the
+              largest trial approaches a billion ({HEADLINE.maxTokensPerTrialM}M) — far
               past what any single context window holds. Holding the model
               fixed and varying the scaffold moves median tokens-per-trial
               by up to 12×.
