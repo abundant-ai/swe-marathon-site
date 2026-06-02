@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{{ title or "Chirp" }}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/htmx-ext-sse.min.js" defer></script>
+  <script src="/static/alpine.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">Chirp</a>
+    <nav class="topnav" aria-label="Primary">
+      <a href="/public">Local</a>
+      {% if current_user %}
+      <a href="/home">Home</a>
+      <a class="nav-notifications" href="/notifications">Notifications <span id="notification-badge" class="badge">{{ unread_count }}</span></a>
+      <a href="/@{{ current_user.username }}">@{{ current_user.username }}</a>
+      <form method="post" action="/logout" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="text-button">Sign out</button>
+      </form>
+      {% else %}
+      <a href="/login">Sign in</a>
+      <a class="button-link" href="/signup">Sign up</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="shell">
+    <aside class="sidebar sidebar-left" aria-label="Instance">
+      <div class="panel instance-panel">
+        <div class="instance-mark">Chirp</div>
+        <p>@{{ instance_domain }}</p>
+        <a href="/public">Public timeline</a>
+        {% if current_user %}<a href="/notifications">Notifications</a>{% endif %}
+      </div>
+    </aside>
+    <section class="content">
+      {% block content %}{% endblock %}
+    </section>
+    <aside class="sidebar sidebar-right" aria-label="Trending">
+      <div class="panel">
+        <h2>Trending</h2>
+        <ol class="trend-list">
+          {% for tag in trends[:6] %}
+          <li><a href="/tags/{{ tag.name }}">#{{ tag.name }}</a></li>
+          {% endfor %}
+        </ol>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

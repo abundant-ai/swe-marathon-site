@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_status.html" import render as render_status %}
+{% block title %}{{ title or 'Home' }} — Chirp{% endblock %}
+{% block main %}
+{% if not viewer %}
+<div class="cta-banner" style="margin: 1rem">
+  <h2>Welcome to Chirp</h2>
+  <p>A small Mastodon-compatible community. Share short posts, follow people, and join hashtag conversations.</p>
+  <a class="btn-cta" href="/signup">Create an account</a>
+</div>
+{% endif %}
+<div class="tabs" role="tablist">
+  <a href="/home" role="tab" {% if active=='home' %}class="active"{% endif %}>Home</a>
+  <a href="/public/local" role="tab" {% if active=='local' %}class="active"{% endif %}>Local</a>
+  <a href="/public" role="tab" {% if active=='federated' %}class="active"{% endif %}>Federated</a>
+</div>
+{% include "_compose.html" %}
+<div id="timeline">
+  {% if statuses %}
+    {% for s in statuses %}
+      {{ render_status(s, viewer=viewer) }}
+    {% endfor %}
+  {% else %}
+    <div class="empty-state"><p>No posts yet. Be the first.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

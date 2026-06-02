@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ status }} — Chirp{% endblock %}
+{% block layout %}
+<div class="error-page" style="grid-column: 1 / -1">
+  <h1>{{ status }}</h1>
+  <p>{{ message }}</p>
+  <p><a class="btn" href="/" style="text-decoration:none">Back to Chirp</a></p>
+</div>
+{% endblock %}

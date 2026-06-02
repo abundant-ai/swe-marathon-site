@@ -1,0 +1,49 @@
+{% macro vis_icon(v) -%}
+  {% if v == 'public' %}<span class="vis-icon vis-public" title="Public" aria-label="public">🌐</span>
+  {% elif v == 'unlisted' %}<span class="vis-icon vis-unlisted" title="Unlisted" aria-label="unlisted">👁</span>
+  {% elif v == 'private' %}<span class="vis-icon vis-private" title="Followers only" aria-label="followers-only">🔒</span>
+  {% elif v == 'direct' %}<span class="vis-icon vis-direct" title="Direct" aria-label="direct">✉️</span>
+  {% endif %}
+{%- endmacro %}
+
+{% macro status_card(s, viewer=None) %}
+{% set base = s.reblog if s.reblog else s %}
+<article class="status-card" data-status-id="{{ base.id }}" data-author="{{ base.account.acct }}">
+  {% if s.reblog %}<div class="reblog-banner">🔁 {{ s.account.display_name }} boosted</div>{% endif %}
+  <div class="status-row">
+    <a href="/@{{ base.account.username }}" class="avatar-link"><img class="avatar" src="{{ base.account.avatar }}" alt="" width="48" height="48" onerror="this.src='/static/avatars/default.svg'"></a>
+    <div class="status-body">
+      <header class="status-head">
+        <a class="display-name" href="/@{{ base.account.username }}">{{ base.account.display_name }}</a>
+        <span class="acct">@{{ base.account.username }}@{{ DOMAIN }}</span>
+        <span class="reltime" title="{{ base.created_at }}">{{ base.created_at|reltime }}</span>
+        {{ vis_icon(base.visibility) }}
+      </header>
+      {% if base.spoiler_text %}
+        <details class="cw"><summary>CW: {{ base.spoiler_text }}</summary>
+          <div class="status-content">{{ base.content|safe }}</div>
+        </details>
+      {% else %}
+        <div class="status-content">{{ base.content|safe }}</div>
+      {% endif %}
+      {% if base.media_attachments %}
+        <div class="media-grid">
+        {% for m in base.media_attachments %}
+          <a class="media-item" href="{{ m.url }}" target="_blank"><img src="{{ m.preview_url or m.url }}" alt="{{ m.description or '' }}"></a>
+        {% endfor %}
+        </div>
+      {% endif %}
+      <footer class="status-actions" role="group" aria-label="status actions">
+        <a class="action action-reply" href="/statuses/{{ base.id }}" aria-label="Reply"><span class="icon">💬</span> <span class="count" data-replies>{{ base.replies_count }}</span></a>
+        <button class="action action-boost" type="button" data-boost data-id="{{ base.id }}" aria-pressed="{{ 'true' if base.reblogged else 'false' }}"><span class="icon">🔁</span> <span class="count" data-reblogs>{{ base.reblogs_count }}</span></button>
+        <button class="action action-fav" type="button" data-fav data-id="{{ base.id }}" aria-pressed="{{ 'true' if base.favourited else 'false' }}"><span class="icon">⭐</span> <span class="count" data-favs>{{ base.favourites_count }}</span></button>
+        <button class="action action-bookmark" type="button" data-bookmark data-id="{{ base.id }}" aria-pressed="{{ 'true' if base.bookmarked else 'false' }}"><span class="icon">🔖</span></button>
+        {% if viewer and viewer.id == base.account.id %}
+          <a class="action action-edit" href="/statuses/{{ base.id }}" aria-label="Edit"><span class="icon">✏️</span></a>
+          <button class="action action-delete" type="button" data-delete data-id="{{ base.id }}" aria-label="Delete"><span class="icon">🗑</span></button>
+        {% endif %}
+      </footer>
+    </div>
+  </div>
+</article>
+{% endmacro %}

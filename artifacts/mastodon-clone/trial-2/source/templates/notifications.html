@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-header"><h1>Notifications</h1></header>
+<div class="notification-list">
+  {% for note in notifications %}
+  <article class="notification notification-{{ note.type }}">
+    <span class="note-icon">{% if note.type == "follow" %}+{% elif note.type == "favourite" %}*{% elif note.type == "reblog" %}Boost{% else %}Reply{% endif %}</span>
+    <div>
+      <strong>{{ note.account.display_name or note.account.username }}</strong>
+      <span>{{ note.type }}</span>
+      {% if note.status %}
+      {% set status = note.status %}
+      {% include "_status.html" %}
+      {% endif %}
+    </div>
+  </article>
+  {% else %}
+  <p class="empty">No notifications yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

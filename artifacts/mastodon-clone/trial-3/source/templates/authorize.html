@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="narrow"><h1>Authorize {{ app.name }}</h1>
+<p>This app is requesting access with scope: <code>{{ scope }}</code></p>
+<form method="post" action="/oauth/authorize">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <input type="hidden" name="client_id" value="{{ client_id }}">
+  <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
+  <input type="hidden" name="scope" value="{{ scope }}">
+  <input type="hidden" name="state" value="{{ state }}">
+  <input type="hidden" name="code_challenge" value="{{ code_challenge }}">
+  <input type="hidden" name="code_challenge_method" value="{{ code_challenge_method }}">
+  <button class="btn btn-primary" type="submit">Authorize</button>
+</form></div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="thread">
+  <h1>Thread</h1>
+  {% for status in ancestors %}
+  {% include "_status.html" %}
+  {% endfor %}
+  {% set status = target %}
+  {% include "_status.html" %}
+  {% if current_user %}
+  <form id="reply" class="compose" method="post" action="/ui/statuses">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="in_reply_to_id" value="{{ target.id }}">
+    <label for="reply-text">Reply</label>
+    <textarea id="reply-text" name="status" data-counter="#reply-counter" rows="4"></textarea>
+    <div class="compose-row"><span id="reply-counter" class="counter" data-limit="{{ char_limit }}">{{ char_limit }}</span><button class="primary-button" type="submit">Post</button></div>
+  </form>
+  {% endif %}
+  <div class="descendants">
+    {% for status in descendants %}
+    {% include "_status.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

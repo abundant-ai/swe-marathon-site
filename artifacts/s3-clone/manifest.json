@@ -1,0 +1,26 @@
+{
+  "task": "s3-clone",
+  "artifacts": [
+    {
+      "id": "trial-1",
+      "root": "artifacts/s3-clone/trial-1",
+      "sourceTrial": "s3-clone-214",
+      "localUrl": "http://127.0.0.1:8200/console/",
+      "railwayUrl": "https://swe-marathon-s3-trial-1-production.up.railway.app/console/"
+    },
+    {
+      "id": "trial-2",
+      "root": "artifacts/s3-clone/trial-2",
+      "sourceTrial": "s3-clone-144",
+      "localUrl": "http://127.0.0.1:8210/console/",
+      "railwayUrl": "https://swe-marathon-s3-trial-2-production.up.railway.app/console/"
+    },
+    {
+      "id": "trial-3",
+      "root": "artifacts/s3-clone/trial-3",
+      "sourceTrial": "s3-clone-172",
+      "localUrl": "http://127.0.0.1:8220/console/",
+      "railwayUrl": "https://swe-marathon-s3-trial-3-production.up.railway.app/console/"
+    }
+  ]
+}

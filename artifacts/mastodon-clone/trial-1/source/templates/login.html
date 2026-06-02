@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Log in — Chirp{% endblock %}
+{% block layout %}
+<div class="auth-card" style="grid-column: 1 / -1">
+  <h1>Log in to Chirp</h1>
+  {% if error %}<div class="error-banner">{{ error }}</div>{% endif %}
+  <form method="post" action="/web/login">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="next" value="{{ next or '/home' }}">
+    <div class="field"><label for="u">Username or email</label><input id="u" name="username" type="text" autocomplete="username" required></div>
+    <div class="field"><label for="p">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required></div>
+    <button class="btn" type="submit">Log in</button>
+    <p class="muted" style="margin-top: 1rem">No account? <a href="/signup">Sign up</a>.</p>
+  </form>
+</div>
+{% endblock %}

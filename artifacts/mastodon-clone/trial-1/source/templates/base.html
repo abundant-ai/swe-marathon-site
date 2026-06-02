@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Chirp{% endblock %}</title>
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<meta name="csrf-token" content="{{ csrf or '' }}">
+{% if viewer %}<meta name="user-id" content="{{ viewer.id }}">{% endif %}
+<script src="/static/htmx.min.js" defer></script>
+<script src="/static/htmx-ext-sse.min.js" defer></script>
+<script src="/static/alpine.min.js" defer></script>
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="/" class="brand"><span class="brand-mark">C</span> Chirp</a>
+    <nav>
+      <a href="/home"{% if active=='home' %} class="active"{% endif %}>Home</a>
+      <a href="/public/local"{% if active=='local' %} class="active"{% endif %}>Local</a>
+      <a href="/public"{% if active=='federated' %} class="active"{% endif %}>Federated</a>
+      {% if viewer %}
+      <a href="/notifications"{% if active=='notifications' %} class="active"{% endif %}>Notifications<span id="nav-notif-badge" class="nav-badge" {% if unread_count and unread_count > 0 %}{% else %}style="display:none"{% endif %}>{{ unread_count or 0 }}</span></a>
+      {% endif %}
+    </nav>
+    <div class="spacer"></div>
+    {% if viewer %}
+      <a href="/@{{ viewer.username }}">@{{ viewer.username }}</a>
+      <form method="post" action="/web/logout" style="display:inline">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button type="submit" class="btn btn-ghost">Log out</button>
+      </form>
+    {% else %}
+      <a href="/login" class="btn btn-secondary" style="text-decoration:none">Log in</a>
+      <a href="/signup" class="btn" style="text-decoration:none">Sign up</a>
+    {% endif %}
+  </div>
+</header>
+<main class="layout">
+  {% block layout %}
+  <aside class="side" aria-label="Primary navigation">
+    {% block sidebar %}
+      <h3>Timelines</h3>
+      <ul>
+        <li><a href="/home"{% if active=='home' %} class="active"{% endif %}>Home</a></li>
+        <li><a href="/public/local"{% if active=='local' %} class="active"{% endif %}>Local</a></li>
+        <li><a href="/public"{% if active=='federated' %} class="active"{% endif %}>Federated</a></li>
+        {% if viewer %}
+        <li><a href="/notifications"{% if active=='notifications' %} class="active"{% endif %}>Notifications</a></li>
+        <li><a href="/bookmarks"{% if active=='bookmarks' %} class="active"{% endif %}>Bookmarks</a></li>
+        <li><a href="/favourites"{% if active=='favourites' %} class="active"{% endif %}>Favourites</a></li>
+        <li><a href="/lists"{% if active=='lists' %} class="active"{% endif %}>Lists</a></li>
+        {% endif %}
+      </ul>
+      {% if viewer %}
+      <h3 style="margin-top:1rem">You</h3>
+      <ul>
+        <li><a href="/@{{ viewer.username }}">@{{ viewer.username }}</a></li>
+        <li><a href="/settings/profile">Edit profile</a></li>
+      </ul>
+      {% endif %}
+    {% endblock %}
+  </aside>
+  <section class="main" id="main-pane">
+    {% block main %}{% endblock %}
+  </section>
+  <aside class="side-right" aria-label="Trending">
+    {% block right %}
+      <h3>Trending hashtags</h3>
+      <ul class="tag-list">
+        {% for t in trending or [] %}
+        <li><a href="/tags/{{ t.name }}"><span class="hashtag">#{{ t.name }}</span> <span class="muted">{{ t.uses }} posts</span></a></li>
+        {% endfor %}
+      </ul>
+      <hr>
+      <p class="muted">A small Chirp instance — Mastodon-compatible.</p>
+    {% endblock %}
+  </aside>
+  {% endblock %}
+</main>
+</body>
+</html>

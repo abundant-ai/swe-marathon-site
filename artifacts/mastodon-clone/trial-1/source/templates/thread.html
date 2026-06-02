@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "_status.html" import render as render_status %}
+{% block title %}Thread — Chirp{% endblock %}
+{% block main %}
+<div class="main-header">Thread</div>
+<div>
+  {% for s in ancestors %}{{ render_status(s, viewer=viewer) }}{% endfor %}
+  <div style="background: var(--c-panel-2)">{{ render_status(status, viewer=viewer) }}</div>
+  {% include "_compose.html" %}
+  {% for s in descendants %}{{ render_status(s, viewer=viewer) }}{% endfor %}
+</div>
+{% endblock %}

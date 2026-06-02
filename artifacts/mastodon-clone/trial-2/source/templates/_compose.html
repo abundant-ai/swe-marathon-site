@@ -1,0 +1,19 @@
+{% if current_user %}
+<form class="compose" action="/ui/statuses" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label for="compose-cw">Content warning</label>
+  <input id="compose-cw" name="spoiler_text" type="text" autocomplete="off">
+  <label for="compose-text">Post</label>
+  <textarea id="compose-text" name="status" maxlength="5000" data-counter="#compose-counter" rows="5"></textarea>
+  <div class="compose-row">
+    <select name="visibility" aria-label="Visibility">
+      <option value="public">Globe Public</option>
+      <option value="unlisted">Eye Unlisted</option>
+      <option value="private">Lock Followers</option>
+      <option value="direct">Envelope Direct</option>
+    </select>
+    <span id="compose-counter" class="counter" data-limit="{{ char_limit }}">{{ char_limit }}</span>
+    <button type="submit" class="primary-button">Post</button>
+  </div>
+</form>
+{% endif %}

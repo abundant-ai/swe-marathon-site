@@ -1,0 +1,22 @@
+{% if viewer %}
+<form class="compose" method="post" action="/web/statuses" enctype="multipart/form-data">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% if in_reply_to %}<input type="hidden" name="in_reply_to_id" value="{{ in_reply_to }}">{% endif %}
+  <details>
+    <summary class="muted" style="cursor:pointer; margin-bottom: 0.4rem">Add content warning</summary>
+    <input class="cw-input" type="text" name="spoiler_text" placeholder="Content warning (optional)">
+  </details>
+  <textarea name="status" data-counter="ccount" data-max="500" placeholder="What's on your mind?" required aria-label="Compose post"></textarea>
+  <div class="compose-tools">
+    <select name="visibility" aria-label="Visibility">
+      <option value="public">Public</option>
+      <option value="unlisted">Unlisted</option>
+      <option value="private">Followers-only</option>
+      <option value="direct">Direct</option>
+    </select>
+    <input type="file" name="media" accept="image/*" aria-label="Attach media">
+    <span class="compose-counter" id="ccount" aria-live="polite">500</span>
+    <button class="btn" type="submit">Post</button>
+  </div>
+</form>
+{% endif %}

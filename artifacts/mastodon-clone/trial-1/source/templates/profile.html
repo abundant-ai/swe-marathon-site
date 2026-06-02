@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_status.html" import render as render_status %}
+{% block title %}{{ account.display_name }} — Chirp{% endblock %}
+{% block main %}
+<div class="profile-header">
+  <div class="profile-banner" style="background-image: url('{{ account.header }}'); background-size: cover; background-position: center"></div>
+  <div class="profile-body">
+    <div class="profile-avatar"><img src="{{ account.avatar }}" alt=""></div>
+    <div class="profile-actions">
+      {% if viewer and viewer.id|string == account.id|string %}
+      <a class="btn btn-secondary" href="/settings/profile">Edit profile</a>
+      {% elif viewer %}
+      <button type="button" class="btn{% if relationship.following %} btn-secondary active{% endif %}" data-action="follow" data-id="{{ account.id }}" data-optimistic="1">{% if relationship.following %}Following{% else %}Follow{% endif %}</button>
+      <details style="display:inline-block; margin-left: 0.4rem">
+        <summary class="btn btn-ghost" style="display:inline-block">More</summary>
+        <div style="position:absolute; background: var(--c-panel); border: 1px solid var(--c-border); border-radius: 6px; padding: 0.4rem; right: 1rem; z-index: 5">
+          <form method="post" action="/web/accounts/{{ account.id }}/mute" style="display:block">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <button class="btn-ghost" type="submit">{% if relationship.muting %}Unmute{% else %}Mute{% endif %}</button>
+          </form>
+          <form method="post" action="/web/accounts/{{ account.id }}/block" style="display:block">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <button class="btn-ghost" type="submit">{% if relationship.blocking %}Unblock{% else %}Block{% endif %}</button>
+          </form>
+          <a class="btn-ghost" style="display:block; padding: 0.5rem 1rem; border-radius: 6px" href="/report?account_id={{ account.id }}">Report</a>
+        </div>
+      </details>
+      {% endif %}
+    </div>
+    <div class="profile-name">{{ account.display_name }}</div>
+    <div class="profile-handle">@{{ account.acct if '@' in account.acct else account.username + '@' + instance_domain }}</div>
+    <div class="profile-bio">{{ account.note_html|safe }}</div>
+    {% if account.fields %}
+    <table class="fields-table">
+      {% for f in account.fields %}<tr><td>{{ f.name }}</td><td>{{ f.value }}</td></tr>{% endfor %}
+    </table>
+    {% endif %}
+    <div class="profile-meta">Joined {{ account.created_at[:10] }}</div>
+    <div class="profile-counts">
+      <a href="/@{{ account.username }}"><strong>{{ account.statuses_count }}</strong>Posts</a>
+      <a href="/@{{ account.username }}/followers"><strong>{{ account.followers_count }}</strong>Followers</a>
+      <a href="/@{{ account.username }}/following"><strong>{{ account.following_count }}</strong>Following</a>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <a href="/@{{ account.username }}" class="{% if not subview %}active{% endif %}">Posts</a>
+  <a href="/@{{ account.username }}/with_replies" class="{% if subview=='replies' %}active{% endif %}">Posts &amp; replies</a>
+  <a href="/@{{ account.username }}/media" class="{% if subview=='media' %}active{% endif %}">Media</a>
+</div>
+<div>
+  {% if statuses %}
+    {% for s in statuses %}{{ render_status(s, viewer=viewer) }}{% endfor %}
+  {% else %}
+    <div class="empty-state"><p>No posts yet.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

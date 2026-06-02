@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Report — Chirp{% endblock %}
+{% block main %}
+<div class="main-header">Report account</div>
+<form method="post" action="/web/report" style="padding: 1rem">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input type="hidden" name="account_id" value="{{ target.id }}">
+  <p>You're reporting @{{ target.username }}. The instance moderators will review this report.</p>
+  <div class="form-row"><label for="cat">Category</label>
+    <select id="cat" name="category">
+      <option value="spam">Spam</option>
+      <option value="violation">Rule violation</option>
+      <option value="other" selected>Other</option>
+    </select>
+  </div>
+  <div class="form-row"><label for="cmt">Details</label><textarea id="cmt" name="comment" rows="4"></textarea></div>
+  <button class="btn" type="submit">Submit report</button>
+</form>
+{% endblock %}

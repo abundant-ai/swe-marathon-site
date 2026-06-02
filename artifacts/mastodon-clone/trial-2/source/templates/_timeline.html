@@ -1,0 +1,7 @@
+<div class="timeline-list">
+  {% for status in statuses %}
+  {% include "_status.html" %}
+  {% else %}
+  <p class="empty">No statuses here yet.</p>
+  {% endfor %}
+</div>

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-panel">
+  <h1>Authorize app</h1>
+  <p>Allow this Mastodon client to access Chirp with the requested scopes.</p>
+  <form method="post" action="/oauth/authorize">
+    {% for key, value in query.items() %}
+    <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+    <button class="primary-button" type="submit">Authorize</button>
+  </form>
+</section>
+{% endblock %}

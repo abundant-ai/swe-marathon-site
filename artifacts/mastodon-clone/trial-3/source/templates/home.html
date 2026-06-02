@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_status.html" import status_card %}
+{% block content %}
+<div class="layout" x-data="chirpHome">
+  <aside class="sidebar sidebar-left">
+    <nav class="timeline-tabs" aria-label="timelines">
+      <a href="/home" class="tab {% if tab=='home' %}active{% endif %}" hx-get="/home" hx-target="#feed-list" hx-select="#feed-list" hx-swap="outerHTML">Home</a>
+      <a href="/local" class="tab {% if tab=='local' %}active{% endif %}" hx-get="/local" hx-target="#feed-list" hx-select="#feed-list" hx-swap="outerHTML">Local</a>
+      <a href="/federated" class="tab {% if tab=='federated' %}active{% endif %}" hx-get="/federated" hx-target="#feed-list" hx-select="#feed-list" hx-swap="outerHTML">Federated</a>
+    </nav>
+    {% if user %}
+    <form class="compose" method="post" action="/compose" data-compose>
+      <input type="hidden" name="_csrf" value="{{ csrf }}">
+      <input type="hidden" name="next" value="{{ path }}">
+      <details><summary>Add content warning</summary><input class="cw-input" name="spoiler_text" placeholder="Content warning" maxlength="100"></details>
+      <textarea class="compose-text" name="status" maxlength="500" rows="4" placeholder="What's happening?" required></textarea>
+      <div class="compose-bar">
+        <select name="visibility" aria-label="visibility">
+          <option value="public">Public</option><option value="unlisted">Unlisted</option>
+          <option value="private">Followers only</option><option value="direct">Direct</option>
+        </select>
+        <span class="counter" data-counter>500</span>
+        <button class="btn btn-primary" type="submit">Post</button>
+      </div>
+    </form>
+    {% endif %}
+  </aside>
+  <section class="feed" aria-label="timeline">
+    <h1 class="feed-title">{{ tab|capitalize }}</h1>
+    <div class="feed-list" id="feed-list" hx-ext="sse" sse-connect="/api/v1/streaming/user">
+      {% for s in statuses %}{{ status_card(s, user) }}{% endfor %}
+      {% if not statuses %}<p class="empty">Nothing here yet. Follow some folks!</p>{% endif %}
+    </div>
+  </section>
+  <aside class="sidebar sidebar-right">
+    <h3>Trending</h3>
+    <ul class="trending">
+      {% for t in trending %}<li><a href="/tags/{{ t.tag }}">#{{ t.tag }}</a> <span class="count">{{ t.c }}</span></li>{% endfor %}
+      {% if not trending %}<li class="empty">No trends yet</li>{% endif %}
+    </ul>
+  </aside>
+</div>
+{% endblock %}

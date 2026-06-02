@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_status.html" import status_card %}
+{% block content %}
+<div class="layout"><section class="feed">
+<h1>Notifications</h1>
+<ul class="notif-list" id="notif-list" hx-ext="sse" sse-connect="/api/v1/streaming/user">
+{% for n in notifications %}
+  <li class="notif notif-{{ n.type }}">
+    <span class="notif-icon">{% if n.type=='favourite' %}&#11088;{% elif n.type=='reblog' %}&#128257;{% elif n.type=='follow' %}&#128100;{% elif n.type=='mention' %}&#128172;{% else %}&#128276;{% endif %}</span>
+    <a href="/@{{ n.account.username }}">{{ n.account.display_name }}</a> {{ n.type }}
+    {% if n.status %}<a href="/statuses/{{ n.status.id }}">view</a>{% endif %}
+  </li>
+{% endfor %}
+{% if not notifications %}<li class="empty">No notifications.</li>{% endif %}
+</ul>
+</section></div>
+{% endblock %}

@@ -1,3 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 cd /app
-exec /opt/venv/bin/python3 -u -m server.supervisor
+exec python3 /app/server.py

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="narrow">
+<h1>Edit profile</h1>
+<form method="post" action="/settings" enctype="multipart/form-data" class="auth-form">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <label>Display name <input name="display_name" value="{{ user.display_name }}" maxlength="30"></label>
+  <label>Bio <textarea name="note" rows="4" maxlength="500">{{ user.note }}</textarea></label>
+  <label>Avatar <input type="file" name="avatar" accept="image/*"></label>
+  <label>Header <input type="file" name="header" accept="image/*"></label>
+  {% for i in range(4) %}
+  <fieldset><legend>Field {{ i+1 }}</legend>
+    <label>Label <input name="fields_attributes[{{ i }}][name]" maxlength="50"></label>
+    <label>Value <input name="fields_attributes[{{ i }}][value]" maxlength="200"></label>
+  </fieldset>
+  {% endfor %}
+  <button class="btn btn-primary" type="submit">Save</button>
+</form>
+</div>
+{% endblock %}

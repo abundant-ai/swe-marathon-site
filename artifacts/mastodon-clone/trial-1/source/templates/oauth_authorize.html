@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Authorize — Chirp{% endblock %}
+{% block layout %}
+<div class="auth-card" style="grid-column: 1 / -1">
+  <h1>Authorize {{ app.name }}</h1>
+  {% if error %}<div class="error-banner">{{ error }}</div>{% endif %}
+  <p>This application wants to access your Chirp account with the following permissions:</p>
+  <ul>{% for s in scope_list %}<li><strong>{{ s }}</strong></li>{% endfor %}</ul>
+  {% if not viewer %}
+  <p>Please <a href="/login?next={{ next_url }}">log in</a> to continue.</p>
+  {% else %}
+  <p>Logged in as <strong>@{{ viewer.username }}</strong>.</p>
+  <form method="post" action="/oauth/authorize">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="client_id" value="{{ form.client_id }}">
+    <input type="hidden" name="redirect_uri" value="{{ form.redirect_uri }}">
+    <input type="hidden" name="response_type" value="{{ form.response_type }}">
+    <input type="hidden" name="scope" value="{{ form.scope }}">
+    <input type="hidden" name="state" value="{{ form.state or '' }}">
+    <input type="hidden" name="code_challenge" value="{{ form.code_challenge or '' }}">
+    <input type="hidden" name="code_challenge_method" value="{{ form.code_challenge_method or '' }}">
+    <button class="btn" type="submit" name="approve" value="1">Authorize</button>
+    <button class="btn btn-ghost" type="submit" name="approve" value="0">Cancel</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

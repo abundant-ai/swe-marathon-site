@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_status.html" import status_card %}
+{% block content %}
+<div class="layout">
+<section class="profile">
+  <header class="profile-header">
+    <img class="profile-banner" src="{{ profile.header }}" alt="" onerror="this.style.display='none'">
+    <img class="profile-avatar" src="{{ profile.avatar }}" alt="" onerror="this.src='/static/avatars/default.svg'">
+    <h1 class="profile-name">{{ profile.display_name }}</h1>
+    <p class="profile-acct">@{{ profile.username }}@{{ DOMAIN }}</p>
+    <div class="profile-bio">{{ profile.note|safe }}</div>
+    <p class="profile-joined">Joined {{ profile.created_at[:10] }}</p>
+    <ul class="profile-counts">
+      <li><a href="/@{{ profile.username }}"><b>{{ profile.statuses_count }}</b> Posts</a></li>
+      <li><a href="/@{{ profile.username }}/followers"><b>{{ profile.followers_count }}</b> Followers</a></li>
+      <li><a href="/@{{ profile.username }}/following"><b>{{ profile.following_count }}</b> Following</a></li>
+    </ul>
+    {% if user and user.id == profile.id %}
+      <a href="/settings" class="btn btn-secondary">Edit profile</a>
+    {% elif user %}
+      <button class="btn btn-primary" data-follow data-id="{{ profile.id }}">{% if rel and rel.following %}Unfollow{% else %}Follow{% endif %}</button>
+      <details class="overflow"><summary>More</summary>
+        <button data-mute data-id="{{ profile.id }}">Mute</button>
+        <button data-block data-id="{{ profile.id }}">Block</button>
+        <a href="/report?account_id={{ profile.id }}">Report</a>
+      </details>
+    {% endif %}
+  </header>
+  <h2>Posts</h2>
+  <div class="feed-list">
+    {% for s in statuses %}{{ status_card(s, user) }}{% endfor %}
+    {% if not statuses %}<p class="empty">No posts yet.</p>{% endif %}
+  </div>
+</section>
+</div>
+{% endblock %}

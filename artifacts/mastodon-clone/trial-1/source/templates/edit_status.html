@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit post — Chirp{% endblock %}
+{% block main %}
+<div class="main-header">Edit post</div>
+<form method="post" action="/web/statuses/{{ status.id }}/edit" style="padding: 1rem">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input class="cw-input" type="text" name="spoiler_text" placeholder="Content warning" value="{{ status.spoiler_text }}">
+  <textarea name="status" data-counter="ccount" data-max="500" required>{{ status.text }}</textarea>
+  <div class="compose-tools">
+    <span class="compose-counter" id="ccount">500</span>
+    <button class="btn" type="submit">Save</button>
+    <a class="btn btn-ghost" href="/statuses/{{ status.id }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

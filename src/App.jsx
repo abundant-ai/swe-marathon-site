@@ -8,6 +8,7 @@ import {
   LEADERBOARD,
   PIPELINE,
   RH_BY_MODEL,
+  SLACK_TRIAL_BY_ID,
   TASK_DETAILS,
   TASKS,
 } from "./data.js";
@@ -637,8 +638,8 @@ function Leaderboard() {
                       </span>
                     </td>
                     <td>
-                      <div className="agent-name">{row.name}</div>
-                      <div className="scaffold" style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 2 }}>{row.scaffold}</div>
+                      <span className="agent-name">{row.name}</span>
+                      <span className="scaffold" style={{ fontSize: 11, color: "var(--ink-3)", marginLeft: 8 }}>{row.scaffold}</span>
                     </td>
                     <td className="num score-bar-cell">
                       <span className={"score-bar " + (row.ref ? "ref" : "")}
@@ -719,6 +720,250 @@ function Tasks() {
 
 }
 
+/* ---------------- Trajectory viewer (DeepSWE-inspired) ---------------- */
+
+// Per-tool-kind presentation metadata. Colors are drawn from the site palette
+// so the trajectory reads as part of the same visual language.
+const TOOL_META = {
+  Bash:       { label: "Bash",     glyph: "$",  color: "#1a1a17" },
+  Write:      { label: "Write",    glyph: "✎",  color: "oklch(0.50 0.10 145)" },
+  Edit:       { label: "Edit",     glyph: "±",  color: "oklch(0.55 0.13 70)" },
+  Read:       { label: "Read",     glyph: "▤",  color: "#6b8da3" },
+  Grep:       { label: "Grep",     glyph: "⌕",  color: "#5a6cb8" },
+  TaskCreate: { label: "Task +",   glyph: "◆",  color: "oklch(0.55 0.15 35)" },
+  TaskUpdate: { label: "Task ·",   glyph: "◇",  color: "#a86237" },
+  ToolSearch: { label: "Search",   glyph: "≋",  color: "#7a83b3" },
+  Submit:     { label: "Submit",   glyph: "✓",  color: "oklch(0.52 0.12 150)" },
+};
+const DEFAULT_TOOL_META = { label: "Tool", glyph: "•", color: "#84827a" };
+const toolMeta = (kind) => TOOL_META[kind] || DEFAULT_TOOL_META;
+
+// The logged `detail` looks like:
+//   "Agent message:\n<text>\n\nTool arguments:\n{ ...json... }"
+// Split it into a human header and the parsed tool arguments so we can render
+// commands, file writes, and edits in a structured way instead of raw JSON.
+function parseDetail(detail) {
+  const marker = "Tool arguments:";
+  const idx = detail ? detail.indexOf(marker) : -1;
+  if (idx === -1) return { header: detail || "", args: null, rawArgs: "" };
+  const header = detail.slice(0, idx).replace(/^Agent message:\s*/i, "").trim();
+  const rawArgs = detail.slice(idx + marker.length).trim();
+  let args = null;
+  try { args = JSON.parse(rawArgs); } catch { args = null; }
+  return { header, args, rawArgs };
+}
+
+// Render the parsed arguments for a single step in a tool-aware way.
+function StepBody({ kind, detail }) {
+  const { args, rawArgs } = parseDetail(detail);
+
+  if (args && typeof args.command === "string") {
+    return (
+      <div className="step-body">
+        {args.description && <div className="step-desc">{args.description}</div>}
+        <div className="code-block term">
+          <div className="code-block-tag">shell</div>
+          <pre>{args.command}</pre>
+        </div>
+      </div>
+    );
+  }
+  if (args && typeof args.content === "string") {
+    return (
+      <div className="step-body">
+        <div className="code-block">
+          <div className="code-block-tag">write · {args.file_path || "file"}</div>
+          <pre>{args.content || "(empty file)"}</pre>
+        </div>
+      </div>
+    );
+  }
+  if (args && (typeof args.old_string === "string" || typeof args.new_string === "string")) {
+    return (
+      <div className="step-body">
+        {args.file_path && <div className="step-desc mono">{args.file_path}</div>}
+        <div className="code-block diff">
+          <div className="code-block-tag">− removed</div>
+          <pre className="diff-old">{args.old_string || ""}</pre>
+        </div>
+        <div className="code-block diff">
+          <div className="code-block-tag">+ added</div>
+          <pre className="diff-new">{args.new_string || ""}</pre>
+        </div>
+      </div>
+    );
+  }
+  if (args && (args.subject || args.description)) {
+    return (
+      <div className="step-body">
+        {args.subject && <div className="step-desc"><b>{args.subject}</b></div>}
+        {args.description && <div className="step-desc">{args.description}</div>}
+      </div>
+    );
+  }
+  if (args && (args.pattern || args.query)) {
+    return (
+      <div className="step-body">
+        <div className="code-block term">
+          <div className="code-block-tag">{args.pattern ? "grep" : "search"}</div>
+          <pre>{args.pattern || args.query}</pre>
+        </div>
+      </div>
+    );
+  }
+  if (args && args.file_path) {
+    return (
+      <div className="step-body">
+        <div className="step-desc mono">{args.file_path}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="step-body">
+      <pre className="code-block-raw">{rawArgs || detail}</pre>
+    </div>
+  );
+}
+
+function TrajectoryExplorer({ trial, label, rows, status }) {
+  const [open, setOpen] = useState(() => new Set());
+  const [mutedKinds, setMutedKinds] = useState(() => new Set());
+  const stepRefs = useRef({});
+  const listRef = useRef(null);
+
+  // Reset interaction state when switching trials.
+  useEffect(() => {
+    setOpen(new Set());
+    setMutedKinds(new Set());
+  }, [trial]);
+
+  const kinds = useMemo(() => {
+    const counts = {};
+    rows.forEach((r) => { counts[r.kind] = (counts[r.kind] || 0) + 1; });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [rows]);
+
+  const visible = useMemo(
+    () => rows.filter((r) => !mutedKinds.has(r.kind)),
+    [rows, mutedKinds]
+  );
+
+  const maxWeight = useMemo(
+    () => Math.max(1, ...rows.map((r) => (r.detail || "").length)),
+    [rows]
+  );
+
+  const toggleStep = (i) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
+
+  const focusStep = (i) => {
+    setOpen((prev) => new Set(prev).add(i));
+    const el = stepRefs.current[i];
+    if (el) el.scrollIntoView({ block: "center", behavior: "smooth" });
+  };
+
+  const toggleKind = (k) =>
+    setMutedKinds((prev) => {
+      const next = new Set(prev);
+      next.has(k) ? next.delete(k) : next.add(k);
+      return next;
+    });
+
+  const allOpen = open.size >= visible.length && visible.length > 0;
+  const setAll = () =>
+    setOpen(allOpen ? new Set() : new Set(rows.map((_, i) => i)));
+
+  if (status === "loading") {
+    return <div className="trajectory-loading">Loading trajectory…</div>;
+  }
+  if (status === "error") {
+    return <div className="trajectory-loading">Could not load trajectory JSON.</div>;
+  }
+
+  return (
+    <div className="traj">
+      <div className="traj-head">
+        <div className="traj-head-main">
+          <div className="traj-kicker">Tool-by-tool agent trajectory{label ? ` · ${label}` : ""}</div>
+          <div className="traj-count">
+            <b>{rows.length}</b> tool calls · {kinds.length} tool types
+          </div>
+        </div>
+        <button className="pill" onClick={setAll}>
+          {allOpen ? "Collapse all" : "Expand all"}
+        </button>
+      </div>
+
+      {/* Timeline: one tick per step, height ∝ payload size, color by tool. */}
+      <div className="traj-timeline" aria-hidden="true">
+        {rows.map((r, i) => {
+          const w = (r.detail || "").length;
+          const h = 22 + Math.round((Math.log(w + 1) / Math.log(maxWeight + 1)) * 26);
+          const muted = mutedKinds.has(r.kind);
+          return (
+            <button
+              key={`${r.step}-${r.call}-${i}`}
+              className={"traj-tick " + (muted ? "muted" : "")}
+              style={{ height: h, background: muted ? "var(--rule)" : toolMeta(r.kind).color }}
+              title={`#${i + 1} · ${r.kind} · ${r.title}`}
+              onClick={() => focusStep(i)}
+            />
+          );
+        })}
+      </div>
+
+      {/* Legend doubles as a per-tool filter. */}
+      <div className="traj-legend">
+        {kinds.map(([k, n]) => {
+          const m = toolMeta(k);
+          const muted = mutedKinds.has(k);
+          return (
+            <button
+              key={k}
+              className={"traj-legend-chip " + (muted ? "off" : "")}
+              onClick={() => toggleKind(k)}
+            >
+              <span className="leg-swatch" style={{ background: m.color }} />
+              {m.label}
+              <b>{n}</b>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="traj-steps" ref={listRef}>
+        {visible.map((r) => {
+          const i = rows.indexOf(r);
+          const m = toolMeta(r.kind);
+          const isOpen = open.has(i);
+          return (
+            <div
+              key={`${r.step}-${r.call}-${i}`}
+              ref={(el) => { stepRefs.current[i] = el; }}
+              className={"traj-step " + (isOpen ? "open" : "")}
+            >
+              <button className="traj-step-head" onClick={() => toggleStep(i)}>
+                <span className="traj-step-no">{String(i + 1).padStart(3, "0")}</span>
+                <span className="traj-step-kind" style={{ "--tk": m.color }}>
+                  <i>{m.glyph}</i>{m.label}
+                </span>
+                <span className="traj-step-title">{r.title}</span>
+                <span className="traj-step-meta">step {r.step}</span>
+                <span className="traj-step-chev">{isOpen ? "−" : "+"}</span>
+              </button>
+              {isOpen && <StepBody kind={r.kind} detail={r.detail} />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SlackArtifact({ artifacts }) {
   const [activeId, setActiveId] = useState(artifacts.trials[0].id);
   const [loadedFor, setLoadedFor] = useState(null);
@@ -750,18 +995,14 @@ function SlackArtifact({ artifacts }) {
   return (
     <div className="artifact-card">
       <div className="artifact-head">
-        <div>
-          <div className="artifact-kicker">Restored agent trial artifacts</div>
-          <h3>{artifacts.title}</h3>
-        </div>
-        <div className={"artifact-status " + (loadedFor === active.id ? "live" : "")}>
+        <div className={"artifact-status " + (loadedFor === active.id ? "live" : "")} style={{ marginLeft: "auto" }}>
           {loadedFor === active.id ? "IFRAME LOADED" : "LOCAL SERVICE"}
         </div>
       </div>
-      <p className="artifact-intro">{artifacts.intro}</p>
 
+      <div className="artifact-pick-label">Pick a trial</div>
       <div className="artifact-selector">
-        {artifacts.trials.map((trial) => (
+        {artifacts.trials.map((trial, i) => (
           <button
             key={trial.id}
             className={"artifact-option " + (trial.id === active.id ? "active" : "")}
@@ -770,51 +1011,30 @@ function SlackArtifact({ artifacts }) {
               setLoadedFor(null);
             }}
           >
-            <span>{trial.label}</span>
-            <b>{trial.label}</b>
-            <em>{trial.agent} · {trial.model}</em>
-            <small>{trial.result}</small>
+            <b>{trial.model}</b>
+            <span>{trial.agent}</span>
+            <em>{trial.tokens} tokens · {trial.cost}</em>
           </button>
         ))}
       </div>
 
-      <div className="selected-artifact-meta">
-        <div><span>Artifact</span><b>{active.label}</b></div>
-        <div><span>Agent</span><b>{active.agent} · {active.model}</b></div>
-        <div><span>Tokens</span><b>{active.tokens}</b></div>
-        <div><span>Cost</span><b>{active.cost}</b></div>
-        <div><span>Partial score</span><b>{active.result}</b></div>
-        <div><span>Stages</span><b>{active.stages}</b></div>
+      <div className="artifact-scoreline">
+        <div className="asl-main">
+          <span>{active.agent} · {active.trial}</span>
+          <b>{active.model}</b>
+        </div>
+        <div className="asl-stats">
+          <span><i>Partial</i>{active.result.replace(/\s*partial$/i, "")}</span>
+          {active.stages.split(" · ").map((part) => (
+            <span key={part}><i>{/ux/i.test(part) ? "CUA UX" : "Unit tests"}</i>{part.replace(/\s*(CUA UX|correctness gates)$/i, "")}</span>
+          ))}
+        </div>
       </div>
-      <p className="artifact-note">{active.note}</p>
-
-      <details className="artifact-trajectory">
-        <summary className="artifact-trajectory-summary">
-          <span>Full agent tool trajectory · {active.label}</span>
-          <b>{trajectoryRows.length || "…" } tool calls</b>
-        </summary>
-        {trajectoryStatus === "loading" && <div className="trajectory-loading">Loading trajectory…</div>}
-        {trajectoryStatus === "error" && <div className="trajectory-loading">Could not load trajectory JSON.</div>}
-        {trajectoryRows.length > 0 && (
-          <div className="trajectory-list">
-            {trajectoryRows.map((row, i) => (
-              <details className="trajectory-row" key={`${active.id}-${row.step}-${row.call}-${row.kind}`}>
-                <summary>
-                  <span>{String(i + 1).padStart(3, "0")} · step {row.step}</span>
-                  <b>{row.kind}</b>
-                  <p>{row.title}</p>
-                </summary>
-                <pre>{row.detail}</pre>
-              </details>
-            ))}
-          </div>
-        )}
-      </details>
 
       <div className="live-artifact-frame">
         <div className="iframe-toolbar">
           <div>
-            <span>Artifact URL</span>
+            <span>Live app · {active.agent} · {active.model}</span>
             <b>{active.liveUrl}</b>
           </div>
           <a className="btn ghost" href={active.liveUrl} target="_blank" rel="noreferrer">Open full app ↗</a>
@@ -827,6 +1047,13 @@ function SlackArtifact({ artifacts }) {
           sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
         />
       </div>
+
+      <TrajectoryExplorer
+        trial={active.id}
+        label={`${active.agent} · ${active.model} · ${active.trial}`}
+        rows={trajectoryRows}
+        status={trajectoryStatus}
+      />
 
     </div>
   );
@@ -875,34 +1102,58 @@ function TaskEvidence({ evidence }) {
 }
 
 function TaskLeaderboard({ leaderboard }) {
+  const [openRank, setOpenRank] = useState(null);
   if (!leaderboard) return null;
-  const maxPartial = Math.max(...leaderboard.rows.map((r) => r.partial || 0), 0.001);
 
   return (
     <div className="task-lb-card">
       <p className="task-lb-note">{leaderboard.note}</p>
       <div className="task-lb-list">
-        {leaderboard.rows.map((row) => (
-          <div className={"task-lb-row " + (row.rank === 1 ? "top" : "")} key={`${row.rank}-${row.agent}-${row.model}`}>
-            <div className="task-lb-main">
+        {leaderboard.rows.map((row) => {
+          const hasTrials = Array.isArray(row.trials) && row.trials.length > 0;
+          const isOpen = openRank === row.rank;
+          return (
+          <div className="task-lb-group" key={`${row.rank}-${row.agent}-${row.model}`}>
+            <button
+              type="button"
+              className={"task-lb-row " + (row.rank === 1 ? "top " : "") + (isOpen ? "open " : "") + (hasTrials ? "clickable" : "")}
+              onClick={() => hasTrials && setOpenRank(isOpen ? null : row.rank)}
+              aria-expanded={isOpen}
+            >
               <span className="rank-badge">{row.rank}</span>
-              <div>
-                <div className="task-lb-name">{row.model}</div>
-                <div className="task-lb-agent">{row.agent} · n={row.n}</div>
+              <div className="task-lb-id">
+                <span className="task-lb-name">{row.model}</span>
+                <span className="task-lb-agent">{row.agent}</span>
+              </div>
+              <div className="task-lb-metrics">
+                <span><b>Reward</b> {row.binary}</span>
+                <span><b>Unit tests</b> {row.correctness.toFixed(3)}</span>
+                <span><b>UX</b> {row.ux.toFixed(3)}</span>
+              </div>
+              <div className="task-lb-bar-track" title={`partial ${row.partial.toFixed(3)} of 1.0`}>
+                <div className="task-lb-bar" style={{ width: `${Math.min(100, row.partial * 100)}%` }} />
               </div>
               <div className="task-lb-score">{row.partial.toFixed(3)}</div>
-            </div>
-            <div className="task-lb-bar-track">
-              <div className="task-lb-bar" style={{ width: `${(row.partial / maxPartial) * 100}%` }} />
-            </div>
-            <div className="task-lb-metrics">
-              <span><b>Binary</b> {row.binary}</span>
-              <span><b>Best</b> {row.best.toFixed(3)}</span>
-              <span><b>Correct</b> {row.correctness.toFixed(3)}</span>
-              <span><b>UX</b> {row.ux.toFixed(3)}</span>
-            </div>
+              {hasTrials && <span className="task-lb-chev">{isOpen ? "−" : "+"}</span>}
+            </button>
+
+            {isOpen && hasTrials && (
+              <div className="task-lb-trials">
+                {row.trials.map((t) => (
+                  <a className="trial-chip" key={t.id} href={`#trajectory/${encodeURIComponent(t.id)}`}>
+                    <span className="trial-chip-id">{t.trial}</span>
+                    <span className="trial-chip-metrics">
+                      <span><i>partial</i>{t.partial.toFixed(3)}</span>
+                      <span><i>tokens</i>{t.tokens}</span>
+                      <span><i>duration</i>{t.duration || "—"}</span>
+                    </span>
+                    <span className="trial-chip-open">View trajectory →</span>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
+        );})}
       </div>
     </div>
   );
@@ -914,11 +1165,29 @@ function SampleTask({ sample }) {
   if (!sample) return null;
   const active = sample.tabs.find((tab) => tab.id === activeId) || sample.tabs[0];
   const selectedFile = active.files?.find((file) => file.path === selectedFilePath) || active.files?.[0];
+  // Inline markdown: `code`, **bold**.
+  const renderInline = (text) => {
+    const out = [];
+    const re = /(`[^`]+`|\*\*[^*]+\*\*)/g;
+    let last = 0;
+    let m;
+    let k = 0;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index > last) out.push(text.slice(last, m.index));
+      const tok = m[0];
+      if (tok[0] === "`") out.push(<code key={k++}>{tok.slice(1, -1)}</code>);
+      else out.push(<strong key={k++}>{tok.slice(2, -2)}</strong>);
+      last = m.index + tok.length;
+    }
+    if (last < text.length) out.push(text.slice(last));
+    return out;
+  };
   const renderMarkdownish = (text) => String(text).split("\n").map((line, i) => {
-    if (line.startsWith("## ")) return <h4 key={i}>{line.slice(3)}</h4>;
-    if (line.startsWith("- ")) return <li key={i}>{line.slice(2)}</li>;
-    if (line.trim() === "") return <br key={i} />;
-    return <p key={i}>{line}</p>;
+    if (line.startsWith("### ")) return <h5 key={i}>{renderInline(line.slice(4))}</h5>;
+    if (line.startsWith("## ")) return <h4 key={i}>{renderInline(line.slice(3))}</h4>;
+    if (line.startsWith("- ")) return <li key={i}>{renderInline(line.slice(2))}</li>;
+    if (line.trim() === "") return null;
+    return <p key={i}>{renderInline(line)}</p>;
   });
 
   return (
@@ -937,10 +1206,23 @@ function SampleTask({ sample }) {
       {sample.note && <p className="sample-note">{sample.note}</p>}
 
       <div className="sample-panel">
+        {active.meta && (
+          <div className="env-meta">
+            {active.meta.map((m) => (
+              <div className="env-row" key={m.label}>
+                <span className="env-k">{m.label}</span>
+                <span className="env-v">{m.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {active.blocks?.map((block) => (
           <div className="sample-block" key={block.title}>
             <div className="sample-block-title">{block.title}</div>
-            <div className="sample-markdown">{renderMarkdownish(block.body)}</div>
+            <div className={"sample-markdown" + (block.scroll ? " scroll" : "")}>
+              {renderMarkdownish(block.body)}
+            </div>
           </div>
         ))}
 
@@ -1013,6 +1295,86 @@ function SampleTask({ sample }) {
   );
 }
 
+// Full-page trajectory viewer (DeepSWE-style) reached via #trajectory/<id>.
+function TrajectoryPage({ trialId }) {
+  const trial = SLACK_TRIAL_BY_ID[trialId];
+  const [rows, setRows] = useState([]);
+  const [status, setStatus] = useState("loading");
+
+  useEffect(() => {
+    if (!trial) return;
+    let cancelled = false;
+    setStatus("loading");
+    setRows([]);
+    fetch(trial.trajectoryUrl)
+      .then((res) => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+      .then((data) => { if (!cancelled) { setRows(data.rows || []); setStatus("loaded"); } })
+      .catch(() => { if (!cancelled) setStatus("error"); });
+    return () => { cancelled = true; };
+  }, [trial]);
+
+  if (!trial) {
+    return (
+      <section className="task-page">
+        <div className="container">
+          <a className="back-link" href="#task/slack-clone">← Back to leaderboard</a>
+          <h1 className="task-page-title">Trajectory not found.</h1>
+        </div>
+      </section>
+    );
+  }
+
+  const stats = [
+    { label: "Rank", value: `#${trial.rank}` },
+    { label: "Reward", value: trial.reward.toFixed(1) },
+    { label: "Partial", value: trial.partial.toFixed(3) },
+    { label: "Unit tests", value: trial.gates },
+    { label: "CUA UX", value: trial.ux.toFixed(3) },
+    { label: "Tokens", value: trial.tokens },
+    { label: "Cost", value: trial.cost },
+    { label: "Duration", value: trial.duration || "—" },
+    { label: "Tool calls", value: String(trial.steps) },
+  ];
+
+  return (
+    <>
+      <section className="task-page hero task-hero">
+        <div className="container">
+          <a className="back-link" href="#task/slack-clone">← Back to leaderboard</a>
+          <div className="eyebrow">Trajectory · {trial.trial}</div>
+          <h1 className="title">{trial.configAgent} · {trial.configModel}</h1>
+          <p className="lede">
+            Full agent trajectory for <b>{trial.trial}</b> — every tool call the agent made,
+            replayable step by step.
+          </p>
+          <div className="cta-row" style={{ marginTop: 18 }}>
+            {trial.liveUrl && (
+              <a className="btn" href={trial.liveUrl} target="_blank" rel="noreferrer">Open live app ↗</a>
+            )}
+            <a className="btn ghost" href="#task/slack-clone">Back to task</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="task-page">
+        <div className="container">
+          <div className="selected-artifact-meta" style={{ marginBottom: 22 }}>
+            {stats.map((s) => (
+              <div key={s.label}><span>{s.label}</span><b>{s.value}</b></div>
+            ))}
+          </div>
+          <TrajectoryExplorer
+            trial={trial.id}
+            label={`${trial.configAgent} · ${trial.configModel}`}
+            rows={rows}
+            status={status}
+          />
+        </div>
+      </section>
+    </>
+  );
+}
+
 function TaskDetailPage({ taskId }) {
   const detail = TASK_DETAILS[taskId];
   const task = TASKS.find((t) => t.id === taskId);
@@ -1052,18 +1414,19 @@ function TaskDetailPage({ taskId }) {
           <div className="eyebrow">{detail.taskNo} · {detail.kicker}</div>
           <h1 className="title">{detail.title}</h1>
           <p className="lede">{detail.summary}</p>
-
-          <div className="task-result-grid">
-            {detail.results.map((r) => (
-              <div className="task-result" key={r.label}>
-                <div className="task-result-value">{r.value}</div>
-                <div className="task-result-label">{r.label}</div>
-                <p>{r.note}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
+
+      {detail.leaderboard && (
+        <section className="task-page">
+          <div className="container">
+            <div className="section-head">
+              <div className="section-no"><span className="dot">●</span>Leaderboard</div>
+            </div>
+            <TaskLeaderboard leaderboard={detail.leaderboard} />
+          </div>
+        </section>
+      )}
 
       {detail.sections?.length > 0 && (
         <section className="task-page">
@@ -1083,7 +1446,6 @@ function TaskDetailPage({ taskId }) {
           <div className="container">
             <div className="section-head">
               <div className="section-no"><span className="dot">●</span>Task specification</div>
-              <h2 className="section-title">{detail.sample.title}</h2>
             </div>
             <SampleTask sample={detail.sample} />
           </div>
@@ -1112,18 +1474,6 @@ function TaskDetailPage({ taskId }) {
         </section>
       )}
 
-      {detail.leaderboard && (
-        <section className="task-page">
-          <div className="container">
-            <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>Leaderboard</div>
-              <h2 className="section-title">{detail.leaderboard.title}</h2>
-            </div>
-            <TaskLeaderboard leaderboard={detail.leaderboard} />
-          </div>
-        </section>
-      )}
-
       {(detail.artifacts || detail.evidence) && (
         <section className="task-page">
           <div className="container">
@@ -1131,19 +1481,6 @@ function TaskDetailPage({ taskId }) {
               <div className="section-no"><span className="dot">●</span>{detail.artifacts ? "Agent trials" : "Result"}</div>
               <h2 className="section-title">{detail.resultTitle}</h2>
             </div>
-            {detail.bestTrial && (
-              <>
-                <div className="trial-strip">
-                  <div><span>Trial</span><b>{detail.bestTrial.trial}</b></div>
-                  <div><span>Agent</span><b>{detail.bestTrial.agent} · {detail.bestTrial.model}</b></div>
-                  <div><span>Tokens</span><b>{detail.bestTrial.tokens}</b></div>
-                  <div><span>Cost</span><b>{detail.bestTrial.cost}</b></div>
-                  <div><span>Result</span><b>{detail.bestTrial.partialScore} · {detail.bestTrial.reward}</b></div>
-                  <div><span>Stages</span><b>{detail.bestTrial.correctness} · {detail.bestTrial.ux}</b></div>
-                </div>
-                <p className="trial-note">{detail.bestTrial.note}</p>
-              </>
-            )}
             {detail.artifacts && <SlackArtifact artifacts={detail.artifacts} />}
             {detail.evidence && <TaskEvidence evidence={detail.evidence} />}
           </div>
@@ -1433,10 +1770,23 @@ function App() {
   const [hash, setHash] = useState(() => window.location.hash);
 
   useEffect(() => {
-    const onHash = () => setHash(window.location.hash);
+    const onHash = () => {
+      setHash(window.location.hash);
+      if (/^#(task|trajectory)\//.test(window.location.hash)) window.scrollTo(0, 0);
+    };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  const trajMatch = hash.match(/^#trajectory\/(.+)$/);
+  if (trajMatch) {
+    return (
+      <>
+        <TrajectoryPage trialId={decodeURIComponent(trajMatch[1])} />
+        <Footer />
+      </>
+    );
+  }
 
   const taskMatch = hash.match(/^#task\/(.+)$/);
   if (taskMatch) {

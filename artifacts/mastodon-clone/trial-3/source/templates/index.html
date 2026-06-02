@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_status.html" import status_card %}
+{% block content %}
+<div class="layout">
+  <aside class="sidebar sidebar-left">
+    <div class="signup-cta">
+      <h2>Welcome to {{ INSTANCE_TITLE }}</h2>
+      <p>A small, independent social space speaking the Mastodon API.</p>
+      <a href="/signup" class="btn btn-primary">Create an account</a>
+      <a href="/login" class="btn btn-secondary">Log in</a>
+    </div>
+    <nav class="timeline-tabs" aria-label="timelines">
+      <a href="/home" class="tab {% if tab=='home' %}active{% endif %}">Home</a>
+      <a href="/local" class="tab {% if tab=='local' %}active{% endif %}">Local</a>
+      <a href="/federated" class="tab {% if tab=='federated' or tab=='public' %}active{% endif %}">Federated</a>
+    </nav>
+  </aside>
+  <section class="feed" aria-label="timeline">
+    <h1 class="feed-title">Public timeline</h1>
+    <div class="feed-list" id="feed-list">
+      {% for s in statuses %}{{ status_card(s, user) }}{% endfor %}
+      {% if not statuses %}<p class="empty">No posts yet.</p>{% endif %}
+    </div>
+  </section>
+  <aside class="sidebar sidebar-right">
+    <h3>Trending</h3>
+    <ul class="trending">
+      {% for t in trending %}<li><a href="/tags/{{ t.tag }}">#{{ t.tag }}</a> <span class="count">{{ t.c }}</span></li>{% endfor %}
+      {% if not trending %}<li class="empty">No trends yet</li>{% endif %}
+    </ul>
+  </aside>
+</div>
+{% endblock %}

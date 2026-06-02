@@ -6,16 +6,13 @@ if [ -d "$SCRIPT_DIR/source" ]; then
 else
   cd "$SCRIPT_DIR"
 fi
-export HUDDLE_DATA_DIR="${HUDDLE_DATA_DIR:-/app/data}"
+# Codex / GPT-5.5 submission: single-file stdlib HTTP server. The verifier ran
+# three nodes on 127.0.0.1:8000-8002; for the Railway single-service demo we run
+# only node 0 and bind it on 0.0.0.0 so the public domain can reach it.
 export HUDDLE_HTTP_HOST="${HUDDLE_HTTP_HOST:-0.0.0.0}"
-export HUDDLE_HTTP_BASE_PORT="${PORT:-8000}"
-export HUDDLE_BROKER_HOST="${HUDDLE_BROKER_HOST:-127.0.0.1}"
-export HUDDLE_BROKER_PORT="${HUDDLE_BROKER_PORT:-9100}"
-export HUDDLE_IRC_HOST="${HUDDLE_IRC_HOST:-0.0.0.0}"
-export HUDDLE_IRC_PORT="${HUDDLE_IRC_PORT:-6667}"
-mkdir -p "$HUDDLE_DATA_DIR/files"
-PYTHON_BIN="${PYTHON_BIN:-python}"
+mkdir -p /app/data
+PYTHON_BIN="${PYTHON_BIN:-python3}"
 if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
-  PYTHON_BIN=python3
+  PYTHON_BIN=python
 fi
-exec "$PYTHON_BIN" -u -m server.supervisor
+exec "$PYTHON_BIN" -u server.py http 0

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Edit profile — Chirp{% endblock %}
+{% block main %}
+<div class="main-header">Edit profile</div>
+{% if saved %}<div class="cta-banner" style="margin: 1rem">Saved.</div>{% endif %}
+<form method="post" action="/web/settings/profile" enctype="multipart/form-data" style="padding: 1rem">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <div class="form-row"><label for="dn">Display name</label><input id="dn" name="display_name" type="text" value="{{ account.display_name }}"></div>
+  <div class="form-row"><label for="bio">Bio</label><textarea id="bio" name="note" rows="4">{{ account.note_raw }}</textarea></div>
+  <div class="form-row"><label>Avatar</label><input type="file" name="avatar" accept="image/*"></div>
+  <div class="form-row"><label>Header</label><input type="file" name="header" accept="image/*"></div>
+  <h3>Profile metadata</h3>
+  {% for i in range(4) %}
+  <div class="form-grid">
+    <input type="text" name="field_name_{{ i }}" placeholder="Label" value="{{ (account.fields[i].name if account.fields|length > i else '') }}">
+    <input type="text" name="field_value_{{ i }}" placeholder="Content" value="{{ (account.fields[i].value if account.fields|length > i else '') }}">
+  </div>
+  {% endfor %}
+  <p><button class="btn" type="submit">Save</button></p>
+</form>
+{% endblock %}

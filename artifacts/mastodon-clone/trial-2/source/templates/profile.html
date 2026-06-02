@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-header">
+  <img class="profile-cover" src="{{ profile.header }}" alt="">
+  <div class="profile-info">
+    <img class="avatar avatar-large" src="{{ profile.avatar }}" alt="">
+    <div>
+      <h1>{{ profile.display_name or profile.username }}</h1>
+      <p class="acct">@{{ profile.acct }}{% if "@" not in profile.acct %}@{{ instance_domain }}{% endif %}</p>
+      <div class="bio">{{ profile.note|safe }}</div>
+      <p class="joined">Joined {{ profile.created_at[:10] }}</p>
+    </div>
+  </div>
+  <nav class="profile-counts" aria-label="Profile counts">
+    <a href="/api/v1/accounts/{{ profile.id }}/statuses"><strong>{{ profile.statuses_count }}</strong> statuses</a>
+    <a href="/api/v1/accounts/{{ profile.id }}/followers"><strong>{{ profile.followers_count }}</strong> followers</a>
+    <a href="/api/v1/accounts/{{ profile.id }}/following"><strong>{{ profile.following_count }}</strong> following</a>
+  </nav>
+  {% if current_user and current_user.id|string == profile.id|string %}
+  <details class="edit-profile">
+    <summary class="button-link">Edit profile</summary>
+    <form method="post" action="/ui/profile">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Display name<input name="display_name" value="{{ profile.display_name }}"></label>
+      <label>Bio<textarea name="note" rows="4">{{ profile_row.note }}</textarea></label>
+      <label>Avatar URL<input name="avatar" value="{{ profile_row.avatar }}"></label>
+      <label>Header URL<input name="header" value="{{ profile_row.header }}"></label>
+      {% for n in range(4) %}
+      <div class="field-row">
+        <input name="field_{{ n }}_name" placeholder="Label">
+        <input name="field_{{ n }}_value" placeholder="Value">
+      </div>
+      {% endfor %}
+      <button class="primary-button" type="submit">Publish</button>
+    </form>
+  </details>
+  {% elif current_user %}
+  <div class="profile-actions">
+    <form method="post" action="/ui/profile/{{ profile.id }}/{% if relationship and relationship.following %}unfollow{% else %}follow{% endif %}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="primary-button" type="submit">{% if relationship and relationship.following %}Following{% else %}Follow{% endif %}</button>
+    </form>
+    <details class="moderation-menu">
+      <summary>Moderation</summary>
+      <form method="post" action="/ui/profile/{{ profile.id }}/mute"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit">Mute</button></form>
+      <form method="post" action="/ui/profile/{{ profile.id }}/block"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit">Block</button></form>
+      <form method="post" action="/api/v1/reports" class="report-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="account_id" value="{{ profile.id }}">
+        <label>Category<select name="category"><option value="spam">Spam</option><option value="violation">Rule violation</option><option value="other">Other</option></select></label>
+        <label>Comment<textarea name="comment" rows="3"></textarea></label>
+        <button type="submit">Report</button>
+      </form>
+    </details>
+  </div>
+  {% endif %}
+</section>
+<div id="timeline">
+  {% include "_timeline.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_status.html" import status_card %}
+{% block content %}
+<div class="layout">
+<section class="thread">
+  {% for a in ancestors %}{{ status_card(a, user) }}{% endfor %}
+  <div class="target">{{ status_card(status, user) }}</div>
+  {% if user %}
+  <form class="compose reply" method="post" action="/compose">
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <input type="hidden" name="in_reply_to_id" value="{{ status.id }}">
+    <input type="hidden" name="next" value="{{ path }}">
+    <textarea name="status" rows="3" maxlength="500" placeholder="Post your reply" required></textarea>
+    <div class="compose-bar"><span class="counter" data-counter>500</span><button class="btn btn-primary">Post</button></div>
+  </form>
+  {% endif %}
+  {% for d in descendants %}{{ status_card(d, user) }}{% endfor %}
+</section>
+</div>
+{% endblock %}

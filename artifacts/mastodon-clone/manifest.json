@@ -1,0 +1,26 @@
+{
+  "task": "mastodon-clone",
+  "artifacts": [
+    {
+      "id": "trial-1",
+      "root": "artifacts/mastodon-clone/trial-1",
+      "sourceTrial": "mastodon-clone-173",
+      "localUrl": "http://127.0.0.1:8300/",
+      "railwayUrl": "https://swe-marathon-mastodon-trial-1-production.up.railway.app/"
+    },
+    {
+      "id": "trial-2",
+      "root": "artifacts/mastodon-clone/trial-2",
+      "sourceTrial": "mastodon-clone-177",
+      "localUrl": "http://127.0.0.1:8310/",
+      "railwayUrl": "https://swe-marathon-mastodon-trial-2-production.up.railway.app/"
+    },
+    {
+      "id": "trial-3",
+      "root": "artifacts/mastodon-clone/trial-3",
+      "sourceTrial": "mastodon-clone-207",
+      "localUrl": "http://127.0.0.1:8320/",
+      "railwayUrl": "https://swe-marathon-mastodon-trial-3-production.up.railway.app/"
+    }
+  ]
+}

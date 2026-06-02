@@ -1,0 +1,26 @@
+{
+  "task": "excel-clone",
+  "artifacts": [
+    {
+      "id": "trial-1",
+      "root": "artifacts/excel-clone/trial-1",
+      "sourceTrial": "excel-clone-220",
+      "localUrl": "http://127.0.0.1:8100/",
+      "railwayUrl": "https://swe-marathon-excel-trial-1-production.up.railway.app/"
+    },
+    {
+      "id": "trial-2",
+      "root": "artifacts/excel-clone/trial-2",
+      "sourceTrial": "excel-clone-223",
+      "localUrl": "http://127.0.0.1:8110/",
+      "railwayUrl": "https://swe-marathon-excel-trial-2-production.up.railway.app/"
+    },
+    {
+      "id": "trial-3",
+      "root": "artifacts/excel-clone/trial-3",
+      "sourceTrial": "excel-clone-251",
+      "localUrl": "http://127.0.0.1:8120/",
+      "railwayUrl": "https://swe-marathon-excel-trial-3-production.up.railway.app/"
+    }
+  ]
+}

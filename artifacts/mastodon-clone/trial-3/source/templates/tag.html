@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "_status.html" import status_card %}
+{% block content %}
+<div class="layout"><section class="feed">
+<h1>#{{ tag }}</h1>
+<div class="feed-list">
+{% for s in statuses %}{{ status_card(s, user) }}{% endfor %}
+{% if not statuses %}<p class="empty">No posts for #{{ tag }} yet.</p>{% endif %}
+</div></section></div>
+{% endblock %}

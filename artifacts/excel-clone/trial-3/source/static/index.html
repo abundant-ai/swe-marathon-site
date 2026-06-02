@@ -1,0 +1,48 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Tabula</title>
+<style>
+body{font-family:sans-serif;margin:0;display:flex;height:100vh}
+#side{width:200px;border-right:1px solid #ccc;padding:8px;overflow:auto}
+#main{flex:1;display:flex;flex-direction:column}
+#bar{padding:6px;border-bottom:1px solid #ccc;display:flex;align-items:center;gap:6px}
+#tabs{display:flex;gap:4px;padding:4px;border-bottom:1px solid #ccc;overflow-x:auto}
+.tab{padding:4px 8px;border:1px solid #ccc;cursor:pointer;background:#f7f7f7}
+.tab.active{background:#fff;font-weight:bold}
+#grid{flex:1;overflow:auto}
+table{border-collapse:collapse;font-family:monospace}
+td,th{border:1px solid #ddd;padding:2px 6px;min-width:80px;height:22px;cursor:cell}
+td.sel{outline:2px solid #06c}
+th{background:#eee;text-align:center}
+#fb{flex:1;font-family:monospace;padding:4px}
+button{padding:4px 8px}
+.wb-row{padding:4px;cursor:pointer}
+.wb-row.active{background:#def}
+</style></head><body>
+<div id="side">
+  <button id="new-btn" data-testid="new-workbook-btn">+ New</button>
+  <div id="wblist" data-testid="workbook-list"></div>
+</div>
+<div id="main">
+  <div id="bar">
+    <span id="cellref">A1</span>
+    <input id="fb" data-testid="formula-bar" />
+    <button id="save" data-testid="save-btn">Save</button>
+  </div>
+  <div id="tabs" data-testid="sheet-tabs"></div>
+  <div id="grid"></div>
+</div>
+<script>
+let wbId=null, sheet='Sheet1', sel={c:0,r:0}, COLS=12, ROWS=30;
+let cells={};
+async function api(p,o){o=o||{};o.headers={'content-type':'application/json',...(o.headers||{})};const r=await fetch(p,o);if(!r.ok)throw new Error(await r.text());return r.json();}
+function colLet(i){let s='';i++;while(i){let r=(i-1)%26;s=String.fromCharCode(65+r)+s;i=(i-1-r)/26;}return s;}
+async function listWb(){const j=await api('/api/workbooks');const list=document.getElementById('wblist');list.innerHTML='';j.workbooks.forEach(w=>{const d=document.createElement('div');d.className='wb-row'+(w.id===wbId?' active':'');d.setAttribute('data-testid','workbook-row-'+w.id);d.textContent=w.name;d.onclick=()=>{wbId=w.id;loadWb();};list.appendChild(d);});}
+async function newWb(){const j=await api('/api/workbooks',{method:'POST',body:JSON.stringify({name:'Untitled'})});wbId=j.id;await listWb();await loadWb();}
+async function loadWb(){if(!wbId)return;const j=await api('/api/workbooks/'+wbId);renderTabs(j.sheets);if(!j.sheets.find(s=>s.name===sheet))sheet=j.sheets[0].name;cells={};(j.sheets.find(s=>s.name===sheet)||{cells:[]}).cells.forEach(c=>cells[c.ref]=c);renderGrid();await listWb();}
+function renderTabs(sheets){const t=document.getElementById('tabs');t.innerHTML='';sheets.forEach(s=>{const d=document.createElement('div');d.className='tab'+(s.name===sheet?' active':'');d.setAttribute('data-testid','sheet-tab-'+s.name);d.textContent=s.name;d.onclick=()=>{sheet=s.name;loadWb();};t.appendChild(d);});}
+function renderGrid(){const g=document.getElementById('grid');let h='<table><tr><th></th>';for(let c=0;c<COLS;c++)h+='<th>'+colLet(c)+'</th>';h+='</tr>';for(let r=0;r<ROWS;r++){h+='<tr><th>'+(r+1)+'</th>';for(let c=0;c<COLS;c++){const ref=colLet(c)+(r+1);const cell=cells[ref];const v=cell?(cell.display!==undefined?cell.display:cell.value):'';h+=`<td data-testid="cell-${ref}" data-c="${c}" data-r="${r}" class="${sel.c===c&&sel.r===r?'sel':''}">${v||''}</td>`;}h+='</tr>';}h+='</table>';g.innerHTML=h;g.querySelectorAll('td[data-c]').forEach(td=>{td.onclick=()=>{sel={c:+td.dataset.c,r:+td.dataset.r};const ref=colLet(sel.c)+(sel.r+1);document.getElementById('cellref').textContent=ref;const cell=cells[ref];document.getElementById('fb').value=cell?(cell.input!==undefined?cell.input:(cell.value!==null&&cell.value!==undefined?cell.value:'')):'';renderGrid();};td.ondblclick=()=>{document.getElementById('fb').focus();};});}
+document.getElementById('fb').addEventListener('keydown',async e=>{if(e.key==='Enter'){const ref=colLet(sel.c)+(sel.r+1);const v=e.target.value;try{const j=await api('/api/workbooks/'+wbId+'/cells',{method:'POST',body:JSON.stringify({patches:[{sheet:sheet,ref:ref,input:v||null}]})});j.cells.forEach(c=>cells[c.ref]=c);renderGrid();}catch(err){alert(err.message);}}});
+document.getElementById('new-btn').onclick=newWb;
+document.getElementById('save').onclick=()=>alert('Saved');
+(async()=>{await listWb();const j=await api('/api/workbooks');if(j.workbooks.length){wbId=j.workbooks[0].id;await loadWb();}else{await newWb();}})();
+</script></body></html>

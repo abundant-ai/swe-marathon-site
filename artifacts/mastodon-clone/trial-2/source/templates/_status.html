@@ -1,0 +1,65 @@
+<article class="status-card" id="status-{{ status.id }}" data-status-id="{{ status.id }}">
+  <a class="avatar-link" href="/@{{ status.account.username }}"><img class="avatar" src="{{ status.account.avatar }}" alt=""></a>
+  <div class="status-main">
+    <header class="status-header">
+      <a class="display-name" href="/@{{ status.account.username }}">{{ status.account.display_name or status.account.username }}</a>
+      <span class="acct">@{{ status.account.acct }}{% if "@" not in status.account.acct %}@{{ instance_domain }}{% endif %}</span>
+      <a class="timestamp" href="/statuses/{{ status.id }}">{{ status.created_at }}</a>
+      <span class="visibility" aria-label="{{ status.visibility }}">{{ status.visibility|visibility_icon|safe }}</span>
+    </header>
+    {% if status.spoiler_text %}
+    <details class="content-warning">
+      <summary>{{ status.spoiler_text }}</summary>
+      <div class="status-content">{{ status.content|safe }}</div>
+    </details>
+    {% else %}
+    <div class="status-content">{{ status.content|safe }}</div>
+    {% endif %}
+    {% if status.media_attachments %}
+    <div class="media-grid">
+      {% for media in status.media_attachments %}
+      <a href="{{ media.url }}"><img src="{{ media.preview_url }}" alt="{{ media.description }}"></a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if status.poll %}
+    <div class="poll">
+      {% for option in status.poll.options %}
+      <div class="poll-option"><span>{{ option.title }}</span><span>{{ option.votes_count }}</span></div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <footer class="status-actions">
+      <a class="icon-action" href="/statuses/{{ status.id }}#reply">Reply <span class="count replies-count">{{ status.replies_count }}</span></a>
+      {% if current_user %}
+      <form class="js-action" method="post" action="/ui/statuses/{{ status.id }}/{% if status.reblogged %}unreblog{% else %}reblog{% endif %}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="icon-action {% if status.reblogged %}is-on{% endif %}" type="submit">Boost <span class="count">{{ status.reblogs_count }}</span></button>
+      </form>
+      <form class="js-action" method="post" action="/ui/statuses/{{ status.id }}/{% if status.favourited %}unfavourite{% else %}favourite{% endif %}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="icon-action {% if status.favourited %}is-on{% endif %}" type="submit">Favourite <span class="count">{{ status.favourites_count }}</span></button>
+      </form>
+      <form class="js-action" method="post" action="/ui/statuses/{{ status.id }}/{% if status.bookmarked %}unbookmark{% else %}bookmark{% endif %}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="icon-action {% if status.bookmarked %}is-on{% endif %}" type="submit">Bookmark</button>
+      </form>
+      {% if current_user.id|string == status.account.id|string %}
+      <details class="edit-status" id="edit">
+        <summary class="icon-action">Edit</summary>
+        <form class="js-action edit-status-form" method="post" action="/ui/statuses/{{ status.id }}/edit">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label>Content warning<input name="spoiler_text" value="{{ status.spoiler_text }}"></label>
+          <label>Status<textarea name="status" rows="4">{{ status.content|striptags }}</textarea></label>
+          <button type="submit">Publish</button>
+        </form>
+      </details>
+      <form class="js-action" method="post" action="/ui/statuses/{{ status.id }}/delete" data-confirm="Delete this status?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="icon-action danger" type="submit">Delete</button>
+      </form>
+      {% endif %}
+      {% endif %}
+    </footer>
+  </div>
+</article>

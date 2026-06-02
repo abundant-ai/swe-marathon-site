@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+{% if visitor %}
+<section class="cta-band">
+  <div>
+    <h1>A small Mastodon-compatible home on Chirp</h1>
+    <p>Read the public timeline now, or create an account to post, follow, favourite, boost, and receive notifications.</p>
+  </div>
+  <a class="primary-button" href="/signup">Sign up</a>
+</section>
+{% endif %}
+{% if tag %}
+<header class="page-header"><h1>#{{ tag }}</h1></header>
+{% else %}
+<div class="timeline-tabs" role="tablist" aria-label="Timelines">
+  <button type="button" class="tab-button {% if active_tab == "home" %}is-active{% endif %}" data-timeline="home">Home</button>
+  <button type="button" class="tab-button {% if active_tab in ["local", "public"] %}is-active{% endif %}" data-timeline="local">Local</button>
+  <button type="button" class="tab-button" data-timeline="federated">Federated</button>
+</div>
+{% endif %}
+{% include "_compose.html" %}
+<div id="timeline">
+  {% include "_timeline.html" %}
+</div>
+{% endblock %}

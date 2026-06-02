@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}{{ INSTANCE_TITLE }}{% endblock %}</title>
+<link rel="stylesheet" href="/static/styles.css">
+<script src="/static/htmx.min.js" defer></script>
+<script src="/static/htmx-ext-sse.min.js" defer></script>
+<script src="/static/alpine.min.js" defer></script>
+<script src="/static/app.js" defer></script>
+</head>
+<body class="app">
+<header class="site-header" role="banner">
+  <div class="site-brand"><a href="/" class="brand-link">{{ INSTANCE_TITLE }}</a> <span class="brand-domain">@{{ DOMAIN }}</span></div>
+  <nav class="site-nav" aria-label="primary">
+    <a href="/home" class="nav-link">Home</a>
+    <a href="/local" class="nav-link">Local</a>
+    <a href="/federated" class="nav-link">Federated</a>
+    {% if user %}
+      <a href="/notifications" class="nav-link nav-notif">Notifications{% if unread_notif %}<span class="badge" data-unread>{{ unread_notif }}</span>{% else %}<span class="badge" data-unread hidden>0</span>{% endif %}</a>
+      <a href="/@{{ user.username }}" class="nav-link">@{{ user.username }}</a>
+      <form method="post" action="/logout" class="nav-form"><button type="submit" class="linklike">Log out</button></form>
+    {% else %}
+      <a href="/login" class="nav-link">Log in</a>
+      <a href="/signup" class="btn btn-primary">Sign up</a>
+    {% endif %}
+  </nav>
+</header>
+<main class="site-main" id="main">{% block content %}{% endblock %}</main>
+<footer class="site-footer"><span>{{ INSTANCE_TITLE }} · a small Chirp instance</span></footer>
+</body>
+</html>

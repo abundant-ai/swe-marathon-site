@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_status.html" import render as render_status %}
+{% block title %}Notifications — Chirp{% endblock %}
+{% block main %}
+<div class="main-header">Notifications</div>
+<div hx-ext="sse" sse-connect="/web/sse" sse-swap="notification" hx-swap="afterbegin" hx-target="#notifs"></div>
+<div id="notifs">
+{% for n in notifications %}
+  <div class="notification-row {{ n.type }}">
+    <div class="icon-bubble">
+      {% if n.type == 'favourite' %}<svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 14l-5-5a3 3 0 014-4l1 1 1-1a3 3 0 014 4z" fill="currentColor"/></svg>
+      {% elif n.type == 'reblog' %}<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 6l3-3v2h7v3M13 10l-3 3v-2H3V8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      {% elif n.type == 'mention' %}<svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 5l5-4v3h4a4 4 0 014 4v6l-2-2a4 4 0 00-4-2H7v3z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      {% elif n.type == 'follow' %}<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="6" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3 2-5 4-5s4 2 4 5M11 6h4M13 4v4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      {% endif %}
+    </div>
+    <div>
+      <div><a href="/@{{ n.account.username }}"><strong>{{ n.account.display_name }}</strong></a>
+      {% if n.type == 'favourite' %}favourited your post
+      {% elif n.type == 'reblog' %}boosted your post
+      {% elif n.type == 'mention' %}replied to you
+      {% elif n.type == 'follow' %}followed you
+      {% else %}{{ n.type }}{% endif %}
+      <span class="muted">{{ n.created_at_rel }}</span></div>
+      {% if n.status %}<div class="muted" style="margin-top: 0.2rem">{{ n.status.content_html|safe }}</div>{% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="empty-state"><p>No notifications yet.</p></div>
+{% endfor %}
+</div>
+{% endblock %}
