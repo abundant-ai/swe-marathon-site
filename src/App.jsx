@@ -6,9 +6,8 @@ import {
   CAT_LABEL,
   HEADLINE,
   LEADERBOARD,
-  PIPELINE,
   RH_BY_MODEL,
-  SLACK_TRIAL_BY_ID,
+  TRIAL_BY_ID,
   TASK_DETAILS,
   TASKS,
 } from "./data.js";
@@ -544,21 +543,12 @@ function Hero() {
         </h1>
         <p className="lede">
           <strong>SWE-Marathon</strong> is a benchmark of <strong>20 multi-hour</strong> software-engineering
-          tasks: library reproductions, full-stack product clones, ML engineering, and algorithmic
-          optimisation. Each task ships an executable environment, a held-out reference solution,
-          and a multi-channel verifier — agent budgets of {HEADLINE.agentBudgetMinH}–{HEADLINE.agentBudgetMaxH} hours against
-          expert estimates of {HEADLINE.humanEstMinH}–{HEADLINE.humanEstMaxH} hours.
-        </p>
-        <p className="hero-sub">
-          Across {HEADLINE.nTrials.toLocaleString()} real-agent rollouts averaging {HEADLINE.avgTokensPerTrialM}M tokens each,
-          no evaluated configuration exceeds {Math.ceil(HEADLINE.bestPass1Pct)}% pass@1.
-          {" "}{HEADLINE.rhAttemptPct}% of trajectories contain at least one exploit-shaped action;
-          {" "}{HEADLINE.rhSuccessPct}% earn reward despite shipping the exploit.
+          tasks: library reproductions, full-stack product clones, and ML engineering.
         </p>
         <FoxRunner />
         <div className="cta-row">
           <a className="btn" href="#leaderboard">View leaderboard <span className="arr">↓</span></a>
-          <a className="btn ghost" href="#about">Method <span className="arr">↓</span></a>
+          <a className="btn ghost" href="#tasks">Tasks <span className="arr">↓</span></a>
           <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
         </div>
         <StatStrip />
@@ -567,25 +557,109 @@ function Hero() {
 
 }
 
+// Brand marks + gradients for each model family. Used to give every
+// leaderboard row a recognizable logo and a brand-tinted bar.
+const BRANDS = {
+  openai: {
+    grad: ["#2563eb", "#7aa7f7"],
+    logo: (
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#1a1a17" }}>
+        <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" />
+      </svg>
+    ),
+  },
+  anthropic: {
+    grad: ["#d97757", "#e9b15a"],
+    logo: (
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#1a1a17" }}>
+        <path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.541Zm-.3712 10.2188 2.2914-5.9456 2.2914 5.9456Z" />
+      </svg>
+    ),
+  },
+  gemini: {
+    grad: ["#7c5cd6", "#c158dc"],
+    logo: (
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#9b6dd6" }}>
+        <path d="M12 24A14.304 14.304 0 0 0 0 12 14.304 14.304 0 0 0 12 0a14.305 14.305 0 0 0 12 12 14.305 14.305 0 0 0-12 12" />
+      </svg>
+    ),
+  },
+  deepseek: {
+    grad: ["#4d6bfe", "#9db4ff"],
+    logo: (
+      <svg viewBox="0 0 24 24" fill="#4D6BFE">
+        <path d="M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.526 5.526 0 01-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11.365 11.365 0 00-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428-.872.004-1.67.295-2.687.684a3.055 3.055 0 01-.465.137 9.597 9.597 0 00-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.173 4.173 0 001.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588zM11.581 18c-2.089-1.642-3.102-2.183-3.52-2.16-.392.024-.321.471-.235.763.09.288.207.486.371.739.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.167-1.361-.802-2.5-1.86-3.301-3.307-.774-1.393-1.224-2.887-1.298-4.482-.02-.386.093-.522.477-.592a4.696 4.696 0 011.529-.039c2.132.312 3.946 1.265 5.468 2.774.868.86 1.525 1.887 2.202 2.891.72 1.066 1.494 2.082 2.48 2.914.348.292.625.514.891.677-.802.09-2.14.11-3.054-.614zm1-6.44a.306.306 0 01.415-.287.302.302 0 01.2.288.306.306 0 01-.31.307.303.303 0 01-.304-.308zm3.11 1.596c-.2.081-.399.151-.59.16a1.245 1.245 0 01-.798-.254c-.274-.23-.47-.358-.552-.758a1.73 1.73 0 01.016-.588c.07-.327-.008-.537-.239-.727-.187-.156-.426-.199-.688-.199a.559.559 0 01-.254-.078c-.11-.054-.2-.19-.114-.358.028-.054.16-.186.192-.21.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.391.451.462.576.685.914.176.265.336.537.445.848.067.195-.019.354-.25.452z" />
+      </svg>
+    ),
+  },
+  zhipu: {
+    grad: ["#0d9488", "#5eead4"],
+    logo: (
+      <svg viewBox="0 0 24 24" fill="#3859FF" fillRule="nonzero">
+        <path d="M11.991 23.503a.24.24 0 00-.244.248.24.24 0 00.244.249.24.24 0 00.245-.249.24.24 0 00-.22-.247l-.025-.001zM9.671 5.365a1.697 1.697 0 011.099 2.132l-.071.172-.016.04-.018.054c-.07.16-.104.32-.104.498-.035.71.47 1.279 1.186 1.314h.366c1.309.053 2.338 1.173 2.286 2.523-.052 1.332-1.152 2.38-2.478 2.327h-.174c-.715.018-1.274.64-1.239 1.368 0 .124.018.23.053.337.209.373.54.658.96.8.75.23 1.517-.125 1.9-.782l.018-.035c.402-.64 1.17-.96 1.92-.711.854.284 1.378 1.226 1.099 2.167a1.661 1.661 0 01-2.077 1.102 1.711 1.711 0 01-.907-.711l-.017-.035c-.2-.323-.463-.58-.851-.711l-.056-.018a1.646 1.646 0 00-1.954.746 1.66 1.66 0 01-1.065.764 1.677 1.677 0 01-1.989-1.279c-.209-.906.332-1.83 1.257-2.043a1.51 1.51 0 01.296-.035h.018c.68-.071 1.151-.622 1.116-1.333a1.307 1.307 0 00-.227-.693 2.515 2.515 0 01-.366-1.403 2.39 2.39 0 01.366-1.208c.14-.195.21-.444.227-.693.018-.71-.506-1.261-1.186-1.332l-.07-.018a1.43 1.43 0 01-.299-.07l-.05-.019a1.7 1.7 0 01-1.047-2.114 1.68 1.68 0 012.094-1.101zm-5.575 10.11c.26-.264.639-.367.994-.27.355.096.633.379.728.74.095.362-.007.748-.267 1.013-.402.41-1.053.41-1.455 0a1.062 1.062 0 010-1.482zm14.845-.294c.359-.09.738.024.992.297.254.274.344.665.237 1.025-.107.36-.396.634-.756.718-.551.128-1.1-.22-1.23-.781a1.05 1.05 0 01.757-1.26zm-.064-4.39c.314.32.49.753.49 1.206 0 .452-.176.886-.49 1.206-.315.32-.74.5-1.185.5-.444 0-.87-.18-1.184-.5a1.727 1.727 0 010-2.412 1.654 1.654 0 012.369 0zm-11.243.163c.364.484.447 1.128.218 1.691a1.665 1.665 0 01-2.188.923c-.855-.36-1.26-1.358-.907-2.228a1.68 1.68 0 011.33-1.038c.593-.08 1.183.169 1.547.652zm11.545-4.221c.368 0 .708.2.892.524.184.324.184.724 0 1.048a1.026 1.026 0 01-.892.524c-.568 0-1.03-.47-1.03-1.048 0-.579.462-1.048 1.03-1.048zm-14.358 0c.368 0 .707.2.891.524.184.324.184.724 0 1.048a1.026 1.026 0 01-.891.524c-.569 0-1.03-.47-1.03-1.048 0-.579.461-1.048 1.03-1.048zm10.031-1.475c.925 0 1.675.764 1.675 1.706s-.75 1.705-1.675 1.705-1.674-.763-1.674-1.705c0-.942.75-1.706 1.674-1.706zm-2.626-.684c.362-.082.653-.356.761-.718a1.062 1.062 0 00-.238-1.028 1.017 1.017 0 00-.996-.294c-.547.14-.881.7-.752 1.257.13.558.675.907 1.225.783zm0 16.876c.359-.087.644-.36.75-.72a1.062 1.062 0 00-.237-1.019 1.018 1.018 0 00-.985-.301 1.037 1.037 0 00-.762.717c-.108.361-.017.754.239 1.028.245.263.606.377.953.305l.043-.01zM17.19 3.5a.631.631 0 00.628-.64c0-.355-.279-.64-.628-.64a.631.631 0 00-.628.64c0 .355.28.64.628.64zm-10.38 0a.631.631 0 00.628-.64c0-.355-.28-.64-.628-.64a.631.631 0 00-.628.64c0 .355.279.64.628.64zm-5.182 7.852a.631.631 0 00-.628.64c0 .354.28.639.628.639a.63.63 0 00.627-.606l.001-.034a.62.62 0 00-.628-.64zm5.182 9.13a.631.631 0 00-.628.64c0 .355.279.64.628.64a.631.631 0 00.628-.64c0-.355-.28-.64-.628-.64zm10.38.018a.631.631 0 00-.628.64c0 .355.28.64.628.64a.631.631 0 00.628-.64c0-.355-.279-.64-.628-.64zm5.182-9.148a.631.631 0 00-.628.64c0 .354.279.639.628.639a.631.631 0 00.628-.64c0-.355-.28-.64-.628-.64zm-.384-4.992a.24.24 0 00.244-.249.24.24 0 00-.244-.249.24.24 0 00-.244.249c0 .142.122.249.244.249zM11.991.497a.24.24 0 00.245-.248A.24.24 0 0011.99 0a.24.24 0 00-.244.249c0 .133.108.236.223.247l.021.001zM2.011 6.36a.24.24 0 00.245-.249.24.24 0 00-.244-.249.24.24 0 00-.244.249.24.24 0 00.244.249zm0 11.263a.24.24 0 00-.243.248.24.24 0 00.244.249.24.24 0 00.244-.249.252.252 0 00-.244-.248zm19.995-.018a.24.24 0 00-.245.248.24.24 0 00.245.25.24.24 0 00.244-.25.252.252 0 00-.244-.248z" />
+      </svg>
+    ),
+  },
+  moonshot: {
+    grad: ["#6b4ea0", "#a78fd0"],
+    logo: (
+      <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" style={{ color: "#1a1a17" }}>
+        <path d="M21.846 0a1.923 1.923 0 110 3.846H20.15a.226.226 0 01-.227-.226V1.923C19.923.861 20.784 0 21.846 0z" />
+        <path d="M11.065 11.199l7.257-7.2c.137-.136.06-.41-.116-.41H14.3a.164.164 0 00-.117.051l-7.82 7.756c-.122.12-.302.013-.302-.179V3.82c0-.127-.083-.23-.185-.23H3.186c-.103 0-.186.103-.186.23V19.77c0 .128.083.23.186.23h2.69c.103 0 .186-.102.186-.23v-3.25c0-.069.025-.135.069-.178l2.424-2.406a.158.158 0 01.205-.023l6.484 4.772a7.677 7.677 0 003.453 1.283c.108.012.2-.095.2-.23v-3.06c0-.117-.07-.212-.164-.227a5.028 5.028 0 01-2.027-.807l-5.613-4.064c-.117-.078-.132-.279-.028-.381z" />
+      </svg>
+    ),
+  },
+  minimax: {
+    grad: ["#e2167e", "#fe603c"],
+    logo: (
+      <svg viewBox="0 0 24 24" fillRule="nonzero">
+        <defs>
+          <linearGradient id="mm-grad" x1="0%" x2="100.182%" y1="50.057%" y2="50.057%">
+            <stop offset="0%" stopColor="#E2167E" />
+            <stop offset="100%" stopColor="#FE603C" />
+          </linearGradient>
+        </defs>
+        <path fill="url(#mm-grad)" d="M16.278 2c1.156 0 2.093.927 2.093 2.07v12.501a.74.74 0 00.744.709.74.74 0 00.743-.709V9.099a2.06 2.06 0 012.071-2.049A2.06 2.06 0 0124 9.1v6.561a.649.649 0 01-.652.645.649.649 0 01-.653-.645V9.1a.762.762 0 00-.766-.758.762.762 0 00-.766.758v7.472a2.037 2.037 0 01-2.048 2.026 2.037 2.037 0 01-2.048-2.026v-12.5a.785.785 0 00-.788-.753.785.785 0 00-.789.752l-.001 15.904A2.037 2.037 0 0113.441 22a2.037 2.037 0 01-2.048-2.026V18.04c0-.356.292-.645.652-.645.36 0 .652.289.652.645v1.934c0 .263.142.506.372.638.23.131.514.131.744 0a.734.734 0 00.372-.638V4.07c0-1.143.937-2.07 2.093-2.07zm-5.674 0c1.156 0 2.093.927 2.093 2.07v11.523a.648.648 0 01-.652.645.648.648 0 01-.652-.645V4.07a.785.785 0 00-.789-.78.785.785 0 00-.789.78v14.013a2.06 2.06 0 01-2.07 2.048 2.06 2.06 0 01-2.071-2.048V9.1a.762.762 0 00-.766-.758.762.762 0 00-.766.758v3.8a2.06 2.06 0 01-2.071 2.049A2.06 2.06 0 010 12.9v-1.378c0-.357.292-.646.652-.646.36 0 .653.29.653.646V12.9c0 .418.343.757.766.757s.766-.339.766-.757V9.099a2.06 2.06 0 012.07-2.048 2.06 2.06 0 012.071 2.048v8.984c0 .419.343.758.767.758.423 0 .766-.339.766-.758V4.07c0-1.143.937-2.07 2.093-2.07z" />
+      </svg>
+    ),
+  },
+  default:  { grad: ["#8a8880", "#bdbbb2"], mono: "·", monoColor: "#8a8880" },
+};
+
+function brandFor(name) {
+  if (/GPT/i.test(name)) return "openai";
+  if (/Claude/i.test(name)) return "anthropic";
+  if (/Gemini/i.test(name)) return "gemini";
+  if (/DeepSeek/i.test(name)) return "deepseek";
+  if (/GLM/i.test(name)) return "zhipu";
+  if (/Kimi/i.test(name)) return "moonshot";
+  if (/MiniMax/i.test(name)) return "minimax";
+  return "default";
+}
+
+function BrandLogo({ name }) {
+  const b = BRANDS[brandFor(name)] || BRANDS.default;
+  if (b.logo) return <span className="lb-logo">{b.logo}</span>;
+  return (
+    <span className="lb-logo lb-logo-mono" style={{ background: b.monoColor }}>{b.mono}</span>
+  );
+}
+
+// Wald standard error for a proportion (n = 5 rollouts × 20 tasks = 100).
+function passMargin(pass1, n = 100) {
+  const p = pass1 / 100;
+  return Math.sqrt((p * (1 - p)) / n) * 100;
+}
+
 function Leaderboard() {
-  const [fam, setFam] = useState("all");
-  const [view, setView] = useState("summary"); // summary | full
-
-  const scoreFor = (row, key) => {
-    if (key === "all") return row.pass1 ?? 0;
-    return row.perCat?.[key] ?? 0;
-  };
-
-  const sorted = useMemo(() => {
-    return [...LEADERBOARD].sort((a, b) => {
-      if (a.ref && !b.ref) return 1;
-      if (b.ref && !a.ref) return -1;
-      return scoreFor(b, fam) - scoreFor(a, fam);
-    });
-  }, [fam]);
-
-  const allCatCols = ["library", "clone", "ml", "algo"];
-  const cols = fam === "all" ? allCatCols : [fam];
+  const sorted = useMemo(
+    () => LEADERBOARD.filter((r) => !r.ref).sort((a, b) => b.pass1 - a.pass1),
+    []
+  );
+  const maxWithMargin = Math.max(...sorted.map((r) => r.pass1 + passMargin(r.pass1)), 1);
+  const axisMax = Math.max(5, Math.ceil(maxWithMargin / 5) * 5);
+  const ticks = [];
+  for (let t = 0; t <= axisMax; t += 5) ticks.push(t);
 
   return (
     <section id="leaderboard">
@@ -595,72 +669,50 @@ function Leaderboard() {
           <h2 className="section-title">Pass@1 across 20 long-horizon tasks.</h2>
         </div>
 
-        <div className="lb-controls">
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
-            <span className="lb-label">Filter</span>
-            {TASK_FAMILIES.map((f) =>
-            <button
-              key={f.id}
-              className={"pill " + (fam === f.id ? "active" : "")}
-              onClick={() => setFam(f.id)}>
-              {f.label}</button>
-            )}
+        <div className="lb-chart">
+          <div className="lb-chart-head">
+            <span>Model</span>
+            <span>Pass@1</span>
           </div>
-          <span style={{ flex: 1 }}></span>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <span className="lb-label">View</span>
-            <button className={"pill " + (view === "summary" ? "active" : "")} onClick={() => setView("summary")}>Summary</button>
-            <button className={"pill " + (view === "full" ? "active" : "")} onClick={() => setView("full")}>All families</button>
+
+          {sorted.map((row) => {
+            const brand = brandFor(row.name);
+            const grad = (BRANDS[brand] || BRANDS.default).grad;
+            const margin = passMargin(row.pass1);
+            const pctOf = (v) => `${(v / axisMax) * 100}%`;
+            return (
+              <div className={"lb-row " + (row.highlight ? "highlight" : "")} key={`${row.name}-${row.scaffold}`}>
+                <div className="lb-row-top">
+                  <div className="lb-id">
+                    <BrandLogo name={row.name} />
+                    <span className="lb-model">{row.name}</span>
+                    <span className="lb-sep">/</span>
+                    <span className="lb-agent">{row.scaffold.replace(/\s+v\d[\d.]*$/i, "")}</span>
+                  </div>
+                  <div className="lb-score">
+                    <b>{row.pass1.toFixed(1)}%</b>
+                    <span className="lb-margin"> ± {margin.toFixed(1)}%</span>
+                  </div>
+                </div>
+                <div className="lb-track">
+                  <div
+                    className="lb-fill"
+                    style={{ width: pctOf(row.pass1), background: `linear-gradient(90deg, ${grad[0]}, ${grad[1]})` }}
+                  />
+                  <div
+                    className="lb-whisker"
+                    style={{ left: pctOf(Math.max(0, row.pass1 - margin)), width: pctOf(Math.min(axisMax, row.pass1 + margin) - Math.max(0, row.pass1 - margin)) }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+
+          <div className="lb-axis">
+            {ticks.map((t) => (
+              <span key={t} className="lb-axis-tick" style={{ left: `${(t / axisMax) * 100}%` }}>{t}%</span>
+            ))}
           </div>
-        </div>
-
-        <div style={{ overflowX: "auto" }}>
-        <table className="lb">
-          <thead>
-            <tr>
-              <th style={{ width: 36 }}>#</th>
-              <th>Agent · Scaffold</th>
-              <th className="num">Pass@1</th>
-              {(view === "full" ? allCatCols : cols).map((c) =>
-                <th key={c} className="num">{CAT_LABEL[c]}</th>
-                )}
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((row) => {
-                const showCols = view === "full" ? allCatCols : cols;
-                return (
-                  <React.Fragment key={`${row.rank}-${row.name}-${row.scaffold}`}>
-                  <tr className={row.highlight ? "highlight" : ""}>
-                    <td>
-                      <span className={"rank-badge " + (row.rank === 1 ? "rank-1 " : "") + (row.ref ? "rank-ref" : "")}>
-                        {row.rank}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="agent-name">{row.name}</span>
-                      <span className="scaffold" style={{ fontSize: 11, color: "var(--ink-3)", marginLeft: 8 }}>{row.scaffold}</span>
-                    </td>
-                    <td className="num score-bar-cell">
-                      <span className={"score-bar " + (row.ref ? "ref" : "")}
-                        style={{ width: `${Math.min(100, row.pass1 / 25 * 100)}%` }}></span>
-                      <span className="num-on-bar">{row.pass1.toFixed(1)}</span>
-                    </td>
-                    {showCols.map((c) =>
-                      <td key={c} className="num">{row.perCat?.[c] != null ? row.perCat[c].toFixed(1) : "—"}</td>
-                      )}
-                  </tr>
-                </React.Fragment>);
-
-              })}
-          </tbody>
-        </table>
-        </div>
-
-        <div className="footnotes">
-          <div><sup>1</sup>Pass@1 = mean over 5 independent rollouts per (agent, model, task); a trial counts resolved when reward = 1.0 from the multi-channel verifier. n = 100 trials per non-reference row (5 trials × 20 tasks); n = 99 / 96 where infrastructure-failed trials were excluded from the canonical grid.</div>
-          <div><sup>2</sup>Reference rows are not directly comparable: <i>Oracle</i> is the held-out maintainer solution; <i>NOP</i> is a no-action baseline.</div>
-          <div><sup>3</sup>Sandbox: Modal via Harbor, with FrontierSWE-style egress controls on the four offline tasks. Agent budgets range from 2 to 10 hours per task.</div>
         </div>
       </div>
     </section>);
@@ -673,48 +725,39 @@ function Tasks() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span>§03 / Tasks</div>
-          <h2 className="section-title">Four families. Twenty marathons.</h2>
+          <h2 className="section-title">20 marathons. 4 task families.</h2>
         </div>
 
-        <div className="section-body" style={{ marginBottom: 28 }}>
-          <div className="sb-side">
-            <div className="label-row">Sources<span>Hand-curated real OSS / research code; 11 unique contributors authored the 20 accepted tasks.</span></div>
-            <div className="label-row">Budget<span>{HEADLINE.agentBudgetMinH}–{HEADLINE.agentBudgetMaxH}h agent · {HEADLINE.humanEstMinH}–{HEADLINE.humanEstMaxH}h expert estimate.</span></div>
-            <div className="label-row">Submission<span>Container state at submit time, graded by the multi-channel verifier.</span></div>
-          </div>
-          <div>
-            <p style={{ fontSize: 16, color: "var(--ink-2)", margin: 0, maxWidth: 600 }}>
-              Each task ships a Dockerized starter, an instruction file specifying
-              outcomes (not algorithms), a held-out human-written reference solution,
-              and a multi-layer verifier. Tasks are accepted only if NOP fails,
-              Oracle passes, and the adversarial cheat sweep finds no shortcut —
-              {" "}{HEADLINE.nVerifierFamilies} verifier families across the suite,
-              spanning {HEADLINE.languages.join(", ")}.
-            </p>
-          </div>
-        </div>
-
-        <div className="tasks-grid">
-          {TASKS.map((t, i) =>
-          <a className={"task task-link " + (TASK_DETAILS[t.id] ? "has-detail" : "")} href={`#task/${t.id}`} key={t.id}>
-              <div className="task-head">
-                <div className="task-id">T{String(i + 1).padStart(2, "0")} · {CAT_LABEL[t.cat]}</div>
-                <div className="task-budget">{t.humanH}h human · {t.agentH}h agent</div>
+        {TASK_FAMILIES.filter((f) => f.id !== "all").map((fam) => {
+          const famTasks = TASKS.filter((t) => t.cat === fam.id);
+          if (famTasks.length === 0) return null;
+          return (
+            <div className="task-family-group" key={fam.id}>
+              <div className="task-family-head">
+                <b>{fam.label}</b>
+                <span>{famTasks.length} tasks</span>
               </div>
-              <h3 className="task-title">{t.title}</h3>
-              <p className="task-desc">{t.desc}</p>
-              <div className="task-meta">
-                <div><span className="k">repo</span><span className="v">{t.id}</span></div>
-                <div><span className="k">verifier</span><span className="v">{t.verifier}</span></div>
-                <div><span className="k">pass@1</span><span className="v">{t.pass1.toFixed(1)}% · n=55</span></div>
-                {t.exploit > 0 && (
-                  <div><span className="k">exploit</span><span className="v">{t.exploit.toFixed(1)}% attempts · {t.succ} succ.</span></div>
-                )}
-                <div><span className="k">open</span><span className="v">{TASK_DETAILS[t.id] ? "task page" : "overview"}</span></div>
+              <div className="tasks-grid">
+                {famTasks.map((t) => {
+                  const i = TASKS.indexOf(t);
+                  return (
+                  <a className={"task task-link " + (TASK_DETAILS[t.id] ? "has-detail" : "")} href={`#task/${t.id}`} key={t.id}>
+                    <div className="task-head">
+                      <div className="task-id">T{String(i + 1).padStart(2, "0")}</div>
+                      <div className="task-budget">{t.agentH}h agent timeout</div>
+                    </div>
+                    <h3 className="task-title">{t.title}</h3>
+                    <p className="task-desc">{t.desc}</p>
+                    <div className="task-meta">
+                      <div><span className="k">verifier</span><span className="v">{t.verifier}</span></div>
+                    </div>
+                  </a>
+                  );
+                })}
               </div>
-            </a>
-          )}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </section>);
 
@@ -964,12 +1007,17 @@ function TrajectoryExplorer({ trial, label, rows, status }) {
   );
 }
 
-function SlackArtifact({ artifacts }) {
+// Trial showcase: a trial picker + the selected trial's full agent trajectory.
+// When the trials carry a `liveUrl` (the four deployed CUA clones) it also
+// embeds the live app in an iframe; otherwise it's a pure trajectory replay,
+// which is what every non-deployable task (compilers, ports, kernels) uses.
+function TrialShowcase({ artifacts }) {
   const [activeId, setActiveId] = useState(artifacts.trials[0].id);
   const [loadedFor, setLoadedFor] = useState(null);
   const [trajectoryRows, setTrajectoryRows] = useState([]);
   const [trajectoryStatus, setTrajectoryStatus] = useState("loading");
   const active = artifacts.trials.find((t) => t.id === activeId) || artifacts.trials[0];
+  const hasLive = Boolean(active.liveUrl);
 
   useEffect(() => {
     let cancelled = false;
@@ -994,15 +1042,17 @@ function SlackArtifact({ artifacts }) {
 
   return (
     <div className="artifact-card">
-      <div className="artifact-head">
-        <div className={"artifact-status " + (loadedFor === active.id ? "live" : "")} style={{ marginLeft: "auto" }}>
-          {loadedFor === active.id ? "IFRAME LOADED" : "LOCAL SERVICE"}
+      {hasLive && (
+        <div className="artifact-head">
+          <div className={"artifact-status " + (loadedFor === active.id ? "live" : "")} style={{ marginLeft: "auto" }}>
+            {loadedFor === active.id ? "IFRAME LOADED" : "LOCAL SERVICE"}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="artifact-pick-label">Pick a trial</div>
       <div className="artifact-selector">
-        {artifacts.trials.map((trial, i) => (
+        {artifacts.trials.map((trial) => (
           <button
             key={trial.id}
             className={"artifact-option " + (trial.id === active.id ? "active" : "")}
@@ -1011,6 +1061,11 @@ function SlackArtifact({ artifacts }) {
               setLoadedFor(null);
             }}
           >
+            {trial.tag && (
+              <span className={"artifact-option-tag " + (/hack/i.test(trial.tag) ? "is-hack" : "is-long")}>
+                {trial.tag}
+              </span>
+            )}
             <b>{trial.model}</b>
             <span>{trial.agent}</span>
             <em>{trial.tokens} tokens · {trial.cost}</em>
@@ -1018,35 +1073,24 @@ function SlackArtifact({ artifacts }) {
         ))}
       </div>
 
-      <div className="artifact-scoreline">
-        <div className="asl-main">
-          <span>{active.agent} · {active.trial}</span>
-          <b>{active.model}</b>
-        </div>
-        <div className="asl-stats">
-          <span><i>Partial</i>{active.result.replace(/\s*partial$/i, "")}</span>
-          {active.stages.split(" · ").map((part) => (
-            <span key={part}><i>{/ux/i.test(part) ? "CUA UX" : "Unit tests"}</i>{part.replace(/\s*(CUA UX|correctness gates)$/i, "")}</span>
-          ))}
-        </div>
-      </div>
-
-      <div className="live-artifact-frame">
-        <div className="iframe-toolbar">
-          <div>
-            <span>Live app · {active.agent} · {active.model}</span>
-            <b>{active.liveUrl}</b>
+      {hasLive && (
+        <div className="live-artifact-frame">
+          <div className="iframe-toolbar">
+            <div>
+              <span>Live app · {active.agent} · {active.model}</span>
+              <b>{active.liveUrl}</b>
+            </div>
+            <a className="btn ghost" href={active.liveUrl} target="_blank" rel="noreferrer">Open full app ↗</a>
           </div>
-          <a className="btn ghost" href={active.liveUrl} target="_blank" rel="noreferrer">Open full app ↗</a>
+          <iframe
+            key={active.id}
+            title={`Interactive artifact ${active.trial}`}
+            src={active.liveUrl}
+            onLoad={() => setLoadedFor(active.id)}
+            sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
+          />
         </div>
-        <iframe
-          key={active.id}
-          title={`Interactive Slack clone artifact ${active.trial}`}
-          src={active.liveUrl}
-          onLoad={() => setLoadedFor(active.id)}
-          sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
-        />
-      </div>
+      )}
 
       <TrajectoryExplorer
         trial={active.id}
@@ -1105,6 +1149,10 @@ function TaskLeaderboard({ leaderboard }) {
   const [openRank, setOpenRank] = useState(null);
   if (!leaderboard) return null;
 
+  // CUA tasks carry a computer-use UX sub-score; pure test-suite tasks (e.g.
+  // compilers) don't, so drop the column entirely rather than show "0.000".
+  const hasUX = leaderboard.rows.some((r) => r.ux > 0);
+
   return (
     <div className="task-lb-card">
       <p className="task-lb-note">{leaderboard.note}</p>
@@ -1128,7 +1176,7 @@ function TaskLeaderboard({ leaderboard }) {
               <div className="task-lb-metrics">
                 <span><b>Reward</b> {row.binary}</span>
                 <span><b>Unit tests</b> {row.correctness.toFixed(3)}</span>
-                <span><b>UX</b> {row.ux.toFixed(3)}</span>
+                {hasUX && <span><b>UX</b> {row.ux.toFixed(3)}</span>}
               </div>
               <div className="task-lb-bar-track" title={`partial ${row.partial.toFixed(3)} of 1.0`}>
                 <div className="task-lb-bar" style={{ width: `${Math.min(100, row.partial * 100)}%` }} />
@@ -1297,7 +1345,8 @@ function SampleTask({ sample }) {
 
 // Full-page trajectory viewer (DeepSWE-style) reached via #trajectory/<id>.
 function TrajectoryPage({ trialId }) {
-  const trial = SLACK_TRIAL_BY_ID[trialId];
+  const trial = TRIAL_BY_ID[trialId];
+  const backTask = trial?.task || "slack-clone";
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState("loading");
 
@@ -1328,19 +1377,19 @@ function TrajectoryPage({ trialId }) {
     { label: "Rank", value: `#${trial.rank}` },
     { label: "Reward", value: trial.reward.toFixed(1) },
     { label: "Partial", value: trial.partial.toFixed(3) },
-    { label: "Unit tests", value: trial.gates },
-    { label: "CUA UX", value: trial.ux.toFixed(3) },
+    trial.gates && { label: "Unit tests", value: trial.gates },
+    trial.ux > 0 && { label: "CUA UX", value: trial.ux.toFixed(3) },
     { label: "Tokens", value: trial.tokens },
     { label: "Cost", value: trial.cost },
     { label: "Duration", value: trial.duration || "—" },
     { label: "Tool calls", value: String(trial.steps) },
-  ];
+  ].filter(Boolean);
 
   return (
     <>
       <section className="task-page hero task-hero">
         <div className="container">
-          <a className="back-link" href="#task/slack-clone">← Back to leaderboard</a>
+          <a className="back-link" href={`#task/${backTask}`}>← Back to leaderboard</a>
           <div className="eyebrow">Trajectory · {trial.trial}</div>
           <h1 className="title">{trial.configAgent} · {trial.configModel}</h1>
           <p className="lede">
@@ -1351,7 +1400,7 @@ function TrajectoryPage({ trialId }) {
             {trial.liveUrl && (
               <a className="btn" href={trial.liveUrl} target="_blank" rel="noreferrer">Open live app ↗</a>
             )}
-            <a className="btn ghost" href="#task/slack-clone">Back to task</a>
+            <a className="btn ghost" href={`#task/${backTask}`}>Back to task</a>
           </div>
         </div>
       </section>
@@ -1481,7 +1530,7 @@ function TaskDetailPage({ taskId }) {
               <div className="section-no"><span className="dot">●</span>{detail.artifacts ? "Agent trials" : "Result"}</div>
               <h2 className="section-title">{detail.resultTitle}</h2>
             </div>
-            {detail.artifacts && <SlackArtifact artifacts={detail.artifacts} />}
+            {detail.artifacts && <TrialShowcase artifacts={detail.artifacts} />}
             {detail.evidence && <TaskEvidence evidence={detail.evidence} />}
           </div>
         </section>
@@ -1520,73 +1569,6 @@ function CourseProfileSection() {
               <div className="split-chip">Best pass@1: <strong>{HEADLINE.bestPass1Pct}%</strong> ({HEADLINE.bestPass1Label})</div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>);
-
-}
-
-function About() {
-  return (
-    <section id="about">
-      <div className="container">
-        <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§05 / Method</div>
-          <h2 className="section-title">A marathon, not a sprint.</h2>
-        </div>
-
-        <div className="section-body">
-          <div className="sb-side">
-            <div className="label-row">Position<span>Project-scale tasks whose difficulty comes from sustained engineering work, not patch localisation — well past SWE-Bench's per-issue scope and Terminal-Bench's per-session scope.</span></div>
-            <div className="label-row">Sandbox<span>Modal sandboxes through Harbor. 1–8 vCPU, 8–32 GB RAM, GPU on the four ML tasks.</span></div>
-            <div className="label-row">Verifiers<span>{HEADLINE.nVerifierFamilies} families: dense unit tests, behavioural parity, performance gates, deterministic replay, integrity / audit, and computer-use UI/UX judges.</span></div>
-          </div>
-          <div>
-            <p style={{ fontSize: 18, color: "var(--ink)", margin: "0 0 18px", maxWidth: 620, lineHeight: 1.5, fontFamily: "var(--serif)" }}>
-              Most coding benchmarks ask: can the model write a function?
-              SWE-Marathon asks whether agents can sustain coherent engineering
-              work over multi-hour rollouts and millions of tokens.
-            </p>
-            <p style={{ maxWidth: 620, color: "var(--ink-2)" }}>
-              Tasks ship a Dockerized starter, an instruction file specifying
-              outcomes (not algorithms), a held-out human-written reference solution,
-              and a multi-channel verifier. Tasks are accepted only if NOP fails,
-              Oracle passes, frontier scaffolds struggle, and the adversarial cheat
-              sweep finds no shortcut. Final scoring uses container state at
-              submit-time; for tasks with both shell and UX stages, trial reward is
-              the minimum across stages so a UI regression floors the score even
-              when every deterministic gate passes.
-            </p>
-          </div>
-        </div>
-
-        <h4 style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 40, marginBottom: 18 }}>The pipeline · five stages</h4>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {PIPELINE.map((p) => (
-            <div key={p.num} style={{
-              display: "grid",
-              gridTemplateColumns: "112px 1fr",
-              border: "1px solid var(--rule)",
-              background: "var(--bg)",
-            }}>
-              <div style={{
-                background: "var(--ink)",
-                color: "var(--bg)",
-                padding: "14px 16px",
-                borderRight: "2px solid var(--accent)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}>
-                <div style={{ fontFamily: "var(--mono)", fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em" }}>{p.num}</div>
-                <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "rgba(250,247,240,0.6)", textTransform: "uppercase", letterSpacing: "0.12em" }}>STAGE</div>
-              </div>
-              <div style={{ padding: "14px 18px 16px" }}>
-                <div style={{ fontFamily: "var(--serif)", fontSize: 19, lineHeight: 1.15, marginBottom: 6 }}>{p.t}</div>
-                <div style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.55 }}>{p.d}</div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </section>);
@@ -1667,24 +1649,6 @@ function Findings() {
 
 }
 
-function Team() {
-  return (
-    <section id="team">
-      <div className="container">
-        <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§07 / Team</div>
-          <h2 className="section-title">Built by a small cross-lab group.</h2>
-        </div>
-        <div style={{ maxWidth: 620, color: "var(--ink-2)", fontSize: 16, lineHeight: 1.55 }}>
-          The 20 accepted tasks were authored by 11 unique contributors —
-          software engineers familiar with the systems each task targets.
-          Author and affiliation details will be added with the public release.
-        </div>
-      </div>
-    </section>);
-
-}
-
 function Citation() {
   const bib = `@misc{swemarathon_2026,
   title        = {{SWE-Marathon: Can Agents Autonomously Complete Ultra-Long-Horizon Software Work?}},
@@ -1701,10 +1665,6 @@ function Citation() {
           <div className="section-no"><span className="dot">●</span>§08 / Paper</div>
           <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
-        <p style={{ maxWidth: 620, color: "var(--ink-2)", margin: "0 0 18px", fontSize: 15, lineHeight: 1.55 }}>
-          Please cite the benchmark via the entry below for now. We'll update
-          this section with the canonical paper citation when it is available.
-        </p>
         <div className="citation-block">
           <button className="copy-btn" onClick={() => {
             navigator.clipboard?.writeText(bib);
@@ -1735,7 +1695,7 @@ function Footer() {
             </div>
             <p style={{ maxWidth: 380, color: "var(--ink-2)", fontSize: 13, margin: 0 }}>
               A long-horizon software engineering benchmark. Open-source under
-              Apache 2.0. We welcome new tasks, new agents, and new judges.
+              Apache 2.0.
             </p>
           </div>
           <div>
@@ -1743,7 +1703,6 @@ function Footer() {
             <div className="foot-list">
               <a href="#leaderboard">Leaderboard</a>
               <a href="#tasks">Tasks</a>
-              <a href="#about">Method</a>
               <a href="#findings">Observations</a>
             </div>
           </div>
@@ -1807,9 +1766,7 @@ function App() {
       </Suspense>
       <Tasks />
       <CourseProfileSection />
-      <About />
       <Findings />
-      <Team />
       <Citation />
       <Footer />
     </>);

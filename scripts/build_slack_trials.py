@@ -31,17 +31,19 @@ SITE = pathlib.Path(__file__).resolve().parent.parent
 
 
 def default_logs() -> pathlib.Path:
-    """Resolve the logs dir at build time without baking in any personal path."""
+    """Resolve the ralphbench-logs ROOT at build time (no personal path baked in)."""
     env = os.environ.get("RALPHBENCH_LOGS")
     if env:
         root = pathlib.Path(env).expanduser()
-        return root / "slack-clone" if root.name != "slack-clone" else root
+        # Accept either the logs root or a single task subdir; normalise to root.
+        return root.parent if (root / "_manifest.json").exists() else root
     # Fall back to a `ralphbench-logs` checkout sitting next to the repo root.
-    for base in (SITE.parent, SITE.parent.parent, pathlib.Path.cwd()):
-        cand = base / "ralphbench-logs" / "slack-clone"
+    for base in (SITE.parent, SITE.parent.parent, pathlib.Path.cwd(),
+                 pathlib.Path.home() / "Documents"):
+        cand = base / "ralphbench-logs"
         if cand.exists():
             return cand
-    return pathlib.Path("ralphbench-logs/slack-clone")
+    return pathlib.Path("ralphbench-logs")
 
 
 DEFAULT_LOGS = default_logs()
@@ -56,8 +58,10 @@ AGENTS = {
 }
 MODELS = {
     "anthropic/claude-opus-4-7": "Claude Opus 4.7",
+    "anthropic/claude-opus-4-8": "Claude Opus 4.8",
     "openai/gpt-5.5": "GPT-5.5",
     "gemini/gemini-3.1-pro-preview": "Gemini 3.1 Pro",
+    "gemini/gemini-3.5-flash": "Gemini 3.5 Flash",
     "openrouter/deepseek/deepseek-v4-pro": "DeepSeek V4 Pro",
     "openrouter/minimax/minimax-m2.7": "MiniMax M2.7",
     "openrouter/moonshotai/kimi-k2.6": "Kimi K2.6",
@@ -66,11 +70,29 @@ MODELS = {
 # Reference agents excluded from the ranked leaderboard.
 SKIP_AGENTS = {"oracle", "nop"}
 
-# Trials that also have a deployed, interactive Railway app.
-LIVE_URLS = {
-    "slack-clone-217": "https://swe-marathon-slack-trial-1-production.up.railway.app/",
-    "slack-clone-219": "https://swe-marathon-slack-trial-2-production.up.railway.app/",
-    "slack-clone-293": "https://swe-marathon-slack-trial-3-production.up.railway.app/",
+# The four CUA product-clone tasks. For each, the three trials that also have a
+# deployed, interactive Railway app (the artifacts shown in the live viewer).
+CUA_TASKS = {
+    "slack-clone": {
+        "slack-clone-217": "https://swe-marathon-slack-trial-1-production.up.railway.app/",
+        "slack-clone-219": "https://swe-marathon-slack-trial-2-production.up.railway.app/",
+        "slack-clone-293": "https://swe-marathon-slack-trial-3-production.up.railway.app/",
+    },
+    "excel-clone": {
+        "excel-clone-220": "https://swe-marathon-excel-trial-1-production.up.railway.app/",
+        "excel-clone-223": "https://swe-marathon-excel-trial-2-production.up.railway.app/",
+        "excel-clone-251": "https://swe-marathon-excel-trial-3-production.up.railway.app/",
+    },
+    "s3-clone": {
+        "s3-clone-214": "https://swe-marathon-s3-trial-1-production.up.railway.app/console/",
+        "s3-clone-144": "https://swe-marathon-s3-trial-2-production.up.railway.app/console/",
+        "s3-clone-172": "https://swe-marathon-s3-trial-3-production.up.railway.app/console/",
+    },
+    "mastodon-clone": {
+        "mastodon-clone-173": "https://swe-marathon-mastodon-trial-1-production.up.railway.app/",
+        "mastodon-clone-177": "https://swe-marathon-mastodon-trial-2-production.up.railway.app/",
+        "mastodon-clone-207": "https://swe-marathon-mastodon-trial-3-production.up.railway.app/",
+    },
 }
 
 
@@ -215,17 +237,17 @@ def attempt_dir(trial_dir: pathlib.Path, meta: dict) -> pathlib.Path | None:
     return hits[0] if hits else None
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--logs", type=pathlib.Path, default=DEFAULT_LOGS)
-    args = ap.parse_args()
-    logs = args.logs
+def build_task(task: str, logs_root: pathlib.Path, out_traj: pathlib.Path) -> None:
+    """Build trajectories + <task>-trials.json for one task.
 
+    Works for any task in ralphbench-logs. Tasks listed in CUA_TASKS also get
+    `liveUrl`s wired onto their three deployed trials; everything else is a
+    pure trajectory/leaderboard task (no live artifact).
+    """
+    live_urls = CUA_TASKS.get(task, {})
+    logs = logs_root / task
     manifest = json.loads((logs / "_manifest.json").read_text())
     trials = manifest["trials"]
-
-    out_traj = SITE / "public" / "trajectories"
-    out_traj.mkdir(parents=True, exist_ok=True)
 
     configs: dict[tuple[str, str], list[dict]] = {}
     n_written = 0
@@ -256,7 +278,14 @@ def main() -> None:
         if metrics_path.exists():
             metrics = json.loads(metrics_path.read_text())
 
-        short = meta.get("source_trial_name") or trial_key
+        # Clean, stable trial id like "rust-c-compiler-210". Prefer a tidy
+        # source_trial_name when present; otherwise derive from the manifest
+        # key ("<task>-<hash>-<num>"), dropping the internal hash segment.
+        src = meta.get("source_trial_name") or ""
+        if src.startswith(f"{task}-") and "__" not in src:
+            short = src
+        else:
+            short = f"{task}-{trial_key.rsplit('-', 1)[-1]}"
         (out_traj / f"{short}.json").write_text(
             json.dumps({"trial": short, "rows": rows}, ensure_ascii=False)
         )
@@ -264,11 +293,24 @@ def main() -> None:
 
         in_tok = meta.get("input_tokens", 0) or 0
         out_tok = meta.get("output_tokens", 0) or 0
-        correctness = metrics.get("correctness_partial_score") or 0.0
-        ux = metrics.get("ux_partial_score") or 0.0
         partial = metrics.get("partial_score")
         if partial is None:
             partial = meta.get("reward") or 0.0
+        # "Unit tests" column: CUA tasks expose a correctness sub-score; pure
+        # test-suite tasks (e.g. compilers) expose only a pass_rate / partial.
+        correctness = metrics.get("correctness_partial_score")
+        if correctness is None:
+            correctness = metrics.get("pass_rate")
+        if correctness is None:
+            correctness = partial
+        ux = metrics.get("ux_partial_score") or 0.0
+        # Tests-passed fraction: CUA gates, else the generic new_passed/new_total.
+        if metrics.get("gates_total") is not None:
+            gates = f"{metrics.get('gates_passed', 0)} / {metrics.get('gates_total', 0)}"
+        elif metrics.get("new_total") is not None:
+            gates = f"{metrics.get('new_passed', 0)} / {metrics.get('new_total', 0)}"
+        else:
+            gates = ""
         reward = meta.get("reward") or 0.0
         cost = meta.get("cost_usd") or 0.0
         trial_entry = {
@@ -280,7 +322,7 @@ def main() -> None:
             "partial": round(partial, 3),
             "correctness": round(correctness, 3),
             "ux": round(ux, 3),
-            "gates": f"{metrics.get('gates_passed', 0)} / {metrics.get('gates_total', 5)}",
+            "gates": gates,
             "tokens": fmt_tokens(in_tok + out_tok),
             "cost": f"${cost:.2f}",
             "duration": fmt_duration(meta.get("started_at", ""), meta.get("finished_at", "")),
@@ -289,8 +331,8 @@ def main() -> None:
             "trajectoryUrl": f"/trajectories/{short}.json",
             "steps": len(rows),
         }
-        if short in LIVE_URLS:
-            trial_entry["liveUrl"] = LIVE_URLS[short]
+        if short in live_urls:
+            trial_entry["liveUrl"] = live_urls[short]
         configs.setdefault((agent, model), []).append(trial_entry)
 
     # Aggregate per config and rank by mean partial score.
@@ -316,12 +358,29 @@ def main() -> None:
         c["rank"] = i
 
     index = {
-        "task": "slack-clone",
+        "task": task,
         "note": "Tasks are binary reward. Uncalibrated partial scores show how far each agent progressed.",
         "configs": out_configs,
     }
-    (SITE / "src" / "slack-trials.json").write_text(json.dumps(index, indent=2, ensure_ascii=False))
-    print(f"Wrote {n_written} trajectory files and {len(out_configs)} configs to slack-trials.json")
+    (SITE / "src" / f"{task}-trials.json").write_text(json.dumps(index, indent=2, ensure_ascii=False))
+    print(f"  {task}: wrote {n_written} trajectory files and {len(out_configs)} configs to {task}-trials.json")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--logs", type=pathlib.Path, default=DEFAULT_LOGS,
+                    help="ralphbench-logs root (containing per-task subdirs)")
+    ap.add_argument("--task", default=None,
+                    help="build a single task by slug, e.g. rust-c-compiler "
+                         "(default: all four CUA tasks)")
+    args = ap.parse_args()
+
+    out_traj = SITE / "public" / "trajectories"
+    out_traj.mkdir(parents=True, exist_ok=True)
+
+    tasks = [args.task] if args.task else list(CUA_TASKS)
+    for task in tasks:
+        build_task(task, args.logs, out_traj)
 
 
 if __name__ == "__main__":
