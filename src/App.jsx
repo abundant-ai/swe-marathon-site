@@ -516,8 +516,9 @@ function FoxRunner() {
 function StatStrip() {
   const stats = [
   { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
-  { num: `${HEADLINE.agentBudgetMinH}–${HEADLINE.agentBudgetMaxH}`, unit: "h", label: "Agent budget" },
   { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Best pass@1" },
+  { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens / trial" },
+  { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Trials reward-hacking" },
   { num: "1,300", unit: "", label: "Logged trials" }];
 
   return (
@@ -645,19 +646,13 @@ function BrandLogo({ name }) {
   );
 }
 
-// Wald standard error for a proportion (n = 5 rollouts × 20 tasks = 100).
-function passMargin(pass1, n = 100) {
-  const p = pass1 / 100;
-  return Math.sqrt((p * (1 - p)) / n) * 100;
-}
-
 function Leaderboard() {
   const sorted = useMemo(
     () => LEADERBOARD.filter((r) => !r.ref).sort((a, b) => b.pass1 - a.pass1),
     []
   );
-  const maxWithMargin = Math.max(...sorted.map((r) => r.pass1 + passMargin(r.pass1)), 1);
-  const axisMax = Math.max(5, Math.ceil(maxWithMargin / 5) * 5);
+  const maxPass = Math.max(...sorted.map((r) => r.pass1), 1);
+  const axisMax = Math.max(5, Math.ceil(maxPass / 5) * 5);
   const ticks = [];
   for (let t = 0; t <= axisMax; t += 5) ticks.push(t);
 
@@ -678,7 +673,6 @@ function Leaderboard() {
           {sorted.map((row) => {
             const brand = brandFor(row.name);
             const grad = (BRANDS[brand] || BRANDS.default).grad;
-            const margin = passMargin(row.pass1);
             const pctOf = (v) => `${(v / axisMax) * 100}%`;
             return (
               <div className={"lb-row " + (row.highlight ? "highlight" : "")} key={`${row.name}-${row.scaffold}`}>
@@ -691,17 +685,12 @@ function Leaderboard() {
                   </div>
                   <div className="lb-score">
                     <b>{row.pass1.toFixed(1)}%</b>
-                    <span className="lb-margin"> ± {margin.toFixed(1)}%</span>
                   </div>
                 </div>
                 <div className="lb-track">
                   <div
                     className="lb-fill"
                     style={{ width: pctOf(row.pass1), background: `linear-gradient(90deg, ${grad[0]}, ${grad[1]})` }}
-                  />
-                  <div
-                    className="lb-whisker"
-                    style={{ left: pctOf(Math.max(0, row.pass1 - margin)), width: pctOf(Math.min(axisMax, row.pass1 + margin) - Math.max(0, row.pass1 - margin)) }}
                   />
                 </div>
               </div>

@@ -268,6 +268,7 @@ function ComputeHorizonChart() {
             color: PAPER.ink2,
             distance: 5,
           },
+          labelLayout: { moveOverlap: "shiftY", hideOverlap: false },
           markLine: {
             silent: true,
             symbol: "none",
@@ -387,6 +388,7 @@ function ParetoChart() {
             color: PAPER.ink2,
             distance: 4,
           },
+          labelLayout: { moveOverlap: "shiftY", hideOverlap: false },
         },
       ],
     };
@@ -430,22 +432,19 @@ function TaskHeatmap() {
     });
     return {
       backgroundColor: "transparent",
-      grid: { left: 230, right: 20, top: 150, bottom: 16 },
+      grid: { left: 230, right: 20, top: 40, bottom: 12 },
       xAxis: {
         type: "category",
-        data: ANALYSIS_TASKS.map((t) => t.title),
+        data: ANALYSIS_TASKS.map((_, i) => "T" + String(i + 1).padStart(2, "0")),
         position: "top",
         axisLine: { show: false },
         axisTick: { show: false },
         splitArea: { show: false },
         axisLabel: {
-          color: PAPER.ink2,
+          color: PAPER.ink3,
           fontFamily: "IBM Plex Mono, monospace",
           fontSize: 10,
           interval: 0,
-          rotate: 50,
-          hideOverlap: false,
-          align: "left",
         },
       },
       yAxis: {
@@ -500,11 +499,19 @@ function TaskHeatmap() {
           <h3 className="anal-card-title">Every agent against all 20 tasks.</h3>
         </div>
       </div>
-      <div ref={ref} className="anal-chart" style={{ height: 520 }}></div>
+      <div ref={ref} className="anal-chart" style={{ height: 360 }}></div>
+      <div className="anal-task-key">
+        {ANALYSIS_TASKS.map((t, i) => (
+          <span key={t.id} className="anal-task-key-item">
+            <b>T{String(i + 1).padStart(2, "0")}</b>
+            <span>{t.title}</span>
+          </span>
+        ))}
+      </div>
       <div className="anal-foot">
         {usingPartial
-          ? "Uncalibrated partial scores (0–100), mean over the 5 canonical trials per (agent, task). Tasks ordered by family."
-          : "Per-task pass@1 (%), mean@5 across the 5 canonical trials per (agent, task). Tasks ordered by family."}
+          ? "Uncalibrated partial scores (0–100), mean over the 5 canonical trials per (agent, task). Tasks ordered by family (T01–T20)."
+          : "Per-task pass@1 (%), mean@5 across the 5 canonical trials per (agent, task). Tasks ordered by family (T01–T20)."}
       </div>
     </div>
   );
@@ -539,7 +546,7 @@ function TaskDistribution() {
       backgroundColor: "transparent",
       tooltip: { ...TOOLTIP_COMMON, trigger: "item" },
       title: [
-        { text: "By family", left: "20%", top: 8, textAlign: "center",
+        { text: "By family", left: "28%", top: 8, textAlign: "center",
           textStyle: { color: PAPER.ink3, fontFamily: "IBM Plex Mono, monospace", fontSize: 11, fontWeight: 400 } },
         { text: "By human-expert estimate", left: "70%", top: 8, textAlign: "center",
           textStyle: { color: PAPER.ink3, fontFamily: "IBM Plex Mono, monospace", fontSize: 11, fontWeight: 400 } },
@@ -566,8 +573,8 @@ function TaskDistribution() {
         {
           name: "By family",
           type: "pie",
-          radius: ["48%", "78%"],
-          center: ["20%", "55%"],
+          radius: ["44%", "70%"],
+          center: ["28%", "56%"],
           label: {
             position: "outside",
             color: PAPER.ink2,
