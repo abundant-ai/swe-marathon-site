@@ -12,6 +12,7 @@
     --accent-light: #E8F5E9;
     --pos: #2d7a4f;
     --warn: #B45309;
+    --display: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
     --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   }
@@ -230,7 +231,7 @@
     display: inline-block;
   }
   h1.title {
-    font-family: var(--sans); font-weight: 500;
+    font-family: var(--display); font-weight: 500;
     font-size: 58px;
     line-height: 1.05; letter-spacing: 0;
     margin: 0 0 28px; text-wrap: balance;
@@ -275,7 +276,7 @@
   .stat + .stat { padding-left: 24px; }
   .stat:last-child { border-right: none; }
   .stat-num {
-    font-family: var(--sans); font-weight: 500; font-size: 42px; line-height: 1;
+    font-family: var(--display); font-weight: 500; font-size: 42px; line-height: 1;
     color: var(--ink); margin-bottom: 14px; letter-spacing: 0;
     font-variant-numeric: tabular-nums;
   }
@@ -297,7 +298,7 @@
   }
   .section-no .dot { color: var(--accent); margin-right: 6px; }
   h2.section-title {
-    font-family: var(--sans); font-weight: 500;
+    font-family: var(--display); font-weight: 500;
     font-size: 38px; line-height: 1.08; letter-spacing: 0;
     margin: 0; text-wrap: balance;
   }
@@ -540,7 +541,7 @@
     font-weight: 500;
   }
   .task-title {
-    font-family: var(--sans); font-size: 22px; line-height: 1.15;
+    font-family: var(--display); font-size: 22px; line-height: 1.15;
     margin: 0 0 8px; letter-spacing: 0;
     font-weight: 400;
   }
@@ -594,7 +595,7 @@
   }
   .task-inspiration a:hover { border-bottom-color: var(--accent); }
   .task-page-title {
-    font-family: var(--sans);
+    font-family: var(--display);
     font-weight: 500;
     font-size: 56px;
     line-height: 1.05;
@@ -629,7 +630,7 @@
     background: var(--bg);
   }
   .task-result-value {
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 38px;
     line-height: 1;
     color: var(--ink);
@@ -675,7 +676,7 @@
   }
   .verifier-grid h3 {
     margin: 0 0 14px;
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 24px;
     font-weight: 400;
   }
@@ -761,7 +762,7 @@
   }
   .sample-markdown h4 {
     margin: 14px 0 5px;
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 17px;
     line-height: 1.15;
     font-weight: 500;
@@ -905,7 +906,7 @@
   }
   .verifier-group h4 {
     margin: 0 0 10px;
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 28px;
     line-height: 1.1;
     font-weight: 400;
@@ -1036,7 +1037,7 @@
   }
   .artifact-head h3 {
     margin: 0;
-    font-family: var(--sans);
+    font-family: var(--display);
     font-weight: 400;
     font-size: 28px;
     line-height: 1.1;
@@ -1109,7 +1110,7 @@
   .artifact-option.active span.artifact-option-tag { color: var(--bg); opacity: 0.92; }
   .artifact-option b {
     display: block;
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 24px;
     line-height: 1;
     font-weight: 400;
@@ -1294,7 +1295,7 @@
     letter-spacing: 0.1em;
   }
   .metric-value {
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 34px;
     line-height: 1;
     color: var(--ink);
@@ -1452,7 +1453,7 @@
     vertical-align: middle;
   }
   .task-lb-score {
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 19px;
     line-height: 1;
     color: var(--ink);
@@ -1723,7 +1724,7 @@
   }
   .step-readout h4 {
     margin: 0 0 8px;
-    font-family: var(--sans);
+    font-family: var(--display);
     font-size: 22px;
     line-height: 1.1;
     font-weight: 400;
@@ -1771,7 +1772,7 @@
     margin-bottom: 8px; letter-spacing: 0.1em;
   }
   .pipe-title {
-    font-family: var(--sans); font-size: 19px; line-height: 1.15; font-weight: 400;
+    font-family: var(--display); font-size: 19px; line-height: 1.15; font-weight: 400;
     margin: 0 0 6px;
   }
   .pipe-desc { font-size: 12px; color: var(--ink-2); line-height: 1.45; }
@@ -1798,7 +1799,7 @@
     margin-bottom: 12px;
   }
   .find-h {
-    font-family: var(--sans); font-size: 26px; line-height: 1.1;
+    font-family: var(--display); font-size: 26px; line-height: 1.1;
     margin: 0 0 12px; letter-spacing: 0;
     text-wrap: balance;
   }
@@ -1974,7 +1975,7 @@
   }
   .bib-body { padding: 14px 16px 18px; }
   .bib-title {
-    font-family: var(--sans); font-size: 19px; line-height: 1.15; font-weight: 400;
+    font-family: var(--display); font-size: 19px; line-height: 1.15; font-weight: 400;
     margin: 0 0 6px;
   }
   .bib-desc { font-size: 12px; color: var(--ink-2); line-height: 1.45; }
@@ -2141,7 +2142,7 @@
     letter-spacing: 0.12em; text-transform: uppercase;
   }
   .anal-tab-t {
-    font-family: var(--sans); font-size: 20px; line-height: 1.15; font-weight: 400;
+    font-family: var(--display); font-size: 20px; line-height: 1.15; font-weight: 400;
     margin-top: 2px;
   }
   .anal-tab-s {
@@ -2168,7 +2169,7 @@
     text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px;
   }
   .anal-card-title {
-    font-family: var(--sans); font-weight: 500;
+    font-family: var(--display); font-weight: 500;
     font-size: 26px; line-height: 1.15; letter-spacing: 0;
     margin: 0 0 8px;
   }
