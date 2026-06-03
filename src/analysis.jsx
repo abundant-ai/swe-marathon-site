@@ -131,28 +131,28 @@ const TRIALS = ANALYSIS_MODELS.flatMap((m) =>
 /* ---------- ECharts theme tokens (sync w/ paper aesthetic) ---------- */
 const PAPER = {
   bg: "transparent",
-  ink: "#1a1a17",
-  ink2: "#494842",
-  ink3: "#84827a",
-  rule: "#d8d3c4",
-  rule2: "#ebe6d7",
-  accent: "#b56636",
-  pos: "#5a7d4f",
-  warn: "#a8763a",
+  ink: "#18181B",
+  ink2: "#3F3F46",
+  ink3: "#71717A",
+  rule: "#E4E4E7",
+  rule2: "#F4F4F5",
+  accent: "#4CAF50",
+  pos: "#2d7a4f",
+  warn: "#B45309",
 };
 const AXIS_COMMON = {
   axisLine: { lineStyle: { color: PAPER.rule } },
   axisTick: { lineStyle: { color: PAPER.rule } },
-  axisLabel: { color: PAPER.ink2, fontFamily: "IBM Plex Mono, monospace", fontSize: 11 },
-  nameTextStyle: { color: PAPER.ink3, fontFamily: "IBM Plex Mono, monospace", fontSize: 11 },
+  axisLabel: { color: PAPER.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
+  nameTextStyle: { color: PAPER.ink3, fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
   splitLine: { lineStyle: { color: PAPER.rule2, type: "dashed" } },
 };
 const TOOLTIP_COMMON = {
-  backgroundColor: "#fdfaf2",
+  backgroundColor: "#FAFAFA",
   borderColor: PAPER.rule,
   borderWidth: 1,
   textStyle: { color: PAPER.ink, fontFamily: "Inter, sans-serif", fontSize: 12 },
-  extraCssText: "box-shadow: 0 4px 16px rgba(26,26,23,0.08); border-radius: 2px; padding: 10px 12px;",
+  extraCssText: "box-shadow: 0 4px 16px rgba(24,24,27,0.08); border-radius: 0; padding: 10px 12px;",
 };
 
 /* ---------- Hook: ECharts instance bound to a div ref ---------- */
@@ -208,7 +208,7 @@ function ComputeHorizonChart() {
     const scatterData = configs.map((m) => ({
       value: [m.avgTokensM, m.pass1],
       m,
-      itemStyle: { color: m.color, opacity: 0.95, borderColor: "#1a1a17", borderWidth: 1 },
+      itemStyle: { color: m.color, opacity: 0.95, borderColor: "#18181B", borderWidth: 1 },
     }));
 
     return {
@@ -241,7 +241,7 @@ function ComputeHorizonChart() {
         formatter: (p) => {
           if (!p.data || !p.data.m) return "";
           const m = p.data.m;
-          return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${m.name}</div>
+          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${m.name}</div>
                   <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${m.scaffold}</div>
                   <div>Pass@1: <b>${m.pass1.toFixed(1)}%</b></div>
                   <div>Tokens / trial: <b>${m.avgTokensM.toFixed(1)}M</b></div>
@@ -263,7 +263,7 @@ function ComputeHorizonChart() {
             show: true,
             position: "right",
             formatter: (p) => cfgLabel(p.data.m),
-            fontFamily: "IBM Plex Mono, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             fontSize: 9,
             color: PAPER.ink2,
             distance: 5,
@@ -276,7 +276,7 @@ function ComputeHorizonChart() {
             label: {
               formatter: `ceiling · ${maxPass.toFixed(0)}%`,
               color: PAPER.accent,
-              fontFamily: "IBM Plex Mono, monospace",
+              fontFamily: "JetBrains Mono, monospace",
               fontSize: 10,
               position: "insideEndTop",
             },
@@ -322,7 +322,7 @@ function ParetoChart() {
     const scatterData = agg.map((a) => ({
       value: [a.x, a.rate * 100],
       a,
-      itemStyle: { color: a.m.color, opacity: 0.95, borderColor: "#1a1a17", borderWidth: 1 },
+      itemStyle: { color: a.m.color, opacity: 0.95, borderColor: "#18181B", borderWidth: 1 },
     }));
 
     return {
@@ -353,7 +353,7 @@ function ParetoChart() {
         formatter: (p) => {
           if (!p.data || !p.data.a) return "";
           const a = p.data.a;
-          return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${a.m.name}</div>
+          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${a.m.name}</div>
                   <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${a.m.scaffold}</div>
                   <div>Pass@1: <b>${a.m.pass1.toFixed(1)}%</b></div>
                   <div>Cost / trial: <b>${a.m.costPerTrial != null ? "$" + a.m.costPerTrial.toFixed(2) : "—"}</b></div>
@@ -383,7 +383,7 @@ function ParetoChart() {
             show: true,
             position: "right",
             formatter: (p) => cfgLabel(p.data.a.m),
-            fontFamily: "IBM Plex Mono, monospace",
+            fontFamily: "JetBrains Mono, monospace",
             fontSize: 9,
             color: PAPER.ink2,
             distance: 4,
@@ -442,7 +442,7 @@ function TaskHeatmap() {
         splitArea: { show: false },
         axisLabel: {
           color: PAPER.ink3,
-          fontFamily: "IBM Plex Mono, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           fontSize: 10,
           interval: 0,
         },
@@ -461,7 +461,7 @@ function TaskHeatmap() {
         trigger: "item",
         formatter: (p) => {
           const { m, t } = p.data;
-          return `<div style="font-family:IBM Plex Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${cfgLabel(m)}</div>
+          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${cfgLabel(m)}</div>
                   <div style="font-weight:600;margin-bottom:2px;">${t.title}</div>
                   <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:4px;">${FAM_LABEL[t.cat]}</div>
                   <div>${usingPartial ? "Partial score" : "Pass@1"}: <b>${p.value[2]}${usingPartial ? " / 100" : "%"}</b></div>`;
@@ -471,7 +471,7 @@ function TaskHeatmap() {
         min: 0, max: 100,
         calculable: false,
         show: false,
-        inRange: { color: ["#f3efe4", "#e8c9a8", "#d49765", "#b56636", "#8b3d1f"] },
+        inRange: { color: ["#F4F4F5", "#E8F5E9", "#A5D6A7", "#4CAF50", "#2d7a4f"] },
       },
       animation: false,
       series: [{
@@ -481,11 +481,11 @@ function TaskHeatmap() {
         label: {
           show: true,
           color: PAPER.ink,
-          fontFamily: "IBM Plex Mono, monospace",
+          fontFamily: "JetBrains Mono, monospace",
           fontSize: 10,
           formatter: (p) => p.value[2] > 0 ? p.value[2].toFixed(0) : "·",
         },
-        itemStyle: { borderColor: "#faf7f0", borderWidth: 2 },
+        itemStyle: { borderColor: "#FAFAFA", borderWidth: 2 },
         emphasis: { itemStyle: { borderColor: PAPER.ink, borderWidth: 1.5 } },
       }],
     };
@@ -541,71 +541,111 @@ function TaskDistribution() {
     const famColor = {
       library: "#a86237", clone: "#5a7d4f", ml: "#5a6cb8", algo: "#9a7daa",
     };
+    const famCountByName = Object.fromEntries(
+      FAM_ORDER.map((f) => [FAM_LABEL[f], famCount[f]])
+    );
 
     return {
-      backgroundColor: "transparent",
-      tooltip: { ...TOOLTIP_COMMON, trigger: "item" },
-      title: [
-        { text: "By family", left: "28%", top: 8, textAlign: "center",
-          textStyle: { color: PAPER.ink3, fontFamily: "IBM Plex Mono, monospace", fontSize: 11, fontWeight: 400 } },
-        { text: "By human-expert estimate", left: "70%", top: 8, textAlign: "center",
-          textStyle: { color: PAPER.ink3, fontFamily: "IBM Plex Mono, monospace", fontSize: 11, fontWeight: 400 } },
-      ],
-      grid: { left: "52%", right: 24, top: 50, bottom: 40 },
-      xAxis: {
-        ...AXIS_COMMON,
-        type: "category",
-        gridIndex: 0,
-        data: bucketCount.map((b) => b.label),
-      },
-      yAxis: {
-        ...AXIS_COMMON,
-        type: "value",
-        gridIndex: 0,
-        name: "tasks",
-        nameLocation: "middle",
-        nameGap: 30,
-        max: 10,
-        interval: 2,
-      },
-      animation: false,
-      series: [
-        {
-          name: "By family",
-          type: "pie",
-          radius: ["44%", "70%"],
-          center: ["28%", "56%"],
-          label: {
-            position: "outside",
-            color: PAPER.ink2,
-            fontFamily: "Inter, sans-serif",
-            fontSize: 11,
-            formatter: (p) => `${FAM_LABEL[p.data.fam]}\n{n|${p.data.value}}`,
-            rich: { n: { color: PAPER.ink, fontWeight: 600, fontSize: 13 } },
-          },
-          labelLine: { lineStyle: { color: PAPER.rule } },
-          data: FAM_ORDER.map((f) => ({
-            value: famCount[f], name: FAM_LABEL[f], fam: f,
-            itemStyle: { color: famColor[f], borderColor: "#faf7f0", borderWidth: 2 },
-          })),
-          emphasis: { itemStyle: { borderColor: PAPER.ink } },
+      baseOption: {
+        backgroundColor: "transparent",
+        tooltip: { ...TOOLTIP_COMMON, trigger: "item" },
+        title: [
+          { text: "By family", left: "24%", top: 8, textAlign: "center",
+            textStyle: { color: PAPER.ink3, fontFamily: "JetBrains Mono, monospace", fontSize: 11, fontWeight: 400 } },
+          { text: "By human-expert estimate", left: "72%", top: 8, textAlign: "center",
+            textStyle: { color: PAPER.ink3, fontFamily: "JetBrains Mono, monospace", fontSize: 11, fontWeight: 400 } },
+        ],
+        legend: {
+          selectedMode: false,
+          data: FAM_ORDER.map((f) => FAM_LABEL[f]),
+          orient: "vertical",
+          left: "3%",
+          bottom: 8,
+          itemWidth: 10,
+          itemHeight: 10,
+          itemGap: 7,
+          textStyle: { color: PAPER.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 10 },
+          formatter: (name) => `${name} · ${famCountByName[name] ?? 0}`,
         },
+        grid: { left: "55%", right: 24, top: 58, bottom: 44 },
+        xAxis: {
+          ...AXIS_COMMON,
+          type: "category",
+          gridIndex: 0,
+          data: bucketCount.map((b) => b.label),
+        },
+        yAxis: {
+          ...AXIS_COMMON,
+          type: "value",
+          gridIndex: 0,
+          name: "tasks",
+          nameLocation: "middle",
+          nameGap: 30,
+          max: 10,
+          interval: 2,
+        },
+        animation: false,
+        series: [
+          {
+            name: "By family",
+            type: "pie",
+            radius: ["34%", "56%"],
+            center: ["24%", "43%"],
+            label: { show: false },
+            labelLine: { show: false },
+            data: FAM_ORDER.map((f) => ({
+              value: famCount[f], name: FAM_LABEL[f], fam: f,
+              itemStyle: { color: famColor[f], borderColor: "#FAFAFA", borderWidth: 2 },
+            })),
+            emphasis: { itemStyle: { borderColor: PAPER.ink } },
+          },
+          {
+            name: "By duration",
+            type: "bar",
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: bucketCount.map((b) => ({
+              value: b.n,
+              itemStyle: { color: PAPER.accent, opacity: 0.85, borderColor: "#18181B", borderWidth: 1 },
+            })),
+            barWidth: "50%",
+            label: {
+              show: true,
+              position: "top",
+              color: PAPER.ink2,
+              fontFamily: "JetBrains Mono, monospace",
+              fontSize: 11,
+            },
+          },
+        ],
+      },
+      media: [
         {
-          name: "By duration",
-          type: "bar",
-          xAxisIndex: 0,
-          yAxisIndex: 0,
-          data: bucketCount.map((b) => ({
-            value: b.n,
-            itemStyle: { color: PAPER.accent, opacity: 0.85, borderColor: "#1a1a17", borderWidth: 1 },
-          })),
-          barWidth: "55%",
-          label: {
-            show: true,
-            position: "top",
-            color: PAPER.ink2,
-            fontFamily: "IBM Plex Mono, monospace",
-            fontSize: 11,
+          query: { maxWidth: 640 },
+          option: {
+            title: [
+              { left: "50%", top: 6 },
+              { left: "50%", top: 360 },
+            ],
+            legend: {
+              orient: "vertical",
+              left: "14%",
+              right: "auto",
+              top: 238,
+              bottom: "auto",
+              itemGap: 7,
+            },
+            grid: { left: 48, right: 16, top: 405, bottom: 48 },
+            yAxis: { nameGap: 28 },
+            series: [
+              {
+                radius: ["22%", "36%"],
+                center: ["50%", "25%"],
+              },
+              {
+                barWidth: "48%",
+              },
+            ],
           },
         },
       ],
@@ -620,7 +660,7 @@ function TaskDistribution() {
           <h3 className="anal-card-title">The 20-task course at a glance.</h3>
         </div>
       </div>
-      <div ref={ref} className="anal-chart" style={{ height: 320 }}></div>
+      <div ref={ref} className="anal-chart anal-chart-dist"></div>
     </div>
   );
 }
@@ -635,7 +675,7 @@ function Analysis() {
     <section id="analysis">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§02 / Analysis</div>
+          <div className="section-no"><span className="dot">●</span> 02 / analysis</div>
           <h2 className="section-title">Compute horizons, Pareto frontiers, where it breaks.</h2>
         </div>
 

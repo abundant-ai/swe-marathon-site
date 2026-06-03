@@ -42,7 +42,7 @@ function ShellMixBars() {
               {r.label}
               <span style={{ display: "block", fontSize: 10.5, color: "var(--ink-3)" }}>{r.hint}</span>
             </div>
-            <div style={{ position: "relative", height: 16, background: "var(--rule2, #ebe6d7)" }}>
+            <div style={{ position: "relative", height: 16, background: "var(--rule-2, #F4F4F5)" }}>
               <div style={{
                 position: "absolute", left: 0, top: 0, bottom: 0,
                 width: `${(r.pct / maxPct) * 100}%`,
@@ -117,8 +117,8 @@ function FoxRunner() {
     "M13 15.5 L11 16.8 L12 17.8 L14 16.5 Z " +
     "M9.5 15.2 L7 17 L7.8 18 L9.5 17 Z";
 
-  const COL_BODY = "oklch(0.55 0.15 35)";
-  const COL_BODY_DK = "oklch(0.42 0.13 35)";
+  const COL_BODY = "#B56636";
+  const COL_BODY_DK = "#7A3F21";
 
   function buildSpriteSVG(legs) {
     // 32×22 viewBox: ears at y7, feet at y21, ~1 unit of breathing room.
@@ -130,7 +130,7 @@ function FoxRunner() {
         '<g fill="' + COL_BODY_DK + '">' +
           '<path d="' + legs + '"/>' +
         '</g>' +
-        '<circle cx="26.5" cy="11.6" r="0.55" fill="#1a1a17"/>' +
+        '<circle cx="26.5" cy="11.6" r="0.55" fill="#18181B"/>' +
       '</svg>'
     );
   }
@@ -158,15 +158,15 @@ function FoxRunner() {
   const PIXEL = 4; // each sprite cell is 4x4 canvas pixels
   const GROUND_Y = CH - 36; // baseline for fox feet
 
-  // Colors pulled from CSS variables (hardcoded fallback values)
-  const COL_SILHOUETTE = "oklch(0.55 0.15 35)"; // accent
-  const COL_HIGHLIGHT = "oklch(0.78 0.10 60)"; // lighter terracotta/cream
-  const COL_GROUND = "#5a564a";
-  const COL_TREE_FAR = "oklch(0.65 0.06 145)";
-  const COL_TREE_NEAR = "oklch(0.45 0.10 145)";
-  const COL_MTN = "oklch(0.62 0.04 50)";
-  const COL_SKY = "oklch(0.94 0.025 50)";
-  const COL_SKY_TOP = "oklch(0.96 0.02 60)";
+  // Scene colors stay naturalistic while the surrounding UI uses Abundant tokens.
+  const COL_SILHOUETTE = "#B56636";
+  const COL_HIGHLIGHT = "#EAD8C6";
+  const COL_GROUND = "#18181B";
+  const COL_TREE_FAR = "#A5D6A7";
+  const COL_TREE_NEAR = "#2d7a4f";
+  const COL_MTN = "#A1A1AA";
+  const COL_SKY = "#EAF4FF";
+  const COL_SKY_TOP = "#FAFAFA";
   // Obstacle palettes — each kind has its own (base, dark) pair.
   //   warning  — amber, only used for the ⚠ triangle
   //   error    — red,   used for the X mark
@@ -177,7 +177,7 @@ function FoxRunner() {
   const COL_ERROR_DK= "oklch(0.42 0.18 25)";
   const COL_BUG     = "oklch(0.28 0.04 30)";
   const COL_BUG_DK  = "oklch(0.18 0.03 30)";
-  const COL_TEXT = "#494842";
+  const COL_TEXT = "#18181B";
 
   function drawCoyote(ctx, frameKey, x, y) {
     const img = SPRITE_IMGS.current[frameKey];
@@ -432,7 +432,7 @@ function FoxRunner() {
 
       // Score badge — output tokens generated (top-right)
       ctx.fillStyle = COL_TEXT;
-      ctx.font = '500 12px ui-monospace, "JetBrains Mono", monospace';
+      ctx.font = '500 12px "Courier New", Courier, monospace';
       ctx.textAlign = "right";
       const tok = s.score.toFixed(2);
       const best = s.best.toFixed(2);
@@ -440,23 +440,23 @@ function FoxRunner() {
 
       // Idle / over overlays
       if (!s.started) {
-        ctx.fillStyle = "rgba(250, 247, 240, 0.85)";
+        ctx.fillStyle = "rgba(250, 250, 250, 0.88)";
         ctx.fillRect(CW / 2 - 180, CH / 2 - 30, 360, 60);
         ctx.strokeStyle = "rgba(26,26,23,0.25)";
         ctx.strokeRect(CW / 2 - 180, CH / 2 - 30, 360, 60);
         ctx.fillStyle = COL_TEXT;
         ctx.textAlign = "center";
-        ctx.font = '600 13px ui-monospace, "JetBrains Mono", monospace';
+        ctx.font = '600 13px "Courier New", Courier, monospace';
         ctx.fillText("PRESS SPACE OR CLICK TO RUN", CW / 2, CH / 2 + 5);
       } else if (s.over) {
-        ctx.fillStyle = "rgba(250, 247, 240, 0.92)";
+        ctx.fillStyle = "rgba(250, 250, 250, 0.94)";
         ctx.fillRect(CW / 2 - 220, CH / 2 - 40, 440, 80);
         ctx.strokeStyle = COL_SILHOUETTE;
         ctx.lineWidth = 1;
         ctx.strokeRect(CW / 2 - 220, CH / 2 - 40, 440, 80);
         ctx.fillStyle = COL_SILHOUETTE;
         ctx.textAlign = "center";
-        ctx.font = '700 16px Georgia, serif';
+        ctx.font = '600 16px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
         // Cycle thru a few flavor messages so it doesn't always say the same thing
         const dnfMsgs = [
           "Lost coherence at " + s.score.toFixed(2) + " Mtok",
@@ -516,8 +516,8 @@ function StatStrip() {
   const stats = [
   { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
   { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Best pass@1" },
-  { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens / trial" },
-  { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Trials reward-hacking" },
+  { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens per trial" },
+  { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Reward-hacking trials" },
   { num: "1,300", unit: "", label: "Logged trials" }];
 
   return (
@@ -538,8 +538,9 @@ function Hero() {
       <div className="container">
         <div className="eyebrow">SWE-MARATHON · 20 LONG-HORIZON TASKS · 1,300 LOGGED TRIALS</div>
         <h1 className="title">
-          Can agents autonomously complete<br />
-          <span className="ital">ultra-long-horizon</span> software work?
+          Can agents autonomously<br />
+          complete <span className="ital">ultra-long-horizon</span><br />
+          software work?
         </h1>
         <p className="lede">
           <strong>SWE-Marathon</strong> is a benchmark of <strong>20 multi-hour</strong> software-engineering
@@ -563,7 +564,7 @@ const BRANDS = {
   openai: {
     grad: ["#2563eb", "#7aa7f7"],
     logo: (
-      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#1a1a17" }}>
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#18181B" }}>
         <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" />
       </svg>
     ),
@@ -571,7 +572,7 @@ const BRANDS = {
   anthropic: {
     grad: ["#d97757", "#e9b15a"],
     logo: (
-      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#1a1a17" }}>
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#18181B" }}>
         <path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.541Zm-.3712 10.2188 2.2914-5.9456 2.2914 5.9456Z" />
       </svg>
     ),
@@ -603,7 +604,7 @@ const BRANDS = {
   moonshot: {
     grad: ["#6b4ea0", "#a78fd0"],
     logo: (
-      <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" style={{ color: "#1a1a17" }}>
+      <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" style={{ color: "#18181B" }}>
         <path d="M21.846 0a1.923 1.923 0 110 3.846H20.15a.226.226 0 01-.227-.226V1.923C19.923.861 20.784 0 21.846 0z" />
         <path d="M11.065 11.199l7.257-7.2c.137-.136.06-.41-.116-.41H14.3a.164.164 0 00-.117.051l-7.82 7.756c-.122.12-.302.013-.302-.179V3.82c0-.127-.083-.23-.185-.23H3.186c-.103 0-.186.103-.186.23V19.77c0 .128.083.23.186.23h2.69c.103 0 .186-.102.186-.23v-3.25c0-.069.025-.135.069-.178l2.424-2.406a.158.158 0 01.205-.023l6.484 4.772a7.677 7.677 0 003.453 1.283c.108.012.2-.095.2-.23v-3.06c0-.117-.07-.212-.164-.227a5.028 5.028 0 01-2.027-.807l-5.613-4.064c-.117-.078-.132-.279-.028-.381z" />
       </svg>
@@ -670,7 +671,7 @@ function Leaderboard() {
     <section id="leaderboard">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§01 / Leaderboard</div>
+          <div className="section-no"><span className="dot">●</span> 01 / leaderboard</div>
           <h2 className="section-title">SWE-Marathon Pass@1</h2>
         </div>
 
@@ -730,7 +731,7 @@ function Tasks() {
     <section id="tasks">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§03 / Tasks</div>
+          <div className="section-no"><span className="dot">●</span> 03 / tasks</div>
           <h2 className="section-title">20 marathons. 4 task families.</h2>
         </div>
 
@@ -774,17 +775,17 @@ function Tasks() {
 // Per-tool-kind presentation metadata. Colors are drawn from the site palette
 // so the trajectory reads as part of the same visual language.
 const TOOL_META = {
-  Bash:       { label: "Bash",     glyph: "$",  color: "#1a1a17" },
+  Bash:       { label: "Bash",     glyph: "$",  color: "#18181B" },
   Write:      { label: "Write",    glyph: "✎",  color: "oklch(0.50 0.10 145)" },
   Edit:       { label: "Edit",     glyph: "±",  color: "oklch(0.55 0.13 70)" },
   Read:       { label: "Read",     glyph: "▤",  color: "#6b8da3" },
   Grep:       { label: "Grep",     glyph: "⌕",  color: "#5a6cb8" },
-  TaskCreate: { label: "Task +",   glyph: "◆",  color: "oklch(0.55 0.15 35)" },
-  TaskUpdate: { label: "Task ·",   glyph: "◇",  color: "#a86237" },
+  TaskCreate: { label: "Task +",   glyph: "◆",  color: "#4CAF50" },
+  TaskUpdate: { label: "Task ·",   glyph: "◇",  color: "#2d7a4f" },
   ToolSearch: { label: "Search",   glyph: "≋",  color: "#7a83b3" },
   Submit:     { label: "Submit",   glyph: "✓",  color: "oklch(0.52 0.12 150)" },
 };
-const DEFAULT_TOOL_META = { label: "Tool", glyph: "•", color: "#84827a" };
+const DEFAULT_TOOL_META = { label: "Tool", glyph: "•", color: "#71717A" };
 const toolMeta = (kind) => TOOL_META[kind] || DEFAULT_TOOL_META;
 
 // The logged `detail` looks like:
@@ -1499,7 +1500,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>Leaderboard</div>
+              <div className="section-no"><span className="dot">●</span> leaderboard</div>
             </div>
             <TaskLeaderboard leaderboard={detail.leaderboard} />
           </div>
@@ -1511,7 +1512,7 @@ function TaskDetailPage({ taskId }) {
           <div className="container">
             {detail.sections.map((s) => (
               <div className="task-detail-section" key={s.title}>
-                <div className="section-no"><span className="dot">●</span>{s.title}</div>
+                <div className="section-no"><span className="dot">●</span> {s.title}</div>
                 <p>{s.body}</p>
               </div>
             ))}
@@ -1523,7 +1524,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>Task specification</div>
+              <div className="section-no"><span className="dot">●</span> task specification</div>
             </div>
             <SampleTask sample={detail.sample} />
           </div>
@@ -1534,7 +1535,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>Task verifier</div>
+              <div className="section-no"><span className="dot">●</span> task verifier</div>
               <h2 className="section-title">{detail.verifierTitle}</h2>
             </div>
             <div className="verifier-grid">
@@ -1556,7 +1557,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>{detail.artifacts ? "Agent trials" : "Result"}</div>
+              <div className="section-no"><span className="dot">●</span> {detail.artifacts ? "agent trials" : "result"}</div>
               <h2 className="section-title">{detail.resultTitle}</h2>
             </div>
             {detail.artifacts && <TrialShowcase artifacts={detail.artifacts} />}
@@ -1574,7 +1575,7 @@ function CourseProfileSection() {
     <section id="course">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§04 / The course</div>
+          <div className="section-no"><span className="dot">●</span> 04 / the course</div>
           <h2 className="section-title">A marathon is run in the shell.</h2>
         </div>
         <div className="section-body" style={{ marginBottom: 28 }}>
@@ -1612,7 +1613,7 @@ function Findings() {
     <section id="findings">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§05 / Failure modes</div>
+          <div className="section-no"><span className="dot">●</span> 05 / failure modes</div>
           <h2 className="section-title">Selected failure modes.</h2>
         </div>
 
@@ -1659,7 +1660,7 @@ function Citation() {
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>§06 / Paper</div>
+          <div className="section-no"><span className="dot">●</span> 06 / paper</div>
           <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
         <div className="citation-block">
@@ -1685,7 +1686,7 @@ function Footer() {
               <div className="brand-mark" aria-label="SWE-Marathon coyote mascot">
                 <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <path d="M2 11 Q5 10 7 12 L8 13.5 L10 12 L12.5 11 L15 11.5 L18 11.5 L20 11 L21 10.5 L21.5 8 L22.5 10 L23.5 10 L24.5 8 L25 10.5 L26 11 L28.5 11.8 L30 12.8 L28 13.5 L26.5 13.6 L26.5 14.4 L25 15 L23 14.8 L22 14.5 L22 21 L20.5 21 L20.5 16 L18 16 L18 21 L16.5 21 L16.5 16 L13 16 L13 21 L11.5 21 L11.5 16 L9 16 L8 21 L6.5 21 L7 15 L5 14 L3.5 13 Z" fill="currentColor" />
-                  <circle cx="26.5" cy="11.8" r="0.55" fill="#1a1a17" />
+                  <circle cx="26.5" cy="11.8" r="0.55" fill="#18181B" />
                 </svg>
               </div>
               <span>SWE-Marathon</span>
