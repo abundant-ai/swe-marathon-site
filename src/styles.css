@@ -74,14 +74,10 @@
   .nav-links a {
     text-decoration: none;
     color: var(--ink);
-    padding: 5px 8px;
+    padding: 6px 10px;
     border-radius: 0;
     display: inline-flex; align-items: baseline; gap: 6px;
     transition: color 0.12s ease, background 0.12s ease;
-  }
-  .nav-links a::before {
-    content: "[ ]";
-    color: var(--ink-3);
   }
   .nav-links a .nl-no {
     font-size: 10px;
@@ -95,8 +91,6 @@
     background: var(--ink);
     outline: 0;
   }
-  .nav-links a:hover::before,
-  .nav-links a:focus-visible::before,
   .nav-links a:hover .nl-no,
   .nav-links a:focus-visible .nl-no {
     color: rgba(255, 255, 255, 0.62);
@@ -106,7 +100,6 @@
     color: var(--bg);
     background: var(--ink);
   }
-  .nav-links .nl-paper::before { content: "[x]"; color: rgba(255, 255, 255, 0.62); }
   .nav-links .nl-paper:hover {
     background: var(--accent);
     color: var(--bg);
