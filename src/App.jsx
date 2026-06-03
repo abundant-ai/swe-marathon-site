@@ -117,8 +117,8 @@ function FoxRunner() {
     "M13 15.5 L11 16.8 L12 17.8 L14 16.5 Z " +
     "M9.5 15.2 L7 17 L7.8 18 L9.5 17 Z";
 
-  const COL_BODY = "#4CAF50";
-  const COL_BODY_DK = "#2d7a4f";
+  const COL_BODY = "#B56636";
+  const COL_BODY_DK = "#7A3F21";
 
   function buildSpriteSVG(legs) {
     // 32×22 viewBox: ears at y7, feet at y21, ~1 unit of breathing room.
@@ -158,14 +158,14 @@ function FoxRunner() {
   const PIXEL = 4; // each sprite cell is 4x4 canvas pixels
   const GROUND_Y = CH - 36; // baseline for fox feet
 
-  // Colors pulled from CSS variables (hardcoded fallback values)
-  const COL_SILHOUETTE = "#4CAF50";
-  const COL_HIGHLIGHT = "#E8F5E9";
+  // Scene colors stay naturalistic while the surrounding UI uses Abundant tokens.
+  const COL_SILHOUETTE = "#B56636";
+  const COL_HIGHLIGHT = "#EAD8C6";
   const COL_GROUND = "#18181B";
   const COL_TREE_FAR = "#A5D6A7";
   const COL_TREE_NEAR = "#2d7a4f";
   const COL_MTN = "#A1A1AA";
-  const COL_SKY = "#F4F4F5";
+  const COL_SKY = "#EAF4FF";
   const COL_SKY_TOP = "#FAFAFA";
   // Obstacle palettes — each kind has its own (base, dark) pair.
   //   warning  — amber, only used for the ⚠ triangle
