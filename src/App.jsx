@@ -456,7 +456,7 @@ function FoxRunner() {
         ctx.strokeRect(CW / 2 - 220, CH / 2 - 40, 440, 80);
         ctx.fillStyle = COL_SILHOUETTE;
         ctx.textAlign = "center";
-        ctx.font = '700 16px Newsreader, Georgia, serif';
+        ctx.font = '600 16px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
         // Cycle thru a few flavor messages so it doesn't always say the same thing
         const dnfMsgs = [
           "Lost coherence at " + s.score.toFixed(2) + " Mtok",
@@ -538,8 +538,9 @@ function Hero() {
       <div className="container">
         <div className="eyebrow">SWE-MARATHON · 20 LONG-HORIZON TASKS · 1,300 LOGGED TRIALS</div>
         <h1 className="title">
-          Can agents autonomously complete<br />
-          <span className="ital">ultra-long-horizon</span> software work?
+          Can agents autonomously<br />
+          complete <span className="ital">ultra-long-horizon</span><br />
+          software work?
         </h1>
         <p className="lede">
           <strong>SWE-Marathon</strong> is a benchmark of <strong>20 multi-hour</strong> software-engineering
