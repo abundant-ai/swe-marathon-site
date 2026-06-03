@@ -64,23 +64,21 @@
   .brand:hover .brand-mark { color: var(--accent); }
   .brand-mark svg { width: 26px; height: 26px; display: block; }
   .nav-links {
-    display: flex; gap: 0;
-    font-family: var(--mono); font-size: 12px;
+    display: flex; gap: 3px;
+    font-family: var(--mono); font-size: 13px;
+    font-weight: 700;
     align-items: center;
-    border: 1px solid var(--rule);
-    background: var(--bg);
-    padding: 3px;
   }
   .nav-links a {
     text-decoration: none;
     color: var(--ink);
-    padding: 6px 10px;
+    padding: 8px 10px;
     border-radius: 0;
     display: inline-flex; align-items: baseline; gap: 6px;
     transition: color 0.12s ease, background 0.12s ease;
   }
   .nav-links a .nl-no {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--ink-3);
     letter-spacing: 0;
     font-variant-numeric: tabular-nums;
@@ -96,7 +94,8 @@
     color: rgba(255, 255, 255, 0.62);
   }
   .nav-links .nl-paper {
-    margin-left: 3px;
+    margin-left: 6px;
+    padding-inline: 14px;
     color: var(--bg);
     background: var(--ink);
   }
