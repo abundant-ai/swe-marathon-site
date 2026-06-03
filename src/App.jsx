@@ -671,7 +671,7 @@ function Leaderboard() {
     <section id="leaderboard">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>01 / leaderboard</div>
+          <div className="section-no"><span className="dot">●</span> 01 / leaderboard</div>
           <h2 className="section-title">SWE-Marathon Pass@1</h2>
         </div>
 
@@ -731,7 +731,7 @@ function Tasks() {
     <section id="tasks">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>03 / tasks</div>
+          <div className="section-no"><span className="dot">●</span> 03 / tasks</div>
           <h2 className="section-title">20 marathons. 4 task families.</h2>
         </div>
 
@@ -1500,7 +1500,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>leaderboard</div>
+              <div className="section-no"><span className="dot">●</span> leaderboard</div>
             </div>
             <TaskLeaderboard leaderboard={detail.leaderboard} />
           </div>
@@ -1512,7 +1512,7 @@ function TaskDetailPage({ taskId }) {
           <div className="container">
             {detail.sections.map((s) => (
               <div className="task-detail-section" key={s.title}>
-                <div className="section-no"><span className="dot">●</span>{s.title}</div>
+                <div className="section-no"><span className="dot">●</span> {s.title}</div>
                 <p>{s.body}</p>
               </div>
             ))}
@@ -1524,7 +1524,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>task specification</div>
+              <div className="section-no"><span className="dot">●</span> task specification</div>
             </div>
             <SampleTask sample={detail.sample} />
           </div>
@@ -1535,7 +1535,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>task verifier</div>
+              <div className="section-no"><span className="dot">●</span> task verifier</div>
               <h2 className="section-title">{detail.verifierTitle}</h2>
             </div>
             <div className="verifier-grid">
@@ -1557,7 +1557,7 @@ function TaskDetailPage({ taskId }) {
         <section className="task-page">
           <div className="container">
             <div className="section-head">
-              <div className="section-no"><span className="dot">●</span>{detail.artifacts ? "agent trials" : "result"}</div>
+              <div className="section-no"><span className="dot">●</span> {detail.artifacts ? "agent trials" : "result"}</div>
               <h2 className="section-title">{detail.resultTitle}</h2>
             </div>
             {detail.artifacts && <TrialShowcase artifacts={detail.artifacts} />}
@@ -1575,7 +1575,7 @@ function CourseProfileSection() {
     <section id="course">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>04 / the course</div>
+          <div className="section-no"><span className="dot">●</span> 04 / the course</div>
           <h2 className="section-title">A marathon is run in the shell.</h2>
         </div>
         <div className="section-body" style={{ marginBottom: 28 }}>
@@ -1613,7 +1613,7 @@ function Findings() {
     <section id="findings">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>05 / failure modes</div>
+          <div className="section-no"><span className="dot">●</span> 05 / failure modes</div>
           <h2 className="section-title">Selected failure modes.</h2>
         </div>
 
@@ -1660,7 +1660,7 @@ function Citation() {
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>06 / paper</div>
+          <div className="section-no"><span className="dot">●</span> 06 / paper</div>
           <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
         <div className="citation-block">

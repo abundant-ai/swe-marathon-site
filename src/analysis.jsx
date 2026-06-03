@@ -675,7 +675,7 @@ function Analysis() {
     <section id="analysis">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span>02 / analysis</div>
+          <div className="section-no"><span className="dot">●</span> 02 / analysis</div>
           <h2 className="section-title">Compute horizons, Pareto frontiers, where it breaks.</h2>
         </div>
 
