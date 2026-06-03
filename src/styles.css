@@ -64,36 +64,52 @@
   .brand:hover .brand-mark { color: var(--accent); }
   .brand-mark svg { width: 26px; height: 26px; display: block; }
   .nav-links {
-    display: flex; gap: 4px;
+    display: flex; gap: 0;
     font-family: var(--mono); font-size: 12px;
     align-items: center;
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    padding: 3px;
   }
   .nav-links a {
     text-decoration: none;
-    color: var(--ink-2);
-    padding: 6px 10px;
-    border-radius: 2px;
+    color: var(--ink);
+    padding: 5px 8px;
+    border-radius: 0;
     display: inline-flex; align-items: baseline; gap: 6px;
     transition: color 0.12s ease, background 0.12s ease;
+  }
+  .nav-links a::before {
+    content: "[ ]";
+    color: var(--ink-3);
   }
   .nav-links a .nl-no {
     font-size: 10px;
     color: var(--ink-3);
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
     font-variant-numeric: tabular-nums;
   }
-  .nav-links a:hover { color: var(--accent); background: var(--bg-2); }
-  .nav-links a:hover .nl-no { color: var(--accent); }
-  .nav-links .nl-paper {
-    margin-left: 6px;
-    padding: 6px 12px;
-    border: 1px solid var(--rule);
-    color: var(--ink);
+  .nav-links a:hover,
+  .nav-links a:focus-visible {
+    color: var(--bg);
+    background: var(--ink);
+    outline: 0;
   }
+  .nav-links a:hover::before,
+  .nav-links a:focus-visible::before,
+  .nav-links a:hover .nl-no,
+  .nav-links a:focus-visible .nl-no {
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .nav-links .nl-paper {
+    margin-left: 3px;
+    color: var(--bg);
+    background: var(--ink);
+  }
+  .nav-links .nl-paper::before { content: "[x]"; color: rgba(255, 255, 255, 0.62); }
   .nav-links .nl-paper:hover {
-    border-color: var(--accent);
-    background: transparent;
-    color: var(--accent);
+    background: var(--accent);
+    color: var(--bg);
   }
   .topnav::after {
     content: none;
