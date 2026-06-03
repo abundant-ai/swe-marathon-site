@@ -5,7 +5,6 @@ import {
   CATEGORIES,
   CAT_LABEL,
   HEADLINE,
-  MARATHON_ANATOMY,
   LEADERBOARD,
   RH_BY_MODEL,
   TRIAL_BY_ID,
@@ -17,52 +16,6 @@ import {
 const Analysis = lazy(() => import("./analysis.jsx"));
 
 const TASK_FAMILIES = CATEGORIES;
-
-// §04 "Anatomy of a marathon" — what agents actually do across a multi-hour
-// run. Aggregated over 1,180 logged trajectories; numbers in MARATHON_ANATOMY.
-function ShellMixBars() {
-  const rows = MARATHON_ANATOMY.shellMix;
-  const maxPct = Math.max(...rows.map((r) => r.pct));
-  return (
-    <div style={{
-      border: "1px solid var(--rule)",
-      background: "var(--bg)",
-      padding: "16px 18px 16px",
-      fontFamily: "var(--mono)",
-      fontSize: 11,
-    }}>
-      <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>
-        <span>Shell commands by intent</span>
-        <span>% of all terminal calls</span>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(150px, 200px) 1fr 46px", gap: "10px 12px", alignItems: "center" }}>
-        {rows.map((r, i) => (
-          <React.Fragment key={r.label}>
-            <div style={{ fontFamily: "var(--sans)", fontSize: 13, color: "var(--ink)", lineHeight: 1.2 }}>
-              {r.label}
-              <span style={{ display: "block", fontSize: 10.5, color: "var(--ink-3)" }}>{r.hint}</span>
-            </div>
-            <div style={{ position: "relative", height: 16, background: "var(--rule-2, #F4F4F5)" }}>
-              <div style={{
-                position: "absolute", left: 0, top: 0, bottom: 0,
-                width: `${(r.pct / maxPct) * 100}%`,
-                background: i === 0
-                  ? "linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent) 55%, var(--bg)))"
-                  : "var(--ink)",
-                opacity: i === 0 ? 0.95 : 0.5 - i * 0.04,
-              }} />
-            </div>
-            <div style={{ textAlign: "right", color: "var(--ink)", fontWeight: 600 }}>
-              {r.pct.toFixed(1)}%
-            </div>
-          </React.Fragment>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-
 
 /* ---------------- COMPONENTS ---------------- */
 
@@ -515,9 +468,9 @@ function FoxRunner() {
 function StatStrip() {
   const stats = [
   { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
-  { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Best pass@1" },
+  { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Task resolution rate" },
   { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens per trial" },
-  { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Reward-hacking trials" },
+  { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Trials with reward-hacking behavior" },
   { num: "1,300", unit: "", label: "Logged trials" }];
 
   return (
@@ -536,23 +489,17 @@ function Hero() {
   return (
     <header className="hero">
       <div className="container">
-        <div className="eyebrow">SWE-MARATHON · 20 LONG-HORIZON TASKS · 1,300 LOGGED TRIALS</div>
-        <h1 className="title">
-          Can agents autonomously<br />
-          complete <span className="ital">ultra-long-horizon</span><br />
-          software work?
-        </h1>
-        <p className="lede">
-          <strong>SWE-Marathon</strong> is a benchmark of <strong>20 multi-hour</strong> software-engineering
-          tasks: library reproductions, full-stack product clones, and ML engineering.
-        </p>
-        <FoxRunner />
-        <div className="cta-row">
-          <a className="btn" href="#leaderboard">View leaderboard <span className="arr">↓</span></a>
-          <a className="btn ghost" href="#tasks">Tasks <span className="arr">↓</span></a>
-          <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
-        </div>
         <StatStrip />
+        <h1 className="title">
+          <span className="title-brand">SWE-Marathon</span>
+        </h1>
+        <a className="abundant-brand" href="https://abundant.ai/">
+          by Abundant AI
+        </a>
+        <p className="lede">
+          a benchmark of <strong>20 multi-hour SWE tasks</strong> spanning library
+          reproductions, full-stack product clones, and ML engineering.
+        </p>
       </div>
     </header>);
 
@@ -646,6 +593,44 @@ function BrandLogo({ name }) {
   );
 }
 
+const TASK_COMPANIES = {
+  "nextjs-vite-rewrite": [{ name: "Cloudflare", mark: "CF" }],
+  "rust-c-compiler": [{ name: "Anthropic", mark: "A" }],
+  "rust-java-lsp": [{ name: "Cursor", mark: "C" }],
+  "excel-clone": [{ name: "Cursor", mark: "C" }],
+  "s3-clone": [{ name: "Amazon S3", mark: "S3" }],
+  "slack-clone": [{ name: "Slack", mark: "SL" }],
+  "stripe-clone": [{ name: "Stripe", mark: "ST" }],
+  "trimul-cuda": [{ name: "Google DeepMind", mark: "G" }],
+  "parameter-golf": [{ name: "OpenAI", mark: "O" }],
+  "vliw-kernel-optimization": [{ name: "Anthropic", mark: "A" }],
+};
+
+function TaskCompanyLogo({ company }) {
+  if (company.name === "OpenAI") {
+    return <BrandLogo name="GPT-5.5" />;
+  }
+  if (company.name === "Anthropic") {
+    return <BrandLogo name="Claude" />;
+  }
+  return <span className="task-company-mark">{company.mark}</span>;
+}
+
+function TaskCompanyBadges({ taskId }) {
+  const companies = TASK_COMPANIES[taskId];
+  if (!companies?.length) return null;
+  return (
+    <div className="task-companies" aria-label="Company inspiration">
+      {companies.map((company) => (
+        <span className="task-company" key={company.name}>
+          <TaskCompanyLogo company={company} />
+          <span>{company.name}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 // Per-failure-bucket accent. Reward hacking is red, consistent with the
 // cheat chips elsewhere on the site; the rest get distinct muted hues.
 function bucketColor(bucket) {
@@ -662,23 +647,22 @@ function Leaderboard() {
     () => LEADERBOARD.filter((r) => !r.ref).sort((a, b) => b.pass1 - a.pass1),
     []
   );
-  const maxPass = Math.max(...sorted.map((r) => r.pass1), 1);
-  const axisMax = Math.max(5, Math.ceil(maxPass / 5) * 5);
+  const axisMax = 100;
   const ticks = [];
-  for (let t = 0; t <= axisMax; t += 5) ticks.push(t);
+  for (let t = 0; t <= axisMax; t += 25) ticks.push(t);
 
   return (
     <section id="leaderboard">
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 01 / leaderboard</div>
-          <h2 className="section-title">SWE-Marathon Pass@1</h2>
+          <h2 className="section-title">Leaderboard</h2>
         </div>
 
         <div className="lb-chart">
           <div className="lb-chart-head">
             <span>Model</span>
-            <span>Pass@1</span>
+            <span>Score</span>
           </div>
 
           {sorted.map((row) => {
@@ -726,6 +710,52 @@ function Leaderboard() {
 
 }
 
+function BenchmarkBullets() {
+  const bullets = [
+    {
+      label: "Eval-community tasks",
+      text: "Tasks draw from the evaluation community and frontier-lab case studies, including Anthropic, OpenAI, and Cursor, alongside product clones, ML systems, ports, and kernels.",
+    },
+    {
+      label: "Handcrafted, not farmed",
+      text: "Each task is handcrafted with a unique prompt, environment, verifier, and reference solution, rather than mined from GitHub pull requests or repos.",
+    },
+    {
+      label: "CUA-verified product clones",
+      text: "Full-stack clone tasks combine API and unit-test checks with computer-use-agent browser rubrics, where a CUA agent drives the UI like a real user.",
+    },
+    {
+      label: "Reward-hacking resistant",
+      text: "Verifiers use visible and hidden tests, held-out oracle solutions, closed-network audits, and adversarial exploit scans to patch shortcuts before release and catch attempts to game the benchmark.",
+    },
+  ];
+
+  return (
+    <section id="benchmark-design" className="benchmark-design">
+      <div className="container">
+        <div className="section-head">
+          <div className="section-no"><span className="dot">●</span> 02 / design</div>
+          <h2 className="section-title">What makes SWE-Marathon different?</h2>
+        </div>
+        <figure className="horizon-figure">
+          <img
+            src="/benchmark-horizons.svg"
+            alt="SWE-Marathon compared with recent software engineering benchmarks by benchmark release year and per-task wall-clock horizon"
+          />
+        </figure>
+        <div className="benchmark-bullets">
+          {bullets.map((bullet) => (
+            <div className="benchmark-bullet" key={bullet.label}>
+              <h3>{bullet.label}</h3>
+              <p>{bullet.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Tasks() {
   return (
     <section id="tasks">
@@ -746,11 +776,10 @@ function Tasks() {
               </div>
               <div className="tasks-grid">
                 {famTasks.map((t) => {
-                  const i = TASKS.indexOf(t);
                   return (
                   <a className={"task task-link " + (TASK_DETAILS[t.id] ? "has-detail" : "")} href={`#task/${t.id}`} key={t.id}>
                     <div className="task-head">
-                      <div className="task-id">T{String(i + 1).padStart(2, "0")}</div>
+                      <TaskCompanyBadges taskId={t.id} />
                       <div className="task-budget">{t.agentH}h agent timeout</div>
                     </div>
                     <h3 className="task-title">{t.title}</h3>
@@ -1569,51 +1598,12 @@ function TaskDetailPage({ taskId }) {
   );
 }
 
-function CourseProfileSection() {
-  const m = MARATHON_ANATOMY;
-  return (
-    <section id="course">
-      <div className="container">
-        <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 04 / the course</div>
-          <h2 className="section-title">A marathon is run in the shell.</h2>
-        </div>
-        <div className="section-body" style={{ marginBottom: 28 }}>
-          <div className="sb-side">
-            <div className="label-row">Actions<span>Median {m.medianActions} tool calls per trial; the busiest 10% top {m.p90Actions}.</span></div>
-            <div className="label-row">Shell<span>{m.shellPct}% of all logged actions are terminal commands — agents barely touch editor tools.</span></div>
-            <div className="label-row">Repetition<span>Terminus-2 repeats an earlier (function, args) call {HEADLINE.duplicationTerminusPct}% of the time; tool errors run {HEADLINE.toolErrorRateRange}.</span></div>
-          </div>
-          <div>
-            <p style={{ fontSize: 15, color: "var(--ink-2)", margin: "0 0 18px", maxWidth: 600 }}>
-              Across {m.nTrajectories.toLocaleString()} logged rollouts and{" "}
-              {Math.round(m.totalActions / 1000)}K tool calls, the work is overwhelmingly
-              terminal-driven: agents spend a marathon inspecting the tree, running and
-              rebuilding, and babysitting long-lived processes far more than they edit.
-              One in eight shell calls is pure process control — starting servers,
-              Ctrl-C, <code>sleep</code>, <code>kill</code> — the tax of keeping a
-              multi-hour environment alive.
-            </p>
-            <ShellMixBars />
-            <div className="split-chips" style={{ marginTop: 18 }}>
-              <div className="split-chip">Logged trajectories: <strong>{m.nTrajectories.toLocaleString()}</strong></div>
-              <div className="split-chip">Median actions / trial: <strong>{m.medianActions}</strong></div>
-              <div className="split-chip">Reasoning steps (median): <strong>{m.medianSteps}</strong></div>
-              <div className="split-chip">Shell share: <strong>{m.shellPct}%</strong></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>);
-
-}
-
 function Findings() {
   return (
     <section id="findings">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 05 / failure modes</div>
+          <div className="section-no"><span className="dot">●</span> 04 / failure modes</div>
           <h2 className="section-title">Selected failure modes.</h2>
         </div>
 
@@ -1660,7 +1650,7 @@ function Citation() {
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 06 / paper</div>
+          <div className="section-no"><span className="dot">●</span> 05 / paper</div>
           <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
         <div className="citation-block">
@@ -1683,16 +1673,19 @@ function Footer() {
         <div className="foot-grid">
           <div>
             <div className="brand" style={{ marginBottom: 14 }}>
-              <div className="brand-mark" aria-label="SWE-Marathon coyote mascot">
+              <div className="brand-mark" aria-label="SWE-Marathon roadrunner mascot">
                 <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path d="M2 11 Q5 10 7 12 L8 13.5 L10 12 L12.5 11 L15 11.5 L18 11.5 L20 11 L21 10.5 L21.5 8 L22.5 10 L23.5 10 L24.5 8 L25 10.5 L26 11 L28.5 11.8 L30 12.8 L28 13.5 L26.5 13.6 L26.5 14.4 L25 15 L23 14.8 L22 14.5 L22 21 L20.5 21 L20.5 16 L18 16 L18 21 L16.5 21 L16.5 16 L13 16 L13 21 L11.5 21 L11.5 16 L9 16 L8 21 L6.5 21 L7 15 L5 14 L3.5 13 Z" fill="currentColor" />
-                  <circle cx="26.5" cy="11.8" r="0.55" fill="#18181B" />
+                  <path d="M4 19.5 C7.8 13.8 13 10.8 19.6 10.8 C22.2 10.8 24.4 11.5 26.2 12.8 L31 11.7 L27.2 14.8 C27.1 17.8 24.7 20.4 20.8 21.5 C16.5 22.8 12.2 22.1 8 19.5 L4 19.5 Z" fill="currentColor" />
+                  <path d="M11.2 11.2 L5.5 6.8 L13 9.4 L10 3.5 L16.1 8.8 L17.6 3 L19.2 9.3" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M15.2 21 L12.8 28 M19.2 21.5 L22.8 28 M11 28 L15.4 28 M21.2 28 L26.2 28" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="23.9" cy="13.3" r="0.65" fill="#18181B" />
                 </svg>
               </div>
               <span>SWE-Marathon</span>
             </div>
             <p style={{ maxWidth: 380, color: "var(--ink-2)", fontSize: 13, margin: 0 }}>
-              A long-horizon software engineering benchmark. Open-source under
+              A long-horizon software engineering benchmark by{" "}
+              <a href="https://abundant.ai/">Abundant AI</a>. Open-source under
               Apache 2.0.
             </p>
           </div>
@@ -1708,9 +1701,6 @@ function Footer() {
             <div className="foot-h">Resources</div>
             <div className="foot-list">
               <a href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
-              <a href="#cite">Paper</a>
-              <a href="#leaderboard">Submit an agent</a>
-              <a href="#tasks">Donate a task</a>
             </div>
           </div>
         </div>
@@ -1759,11 +1749,11 @@ function App() {
     <>
       <Hero />
       <Leaderboard />
+      <BenchmarkBullets />
       <Suspense fallback={<div className="analysis-loading">Loading analysis...</div>}>
         <Analysis />
       </Suspense>
       <Tasks />
-      <CourseProfileSection />
       <Findings />
       <Citation />
       <Footer />

@@ -117,7 +117,7 @@
   }
 
   /* Hero */
-  .hero { padding: 88px 0 64px; border-bottom: 1px solid var(--rule); position: relative; }
+  .hero { padding: 48px 0 38px; border-bottom: 1px solid var(--rule); position: relative; }
 
   /* Fox runner mini-game */
   .fox-runner {
@@ -242,12 +242,45 @@
     font-family: var(--heading); font-weight: 700;
     font-size: 48px;
     line-height: 1.12; letter-spacing: 0;
-    margin: 0 0 28px; text-wrap: balance;
+    margin: 0 0 12px; text-wrap: balance;
+    text-align: center;
   }
   h1 .ital { font-style: normal; color: var(--accent); }
+  .title-brand {
+    display: block;
+    font-family: var(--mono);
+    font-size: 1em;
+    line-height: inherit;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin-bottom: 0;
+  }
+  .abundant-brand {
+    display: table;
+    margin: 0 auto 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+  .abundant-brand::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: 0.05em;
+  }
+  .abundant-brand:hover {
+    color: var(--accent);
+  }
   .lede {
-    font-size: 20px; line-height: 1.45; color: var(--ink-2);
-    max-width: 640px; margin: 0 0 16px; text-wrap: pretty;
+    font-size: 17px; line-height: 1.45; color: var(--ink-2);
+    max-width: 720px; margin: 0 auto 8px; text-wrap: pretty;
+    text-align: center;
   }
   .lede strong { color: var(--ink); font-weight: 600; }
   .hero-sub {
@@ -273,31 +306,32 @@
   .stats-strip {
     display: grid; grid-template-columns: repeat(5, 1fr);
     gap: 0;
-    margin-top: 64px;
-    border-top: 1px solid var(--rule);
+    margin: 0 0 34px;
+    border-bottom: 1px solid var(--rule);
     padding-top: 0;
   }
   .stat {
-    padding: 24px 24px 14px 0;
+    padding: 0 16px 12px 0;
     border-right: 1px solid var(--rule-2);
     min-width: 0;
   }
-  .stat + .stat { padding-left: 24px; }
+  .stat + .stat { padding-left: 16px; }
   .stat:last-child { border-right: none; }
   .stat-num {
-    font-family: var(--sans); font-weight: 500; font-size: 38px; line-height: 1;
-    color: var(--ink); margin-bottom: 12px; letter-spacing: 0;
+    font-family: var(--sans); font-weight: 500; font-size: 24px; line-height: 1;
+    color: var(--ink); margin-bottom: 6px; letter-spacing: 0;
     font-variant-numeric: tabular-nums;
   }
-  .stat-num .unit { font-size: 19px; color: var(--ink-3); margin-left: 5px; font-weight: 400; }
+  .stat-num .unit { font-size: 12px; color: var(--ink-3); margin-left: 4px; font-weight: 400; }
   .stat-label {
-    font-family: var(--mono); font-size: 13px; line-height: 1.35; color: var(--ink-3);
+    font-family: var(--mono); font-size: 9.5px; line-height: 1.3; color: var(--ink-3);
     text-transform: lowercase; letter-spacing: 0;
     text-wrap: balance;
   }
 
   /* Section scaffolding */
   section { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+  #leaderboard { padding-top: 56px; }
   .section-head {
     display: grid; grid-template-columns: 200px 1fr; gap: 48px;
     margin-bottom: 40px; align-items: baseline;
@@ -407,6 +441,53 @@
   }
   .lb-foot sup { color: var(--accent); margin-right: 4px; font-weight: 600; }
   .lb-foot strong { color: var(--ink-2); font-weight: 600; }
+
+  .horizon-figure {
+    margin: 0 0 34px;
+    width: 100%;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+  }
+  .horizon-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .benchmark-design {
+    padding-top: 64px;
+  }
+  .benchmark-bullets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+  .benchmark-bullet {
+    padding: 24px 26px 26px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+  }
+  .benchmark-bullet h3 {
+    margin: 0 0 10px;
+    font-family: var(--heading);
+    font-size: 21px;
+    line-height: 1.15;
+  }
+  .benchmark-bullet h3::before {
+    content: "●";
+    color: var(--accent);
+    font-size: 10px;
+    margin-right: 9px;
+    vertical-align: 0.16em;
+  }
+  .benchmark-bullet p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 1.55;
+  }
 
   /* Leaderboard */
   .lb-controls {
@@ -540,8 +621,10 @@
   }
   .task-link.has-detail:hover { background: var(--accent-bg); }
   .task-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px;
+    min-height: 24px;
+    margin-bottom: 12px;
   }
   .task-id {
     font-family: var(--mono); font-size: 11px; color: var(--ink-3);
@@ -550,6 +633,48 @@
   .task-budget {
     font-family: var(--mono); font-size: 12px; color: var(--accent);
     font-weight: 500;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .task-companies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+  .task-company {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 4px 8px;
+    border: 1px solid var(--rule);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1;
+  }
+  .task-company .lb-logo,
+  .task-company-mark {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+  }
+  .task-company .lb-logo svg {
+    width: 14px;
+    height: 14px;
+  }
+  .task-company-mark {
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-size: 7px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
   }
   .task-title {
     font-family: var(--heading); font-size: 20px; line-height: 1.18;
@@ -2087,6 +2212,7 @@
     .stat { padding-bottom: 22px; }
     .anal-task-key { grid-template-columns: repeat(2, 1fr); }
     .section-head, .section-body { grid-template-columns: 1fr; gap: 16px; }
+    .benchmark-bullets { grid-template-columns: 1fr; }
     .tasks-grid { grid-template-columns: 1fr; }
     .sample-tabs { display: flex; flex-wrap: wrap; }
     .task-files-view { grid-template-columns: 1fr; }
