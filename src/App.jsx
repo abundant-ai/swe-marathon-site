@@ -516,8 +516,8 @@ function StatStrip() {
   const stats = [
   { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
   { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Best pass@1" },
-  { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens / trial" },
-  { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Trials reward-hacking" },
+  { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens per trial" },
+  { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Reward-hacking trials" },
   { num: "1,300", unit: "", label: "Logged trials" }];
 
   return (
