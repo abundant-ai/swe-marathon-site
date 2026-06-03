@@ -432,7 +432,7 @@ function FoxRunner() {
 
       // Score badge — output tokens generated (top-right)
       ctx.fillStyle = COL_TEXT;
-      ctx.font = '500 12px "Courier New", Courier, monospace';
+      ctx.font = '500 12px ui-monospace, "JetBrains Mono", monospace';
       ctx.textAlign = "right";
       const tok = s.score.toFixed(2);
       const best = s.best.toFixed(2);
@@ -446,7 +446,7 @@ function FoxRunner() {
         ctx.strokeRect(CW / 2 - 180, CH / 2 - 30, 360, 60);
         ctx.fillStyle = COL_TEXT;
         ctx.textAlign = "center";
-        ctx.font = '600 13px "Courier New", Courier, monospace';
+        ctx.font = '600 13px ui-monospace, "JetBrains Mono", monospace';
         ctx.fillText("PRESS SPACE OR CLICK TO RUN", CW / 2, CH / 2 + 5);
       } else if (s.over) {
         ctx.fillStyle = "rgba(250, 250, 250, 0.94)";

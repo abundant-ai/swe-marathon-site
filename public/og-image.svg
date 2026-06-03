@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="#FAFAFA"/>
-  <text x="72" y="118" fill="#18181B" font-family="Courier New, Courier, monospace" font-size="62" font-weight="700">Abundant</text>
+  <text x="72" y="118" fill="#18181B" font-family="Inter Tight, Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="62" font-weight="600">Abundant</text>
   <rect x="972" y="68" width="156" height="34" fill="#18181B"/>
-  <text x="1050" y="92" fill="#FAFAFA" font-family="Courier New, Courier, monospace" font-size="13" text-anchor="middle" letter-spacing="1.8">BENCHMARK</text>
+  <text x="1050" y="92" fill="#FAFAFA" font-family="JetBrains Mono, ui-monospace, monospace" font-size="13" text-anchor="middle" letter-spacing="1.8">BENCHMARK</text>
 
   <rect x="72" y="156" width="1056" height="340" fill="#18181B"/>
-  <text x="112" y="218" fill="#FAFAFA" opacity="0.52" font-family="Courier New, Courier, monospace" font-size="20" letter-spacing="2.8">SWE-MARATHON</text>
-  <text x="112" y="300" fill="#FAFAFA" font-family="Courier New, Courier, monospace" font-size="58" font-weight="700">How long can coding</text>
-  <text x="112" y="374" fill="#4CAF50" font-family="Courier New, Courier, monospace" font-size="58" font-weight="700">agents stay useful?</text>
+  <text x="112" y="218" fill="#FAFAFA" opacity="0.52" font-family="JetBrains Mono, ui-monospace, monospace" font-size="20" letter-spacing="2.8">SWE-MARATHON</text>
+  <text x="112" y="300" fill="#FAFAFA" font-family="Inter Tight, Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="62" font-weight="500">How long can coding</text>
+  <text x="112" y="374" fill="#4CAF50" font-family="Inter Tight, Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="62" font-weight="600">agents stay useful?</text>
   <text x="112" y="434" fill="#FAFAFA" opacity="0.74" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="26">20 long-horizon software engineering tasks,</text>
   <text x="112" y="468" fill="#FAFAFA" opacity="0.74" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="26">1,300 logged trials, verifier-gated scoring.</text>
 
-  <g transform="translate(112 532)" font-family="Courier New, Courier, monospace" font-size="18">
+  <g transform="translate(112 532)" font-family="JetBrains Mono, ui-monospace, monospace" font-size="18">
     <rect x="0" y="-24" width="174" height="54" fill="#FAFAFA" stroke="#18181B" stroke-width="1.5"/>
     <text x="22" y="6" fill="#18181B">20 tasks</text>
     <rect x="192" y="-24" width="202" height="54" fill="#FAFAFA" stroke="#18181B" stroke-width="1.5"/>
