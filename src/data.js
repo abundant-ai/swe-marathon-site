@@ -579,6 +579,74 @@ function cuaTask({
   };
 }
 
+// Where each task's premise came from — linked on the per-task hero. A task can
+// draw on multiple sources (paper + reference implementation, etc.).
+export const TASK_INSPIRATION = {
+  "nextjs-vite-rewrite": [
+    { label: "Cloudflare: How we rebuilt Next.js with AI in one week", url: "https://blog.cloudflare.com/vinext/" },
+  ],
+  "rust-c-compiler": [
+    { label: "Anthropic: Building a C compiler with a team of parallel Claudes", url: "https://www.anthropic.com/engineering/building-c-compiler" },
+  ],
+  "kubernetes-rust-rewrite": [
+    { label: "calfonso/rusternetes", url: "https://github.com/calfonso/rusternetes" },
+  ],
+  "rust-java-lsp": [
+    { label: "Cursor: Scaling long-running autonomous coding", url: "https://cursor.com/blog/scaling-agents" },
+  ],
+  "biofabric-rust-rewrite": [
+    { label: "Combing the hairball with BioFabric", url: "https://link.springer.com/article/10.1186/1471-2105-13-275" },
+    { label: "VISNAB", url: "https://www.biorxiv.org/content/10.1101/2019.12.18.881664v1" },
+  ],
+  "ruby-rust-port": [
+    { label: "Sinatra", url: "https://sinatrarb.com/" },
+    { label: "Sequel", url: "https://sequel.jeremyevans.net/" },
+    { label: "Liquid", url: "https://shopify.github.io/liquid/" },
+  ],
+  "wasm-simd": [
+    { label: "WebAssembly SIMD proposal", url: "https://github.com/WebAssembly/simd" },
+  ],
+  "zstd-decoder": [
+    { label: "facebook/zstd", url: "https://github.com/facebook/zstd" },
+    { label: "RFC 8878", url: "https://www.rfc-editor.org/rfc/rfc8878" },
+  ],
+  "excel-clone": [
+    { label: "Cursor: Excel clone", url: "https://github.com/wilson-anysphere/formula" },
+  ],
+  "mastodon-clone": [
+    { label: "Mastodon API", url: "https://docs.joinmastodon.org/api/" },
+  ],
+  "s3-clone": [
+    { label: "Amazon S3 API", url: "https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html" },
+  ],
+  "slack-clone": [
+    { label: "Slack", url: "https://slack.com/" },
+  ],
+  "stripe-clone": [
+    { label: "Stripe API", url: "https://docs.stripe.com/api" },
+  ],
+  "jax-pytorch-rewrite": [
+    { label: "Physical Intelligence: openpi", url: "https://github.com/Physical-Intelligence/openpi" },
+    { label: "karpathy/autoresearch", url: "https://github.com/karpathy/autoresearch" },
+  ],
+  "embedding-eval": [
+    { label: "MTEB: Massive Text Embedding Benchmark", url: "https://github.com/embeddings-benchmark/mteb" },
+  ],
+  "trimul-cuda": [
+    { label: "AlphaFold-3 TriMul", url: "https://github.com/google-deepmind/alphafold3" },
+    { label: "TTT-Discover", url: "https://test-time-training.github.io/discover/" },
+  ],
+  "parameter-golf": [
+    { label: "OpenAI: Parameter Golf", url: "https://github.com/openai/parameter-golf" },
+  ],
+  "find-network-alignments": [
+    { label: "Simulated annealing network alignment", url: "https://academic.oup.com/bioinformatics/article/33/14/2156/2996219" },
+  ],
+  "vliw-kernel-optimization": [
+    { label: "Anthropic: Designing AI-resistant technical evaluations", url: "https://www.anthropic.com/engineering/AI-resistant-technical-evaluations" },
+  ],
+};
+
 export const TASK_DETAILS = {
   "slack-clone": cuaTask({
     taskNo: "T12",

@@ -569,6 +569,21 @@
     margin-bottom: 0;
     max-width: 680px;
   }
+  .task-inspiration {
+    margin: 18px 0 0;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;
+  }
+  .task-insp-label {
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3);
+  }
+  .task-inspiration > span { display: inline-flex; align-items: baseline; gap: 8px; }
+  .task-insp-sep { color: var(--rule); }
+  .task-inspiration a {
+    color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid transparent; transition: border-color 0.15s ease;
+  }
+  .task-inspiration a:hover { border-bottom-color: var(--accent); }
   .task-page-title {
     font-family: var(--serif);
     font-weight: 400;

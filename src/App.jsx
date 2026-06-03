@@ -10,6 +10,7 @@ import {
   RH_BY_MODEL,
   TRIAL_BY_ID,
   TASK_DETAILS,
+  TASK_INSPIRATION,
   TASKS,
 } from "./data.js";
 
@@ -1480,6 +1481,17 @@ function TaskDetailPage({ taskId }) {
           <div className="eyebrow">{detail.taskNo} · {detail.kicker}</div>
           <h1 className="title">{detail.title}</h1>
           <p className="lede">{detail.summary}</p>
+          {TASK_INSPIRATION[detail.slug]?.length > 0 && (
+            <p className="task-inspiration">
+              <span className="task-insp-label">Inspired by</span>
+              {TASK_INSPIRATION[detail.slug].map((s, i) => (
+                <span key={s.url}>
+                  {i > 0 && <span className="task-insp-sep">·</span>}
+                  <a href={s.url} target="_blank" rel="noopener noreferrer">{s.label}</a>
+                </span>
+              ))}
+            </p>
+          )}
         </div>
       </section>
 
