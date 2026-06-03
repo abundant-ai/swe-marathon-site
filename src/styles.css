@@ -1,6 +1,6 @@
   :root {
-    --bg: #FAFAFA;
-    --paper: #FAFAFA;
+    --bg: #FFFFFF;
+    --paper: #FFFFFF;
     --bg-2: #F4F4F5;
     --ink: #18181B;
     --ink-2: #3F3F46;
@@ -39,7 +39,7 @@
   /* Top nav */
   .topnav {
     border-bottom: 1px solid var(--rule);
-    background: rgba(250, 250, 250, 0.86);
+    background: rgba(255, 255, 255, 0.86);
     position: sticky; top: 0; z-index: 50;
     backdrop-filter: blur(8px);
   }
