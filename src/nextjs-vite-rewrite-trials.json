@@ -500,6 +500,109 @@
       "rank": 5
     },
     {
+      "agent": "Claude Code",
+      "model": "Claude Opus 4.8",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.147,
+      "best": 0.716,
+      "correctness": 0.143,
+      "ux": 0.0,
+      "trials": [
+        {
+          "id": "nextjs-vite-rewrite-286",
+          "trial": "nextjs-vite-rewrite-286",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.716,
+          "correctness": 0.714,
+          "ux": 0.0,
+          "gates": "264 / 370",
+          "tokens": "26.4M",
+          "cost": "$23.80",
+          "duration": "1h 16m",
+          "startedAt": "2026-05-31 00:17 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-286.json",
+          "steps": 241
+        },
+        {
+          "id": "nextjs-vite-rewrite-277",
+          "trial": "nextjs-vite-rewrite-277",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.008,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 370",
+          "tokens": "18.2M",
+          "cost": "$21.50",
+          "duration": "1h 20m",
+          "startedAt": "2026-05-31 01:05 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-277.json",
+          "steps": 188
+        },
+        {
+          "id": "nextjs-vite-rewrite-280",
+          "trial": "nextjs-vite-rewrite-280",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.005,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 370",
+          "tokens": "46.5M",
+          "cost": "$48.03",
+          "duration": "3h 17m",
+          "startedAt": "2026-05-31 12:56 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-280.json",
+          "steps": 448
+        },
+        {
+          "id": "nextjs-vite-rewrite-281",
+          "trial": "nextjs-vite-rewrite-281",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.005,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 370",
+          "tokens": "34.6M",
+          "cost": "$44.40",
+          "duration": "2h 47m",
+          "startedAt": "2026-05-30 19:05 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-281.json",
+          "steps": 349
+        },
+        {
+          "id": "nextjs-vite-rewrite-279",
+          "trial": "nextjs-vite-rewrite-279",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 0",
+          "tokens": "19.5M",
+          "cost": "$19.84",
+          "duration": "57m 13s",
+          "startedAt": "2026-05-30 19:05 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-279.json",
+          "steps": 197
+        }
+      ],
+      "rank": 6
+    },
+    {
       "agent": "Terminus 2",
       "model": "Kimi K2.6",
       "n": 5,
@@ -600,7 +703,7 @@
           "steps": 240
         }
       ],
-      "rank": 6
+      "rank": 7
     },
     {
       "agent": "Terminus 2",
@@ -703,7 +806,7 @@
           "steps": 906
         }
       ],
-      "rank": 7
+      "rank": 8
     },
     {
       "agent": "Terminus 2",
@@ -806,7 +909,7 @@
           "steps": 255
         }
       ],
-      "rank": 8
+      "rank": 9
     },
     {
       "agent": "Terminus 2",
@@ -909,7 +1012,7 @@
           "steps": 196
         }
       ],
-      "rank": 9
+      "rank": 10
     },
     {
       "agent": "Gemini CLI",
@@ -948,7 +1051,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "",
+          "gates": "0 / 0",
           "tokens": "1.5M",
           "cost": "$0.91",
           "duration": "9m 33s",
@@ -966,7 +1069,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "",
+          "gates": "0 / 0",
           "tokens": "2.4M",
           "cost": "$1.31",
           "duration": "15m 47s",
@@ -984,7 +1087,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "",
+          "gates": "0 / 0",
           "tokens": "5.1M",
           "cost": "$2.33",
           "duration": "11m 58s",
@@ -1002,7 +1105,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "",
+          "gates": "0 / 0",
           "tokens": "1.9M",
           "cost": "$1.02",
           "duration": "6m 30s",
@@ -1012,7 +1115,7 @@
           "steps": 47
         }
       ],
-      "rank": 10
+      "rank": 11
     },
     {
       "agent": "Kimi CLI",
@@ -1035,7 +1138,7 @@
           "ux": 0.0,
           "gates": "0 / 370",
           "tokens": "24.2M",
-          "cost": "$0.00",
+          "cost": "$18.82",
           "duration": "8h 45m",
           "startedAt": "2026-05-06 01:42 UTC",
           "status": "success",
@@ -1053,7 +1156,7 @@
           "ux": 0.0,
           "gates": "0 / 370",
           "tokens": "14.6M",
-          "cost": "$0.00",
+          "cost": "$11.81",
           "duration": "10h 18m",
           "startedAt": "2026-05-06 04:09 UTC",
           "status": "AgentTimeoutError",
@@ -1071,7 +1174,7 @@
           "ux": 0.0,
           "gates": "0 / 370",
           "tokens": "7.7M",
-          "cost": "$0.00",
+          "cost": "$6.16",
           "duration": "2h 55m",
           "startedAt": "2026-05-18 23:42 UTC",
           "status": "success",
@@ -1089,7 +1192,7 @@
           "ux": 0.0,
           "gates": "0 / 370",
           "tokens": "5.2M",
-          "cost": "$0.00",
+          "cost": "$4.03",
           "duration": "1h 25m",
           "startedAt": "2026-05-06 09:50 UTC",
           "status": "success",
@@ -1107,7 +1210,7 @@
           "ux": 0.0,
           "gates": "",
           "tokens": "16.0M",
-          "cost": "$0.00",
+          "cost": "$12.38",
           "duration": "2h 34m",
           "startedAt": "2026-05-06 08:54 UTC",
           "status": "success",
@@ -1115,7 +1218,7 @@
           "steps": 314
         }
       ],
-      "rank": 11
+      "rank": 12
     },
     {
       "agent": "Terminus 2",
@@ -1216,109 +1319,6 @@
           "status": "success",
           "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-92.json",
           "steps": 213
-        }
-      ],
-      "rank": 12
-    },
-    {
-      "agent": "Claude Code",
-      "model": "Claude Opus 4.8",
-      "n": 5,
-      "binary": "0 / 5",
-      "partial": 0.0,
-      "best": 0.0,
-      "correctness": 0.0,
-      "ux": 0.0,
-      "trials": [
-        {
-          "id": "nextjs-vite-rewrite-280",
-          "trial": "nextjs-vite-rewrite-280",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "\u2014",
-          "tokens": "89.7M",
-          "cost": "\u2014",
-          "duration": "3h 17m",
-          "startedAt": "2026-05-31 12:56 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-280.json",
-          "steps": null
-        },
-        {
-          "id": "nextjs-vite-rewrite-281",
-          "trial": "nextjs-vite-rewrite-281",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "\u2014",
-          "tokens": "65.9M",
-          "cost": "\u2014",
-          "duration": "2h 47m",
-          "startedAt": "2026-05-30 19:05 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-281.json",
-          "steps": null
-        },
-        {
-          "id": "nextjs-vite-rewrite-286",
-          "trial": "nextjs-vite-rewrite-286",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "\u2014",
-          "tokens": "51.2M",
-          "cost": "\u2014",
-          "duration": "1h 16m",
-          "startedAt": "2026-05-31 00:17 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-286.json",
-          "steps": null
-        },
-        {
-          "id": "nextjs-vite-rewrite-279",
-          "trial": "nextjs-vite-rewrite-279",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "\u2014",
-          "tokens": "37.3M",
-          "cost": "\u2014",
-          "duration": "57m 13s",
-          "startedAt": "2026-05-30 19:05 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-279.json",
-          "steps": null
-        },
-        {
-          "id": "nextjs-vite-rewrite-277",
-          "trial": "nextjs-vite-rewrite-277",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "\u2014",
-          "tokens": "34.8M",
-          "cost": "\u2014",
-          "duration": "1h 20m",
-          "startedAt": "2026-05-31 01:05 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/nextjs-vite-rewrite-277.json",
-          "steps": null
         }
       ],
       "rank": 13

@@ -1812,7 +1812,7 @@ const BENCHMARK_CONTRIBUTORS = [
   { name: "Luyang Kong", affiliation: "Independent" },
   { name: "Erik Quintanilla", affiliation: "Refresh" },
   { name: "Ivan Bercovich", affiliation: "UC Santa Barbara" },
-  { name: "Steven Dillmann", affiliation: "Stanford University" },
+  { name: "Steven Dillmann", affiliation: "Stanford University" },  
 ];
 
 const CONTRIBUTOR_LINKS = {
@@ -1968,6 +1968,23 @@ function App() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  useEffect(() => {
+    if (!hash || /^#(task|trajectory)\//.test(hash)) return;
+    const id = decodeURIComponent(hash.slice(1));
+    let frame = 0;
+    let attempts = 0;
+    const scrollToTarget = () => {
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ block: "start" });
+        return;
+      }
+      if (attempts++ < 30) frame = requestAnimationFrame(scrollToTarget);
+    };
+    frame = requestAnimationFrame(scrollToTarget);
+    return () => cancelAnimationFrame(frame);
+  }, [hash]);
 
   const trajMatch = hash.match(/^#trajectory\/(.+)$/);
   if (trajMatch) {

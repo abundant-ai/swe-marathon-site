@@ -24,7 +24,7 @@ use([
   TooltipComponent,
 ]);
 
-const agentLabel = (scaffold) => scaffold.replace(/\s+v\d[\d.]*$/i, "");
+const agentLabel = (scaffold) => scaffold.replace(/\s+(?:v)?\d[\d.]*$/i, "");
 
 /* "Model / Agent" label with agent version suffixes stripped, so the two
    same-model configs (e.g. GPT-5.5) are distinguishable in plots. */
@@ -66,39 +66,22 @@ const LABEL_OFFSETS = {
 
 const labelOffset = (chart, id) => LABEL_OFFSETS[chart]?.[id] || [8, 0];
 
-const LOG_METRIC_OVERRIDES = {
-  "claude48-cc": { n: 96, costPerTrial: 37.57, avgTokensM: 49.65 },
-  "gpt55-codex": { n: 101, costPerTrial: 11.38, avgTokensM: 10.74 },
-  "claude47-cc": { n: 90, costPerTrial: 35.88, avgTokensM: 50.98 },
-  "gpt55-term": { n: 100, costPerTrial: 46.11, avgTokensM: 51.61 },
-  "gemini31-term": { n: 100, costPerTrial: 3.65, avgTokensM: 5.24 },
-  "gemini31-cli": { n: 100, costPerTrial: 5.41, avgTokensM: 14.20 },
-  "claude47-term": { n: 100, costPerTrial: 18.87, avgTokensM: 30.13 },
-  "gemini35-cli": { n: 99, costPerTrial: 6.55, avgTokensM: 19.70 },
-  "deepseek-term": { n: 99, costPerTrial: 11.19, avgTokensM: 36.56 },
-  "glm-term": { n: 99, costPerTrial: 44.55, avgTokensM: 43.94 },
-  "kimi-term": { n: 100, costPerTrial: 5.41, avgTokensM: 19.19 },
-  "minimax-term": { n: 100, costPerTrial: 1.63, avgTokensM: 21.03 },
-  "kimi-cli": { n: 100, costPerTrial: 2.64, avgTokensM: 6.60 },
-};
-
 /* ---------- MODELS: visible configs with log-derived Pareto metrics ---------- */
 const ANALYSIS_MODELS = LEADERBOARD
   .filter((r) => !r.ref)
-  .map((r) => {
-    const logMetrics = LOG_METRIC_OVERRIDES[r.id];
-    return {
-      id: r.id,
-      name: r.name,
-      scaffold: r.scaffold,
-      color: MODEL_COLORS[r.id] || "#888",
-      pass1: r.pass1,
-      costPerTrial: logMetrics?.costPerTrial ?? r.costAvg,
-      avgTokensM: logMetrics?.avgTokensM ?? r.tokAvg,
-      nLoggedTrials: logMetrics?.n,
-      perCat: r.perCat,
-    };
-  });
+  .map((r) => ({
+    id: r.id,
+    name: r.name,
+    scaffold: r.scaffold,
+    color: MODEL_COLORS[r.id] || "#888",
+    pass1: r.pass1,
+    partialScore: r.partialAvg,
+    costPerTrial: r.costAvg,
+    avgTokensM: r.tokAvg,
+    nLoggedTrials: r.nLoggedTrials,
+    nCostTrials: r.nCostTrials,
+    perCat: r.perCat,
+  }));
 
 const RH_CLASSIFICATIONS = [
   { name: "GPT-5.5", harness: "Terminus 2 + Codex", n: 10, hacked: 4, success: 0, criteria: { "Instruct model substitution": 4, "Dataset provenance": 1 } },
@@ -342,21 +325,23 @@ function ComputeHorizonChart() {
 /* ============================================================
    PLOT 2 — Cost / tokens vs pass@1 Pareto (per-config)
    ============================================================ */
-function ParetoChart() {
+function ParetoChart({ metric = "pass1" }) {
   const [xAxis, setXAxis] = useState("cost"); // cost | tokens
 
   const ref = useEcharts((theme) => {
     const axis = axisCommon(theme);
     const tooltip = tooltipCommon(theme);
     const xKey = xAxis === "cost" ? "costPerTrial" : "avgTokensM";
+    const yKey = metric === "partial" ? "partialScore" : "pass1";
+    const yAxisName = metric === "partial" ? "Uncalibrated partial score (%)" : "Resolution rate (%)";
+    const yTooltip = metric === "partial" ? "Partial score" : "Resolution rate";
     const agg = ANALYSIS_MODELS
       .filter((m) => m[xKey] != null && m[xKey] >= 0)
-      .map((m) => ({ m, x: m[xKey], rate: m.pass1 / 100 }));
+      .map((m) => ({ m, x: m[xKey], rate: m[yKey] / 100 }));
 
     const frontierPts = agg
       .filter((a) => !agg.some((b) => b !== a && b.rate >= a.rate && b.x <= a.x && (b.rate > a.rate || b.x < a.x)))
       .sort((p, q) => p.x - q.x);
-
     const scatterData = agg.map((a) => ({
       value: [a.x, a.rate * 100],
       a,
@@ -381,7 +366,7 @@ function ParetoChart() {
       yAxis: {
         ...axis,
         type: "value",
-        name: "Resolution rate (%)",
+        name: yAxisName,
         nameLocation: "middle",
         nameGap: 44,
         axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
@@ -394,10 +379,13 @@ function ParetoChart() {
           const a = p.data.a;
           return `<div style="font-family:JetBrains Mono;font-size:11px;color:${theme.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${a.m.name}</div>
                   <div style="color:${theme.ink2};font-size:11px;margin-bottom:6px;">${a.m.scaffold}</div>
+                  <div>${yTooltip}: <b>${a.m[yKey].toFixed(1)}%</b></div>
                   <div>Resolution rate: <b>${a.m.pass1.toFixed(1)}%</b></div>
+                  <div>Partial score: <b>${a.m.partialScore.toFixed(1)}%</b></div>
                   <div>Cost / trial: <b>${a.m.costPerTrial != null ? "$" + a.m.costPerTrial.toFixed(2) : "—"}</b></div>
                   <div>Tokens / trial: <b>${a.m.avgTokensM.toFixed(1)}M</b></div>
-                  <div>Logged trials: <b>${a.m.nLoggedTrials ?? "—"}</b></div>`;
+                  <div>Logged trials: <b>${a.m.nLoggedTrials ?? "—"}</b></div>
+                  <div>Trials with cost: <b>${a.m.nCostTrials ?? "—"}</b></div>`;
         },
       },
       animation: false,
@@ -431,6 +419,10 @@ function ParetoChart() {
             backgroundColor: theme.labelBg,
             padding: [1, 3],
           },
+          labelLine: {
+            show: true,
+            lineStyle: { color: theme.rule, width: 1, opacity: 0.85 },
+          },
           emphasis: {
             scale: 1.3,
             label: {
@@ -444,17 +436,17 @@ function ParetoChart() {
               padding: [2, 4],
             },
           },
-          labelLayout: { hideOverlap: false },
+          labelLayout: { hideOverlap: false, moveOverlap: "shiftY" },
         },
       ],
     };
-  }, [xAxis]);
+  }, [xAxis, metric]);
 
   return (
     <div className="anal-card">
       <div className="anal-card-head">
         <div>
-          <div className="anal-card-no">FIG · PARETO</div>
+          <div className="anal-card-no">{metric === "partial" ? "FIG · PARTIAL PARETO" : "FIG · PARETO"}</div>
         </div>
         <div className="anal-controls">
           <button className={"pill " + (xAxis === "cost" ? "active" : "")} onClick={() => setXAxis("cost")}>Cost ($)</button>
@@ -462,6 +454,11 @@ function ParetoChart() {
         </div>
       </div>
       <div ref={ref} className="anal-chart" style={{ height: 380 }}></div>
+      {metric === "partial" && (
+        <div className="anal-foot">
+          Partial scores are diagnostic only and should not be interpreted as task success. They are computed as the fraction of unit tests passed. Rollouts caught by anti-cheating guard tests receive reward 0.0, but may still obtain high partial scores by satisfying or gaming other checks.
+        </div>
+      )}
     </div>
   );
 }
@@ -565,7 +562,7 @@ function RewardHackingChart() {
    ANALYSIS SECTION — wraps plots with tab nav
    ============================================================ */
 function Analysis() {
-  const [tab, setTab] = useState("pareto"); // pareto | horizon | rewardHack
+  const [tab, setTab] = useState("pareto"); // pareto | partialPareto | horizon | rewardHack
 
   return (
     <section id="analysis">
@@ -581,13 +578,18 @@ function Analysis() {
             <span className="anal-tab-t">Cost vs score</span>
             <span className="anal-tab-s">Pareto frontier</span>
           </button>
-          <button className={"anal-tab " + (tab === "horizon" ? "active" : "")} onClick={() => setTab("horizon")}>
+          <button className={"anal-tab " + (tab === "partialPareto" ? "active" : "")} onClick={() => setTab("partialPareto")}>
             <span className="anal-tab-no">02</span>
+            <span className="anal-tab-t">Partial score</span>
+            <span className="anal-tab-s">uncalibrated Pareto</span>
+          </button>
+          <button className={"anal-tab " + (tab === "horizon" ? "active" : "")} onClick={() => setTab("horizon")}>
+            <span className="anal-tab-no">03</span>
             <span className="anal-tab-t">Compute horizon</span>
             <span className="anal-tab-s">tokens vs resolution</span>
           </button>
           <button className={"anal-tab " + (tab === "rewardHack" ? "active" : "")} onClick={() => setTab("rewardHack")}>
-            <span className="anal-tab-no">03</span>
+            <span className="anal-tab-no">04</span>
             <span className="anal-tab-t">Reward hacking</span>
             <span className="anal-tab-s">bypass incidence</span>
           </button>
@@ -595,6 +597,7 @@ function Analysis() {
 
         <div className="anal-stage">
           {tab === "pareto"  && <ParetoChart />}
+          {tab === "partialPareto" && <ParetoChart metric="partial" />}
           {tab === "horizon" && <ComputeHorizonChart />}
           {tab === "rewardHack" && <RewardHackingChart />}
         </div>
