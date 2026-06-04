@@ -121,32 +121,48 @@ const RH_CLASSIFIED_TOTALS = RH_CLASSIFICATIONS.reduce(
   { n: 0, hacked: 0, success: 0 }
 );
 
-/* ---------- ECharts theme tokens (sync w/ paper aesthetic) ---------- */
-const PAPER = {
-  bg: "transparent",
-  ink: "#18181B",
-  ink2: "#3F3F46",
-  ink3: "#71717A",
-  rule: "#E4E4E7",
-  rule2: "#F4F4F5",
-  accent: "#4CAF50",
-  pos: "#2d7a4f",
-  warn: "#B45309",
-};
-const AXIS_COMMON = {
-  axisLine: { lineStyle: { color: PAPER.rule } },
-  axisTick: { lineStyle: { color: PAPER.rule } },
-  axisLabel: { color: PAPER.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
-  nameTextStyle: { color: PAPER.ink3, fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
-  splitLine: { lineStyle: { color: PAPER.rule2, type: "dashed" } },
-};
-const TOOLTIP_COMMON = {
-  backgroundColor: "#FAFAFA",
-  borderColor: PAPER.rule,
-  borderWidth: 1,
-  textStyle: { color: PAPER.ink, fontFamily: "Inter, sans-serif", fontSize: 12 },
-  extraCssText: "box-shadow: 0 4px 16px rgba(24,24,27,0.08); border-radius: 0; padding: 10px 12px;",
-};
+/* ---------- ECharts theme tokens (derived from active CSS variables) ---------- */
+function readThemeTokens(node) {
+  const styles = getComputedStyle(node || document.documentElement);
+  const css = (name, fallback) => styles.getPropertyValue(name).trim() || fallback;
+  const isDark = document.documentElement.dataset.theme === "dark";
+  return {
+    bg: "transparent",
+    ink: css("--ink", "#18181B"),
+    ink2: css("--ink-2", "#3F3F46"),
+    ink3: css("--ink-3", "#71717A"),
+    rule: css("--rule", "#E4E4E7"),
+    rule2: css("--rule-2", "#F4F4F5"),
+    accent: css("--accent", "#4CAF50"),
+    pos: css("--pos", "#2d7a4f"),
+    warn: css("--warn", "#B45309"),
+    tooltipBg: css("--paper", "#FAFAFA"),
+    labelBg: isDark ? "rgba(18,19,18,0.82)" : "rgba(250,250,250,0.78)",
+    shadow: isDark ? "rgba(0,0,0,0.32)" : "rgba(24,24,27,0.08)",
+    pointBorder: isDark ? "rgba(244,244,245,0.86)" : "#18181B",
+    rewardHack: isDark ? "#F87171" : "oklch(0.55 0.18 25)",
+  };
+}
+
+function axisCommon(theme) {
+  return {
+    axisLine: { lineStyle: { color: theme.rule } },
+    axisTick: { lineStyle: { color: theme.rule } },
+    axisLabel: { color: theme.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
+    nameTextStyle: { color: theme.ink3, fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
+    splitLine: { lineStyle: { color: theme.rule2, type: "dashed" } },
+  };
+}
+
+function tooltipCommon(theme) {
+  return {
+    backgroundColor: theme.tooltipBg,
+    borderColor: theme.rule,
+    borderWidth: 1,
+    textStyle: { color: theme.ink, fontFamily: "Inter, sans-serif", fontSize: 12 },
+    extraCssText: `box-shadow: 0 4px 16px ${theme.shadow}; border-radius: 0; padding: 10px 12px;`,
+  };
+}
 
 /* ---------- Hook: ECharts instance bound to a div ref ---------- */
 function useEcharts(buildOption, deps) {
@@ -157,10 +173,22 @@ function useEcharts(buildOption, deps) {
     if (!chartRef.current) {
       chartRef.current = init(ref.current, null, { renderer: "canvas" });
     }
-    chartRef.current.setOption(buildOption(), { notMerge: true });
+    const render = () => {
+      if (!chartRef.current || !ref.current) return;
+      chartRef.current.setOption(buildOption(readThemeTokens(ref.current)), { notMerge: true });
+    };
+    render();
     const onResize = () => chartRef.current && chartRef.current.resize();
+    const observer = new MutationObserver(render);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme", "data-theme-mode", "style"],
+    });
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", onResize);
+    };
   }, deps);
   useEffect(() => () => {
     if (chartRef.current) { chartRef.current.dispose(); chartRef.current = null; }
@@ -175,7 +203,9 @@ function useEcharts(buildOption, deps) {
    of the same model to show that more tokens ≠ higher pass@1.
    ============================================================ */
 function ComputeHorizonChart() {
-  const ref = useEcharts(() => {
+  const ref = useEcharts((theme) => {
+    const axis = axisCommon(theme);
+    const tooltip = tooltipCommon(theme);
     const configs = ANALYSIS_MODELS.filter((m) => m.avgTokensM != null && m.avgTokensM > 0);
     const maxPass = Math.max(...configs.map((m) => m.pass1));
 
@@ -201,7 +231,7 @@ function ComputeHorizonChart() {
     const scatterData = configs.map((m) => ({
       value: [m.avgTokensM, m.pass1],
       m,
-      itemStyle: { color: m.color, opacity: 0.95, borderColor: "#18181B", borderWidth: 1 },
+      itemStyle: { color: m.color, opacity: 0.95, borderColor: theme.pointBorder, borderWidth: 1 },
       label: { show: true, offset: labelOffset("horizon", m.id) },
     }));
 
@@ -209,7 +239,7 @@ function ComputeHorizonChart() {
       backgroundColor: "transparent",
       grid: { left: 62, right: 230, top: 48, bottom: 64 },
       xAxis: {
-        ...AXIS_COMMON,
+        ...axis,
         type: "log",
         name: "Mean tokens per trial (M, log)",
         nameLocation: "middle",
@@ -217,26 +247,26 @@ function ComputeHorizonChart() {
         min: 3,
         max: 80,
         logBase: 10,
-        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "M" },
+        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "M" },
       },
       yAxis: {
-        ...AXIS_COMMON,
+        ...axis,
         type: "value",
         name: "Resolution rate (%)",
         nameLocation: "middle",
         nameGap: 40,
         min: 0,
         max: Math.ceil((maxPass + 4) / 5) * 5,
-        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "%" },
+        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
       },
       tooltip: {
-        ...TOOLTIP_COMMON,
+        ...tooltip,
         trigger: "item",
         formatter: (p) => {
           if (!p.data || !p.data.m) return "";
           const m = p.data.m;
-          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${m.name}</div>
-                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${m.scaffold}</div>
+          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${theme.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${m.name}</div>
+                  <div style="color:${theme.ink2};font-size:11px;margin-bottom:6px;">${m.scaffold}</div>
                   <div>Resolution rate: <b>${m.pass1.toFixed(1)}%</b></div>
                   <div>Tokens / trial: <b>${m.avgTokensM.toFixed(1)}M</b></div>
                   <div>Cost / trial: <b>${m.costPerTrial != null ? "$" + m.costPerTrial.toFixed(2) : "—"}</b></div>
@@ -260,9 +290,9 @@ function ComputeHorizonChart() {
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 9,
             lineHeight: 12,
-            color: PAPER.ink2,
+            color: theme.ink2,
             distance: 6,
-            backgroundColor: "rgba(250,250,250,0.78)",
+            backgroundColor: theme.labelBg,
             padding: [1, 3],
           },
           emphasis: {
@@ -271,9 +301,9 @@ function ComputeHorizonChart() {
               show: true,
               formatter: (p) => cfgLabel(p.data.m),
               fontSize: 10,
-              color: PAPER.ink,
-              backgroundColor: "#FAFAFA",
-              borderColor: PAPER.rule,
+              color: theme.ink,
+              backgroundColor: theme.tooltipBg,
+              borderColor: theme.rule,
               borderWidth: 1,
               padding: [2, 4],
             },
@@ -282,10 +312,10 @@ function ComputeHorizonChart() {
           markLine: {
             silent: true,
             symbol: "none",
-            lineStyle: { color: PAPER.accent, type: "dashed", width: 1.5, opacity: 0.7 },
+            lineStyle: { color: theme.accent, type: "dashed", width: 1.5, opacity: 0.7 },
             label: {
               formatter: `ceiling · ${maxPass.toFixed(0)}%`,
-              color: PAPER.accent,
+              color: theme.accent,
               fontFamily: "JetBrains Mono, monospace",
               fontSize: 10,
               position: "insideEndTop",
@@ -315,7 +345,9 @@ function ComputeHorizonChart() {
 function ParetoChart() {
   const [xAxis, setXAxis] = useState("cost"); // cost | tokens
 
-  const ref = useEcharts(() => {
+  const ref = useEcharts((theme) => {
+    const axis = axisCommon(theme);
+    const tooltip = tooltipCommon(theme);
     const xKey = xAxis === "cost" ? "costPerTrial" : "avgTokensM";
     const agg = ANALYSIS_MODELS
       .filter((m) => m[xKey] != null && m[xKey] >= 0)
@@ -328,7 +360,7 @@ function ParetoChart() {
     const scatterData = agg.map((a) => ({
       value: [a.x, a.rate * 100],
       a,
-      itemStyle: { color: a.m.color, opacity: 0.95, borderColor: "#18181B", borderWidth: 1 },
+      itemStyle: { color: a.m.color, opacity: 0.95, borderColor: theme.pointBorder, borderWidth: 1 },
       label: { show: true, offset: labelOffset("pareto", a.m.id) },
     }));
 
@@ -336,32 +368,32 @@ function ParetoChart() {
       backgroundColor: "transparent",
       grid: { left: 62, right: 230, top: 48, bottom: 64 },
       xAxis: {
-        ...AXIS_COMMON,
+        ...axis,
         type: "value",
         name: xAxis === "cost" ? "Mean cost per trial (USD)" : "Mean tokens per trial (M)",
         nameLocation: "middle",
         nameGap: 32,
         axisLabel: {
-          ...AXIS_COMMON.axisLabel,
+          ...axis.axisLabel,
           formatter: (v) => xAxis === "cost" ? "$" + v.toFixed(0) : v.toFixed(0) + "M",
         },
       },
       yAxis: {
-        ...AXIS_COMMON,
+        ...axis,
         type: "value",
         name: "Resolution rate (%)",
         nameLocation: "middle",
         nameGap: 44,
-        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "%" },
+        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
       },
       tooltip: {
-        ...TOOLTIP_COMMON,
+        ...tooltip,
         trigger: "item",
         formatter: (p) => {
           if (!p.data || !p.data.a) return "";
           const a = p.data.a;
-          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${a.m.name}</div>
-                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${a.m.scaffold}</div>
+          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${theme.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${a.m.name}</div>
+                  <div style="color:${theme.ink2};font-size:11px;margin-bottom:6px;">${a.m.scaffold}</div>
                   <div>Resolution rate: <b>${a.m.pass1.toFixed(1)}%</b></div>
                   <div>Cost / trial: <b>${a.m.costPerTrial != null ? "$" + a.m.costPerTrial.toFixed(2) : "—"}</b></div>
                   <div>Tokens / trial: <b>${a.m.avgTokensM.toFixed(1)}M</b></div>
@@ -376,8 +408,8 @@ function ParetoChart() {
           data: frontierPts.map((p) => [p.x, p.rate * 100]),
           showSymbol: false,
           smooth: false,
-          lineStyle: { color: PAPER.accent, type: "dashed", width: 1.5 },
-          areaStyle: { color: PAPER.accent, opacity: 0.05 },
+          lineStyle: { color: theme.accent, type: "dashed", width: 1.5 },
+          areaStyle: { color: theme.accent, opacity: 0.05 },
           z: 2,
           tooltip: { show: false },
         },
@@ -394,9 +426,9 @@ function ParetoChart() {
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 9,
             lineHeight: 12,
-            color: PAPER.ink2,
+            color: theme.ink2,
             distance: 6,
-            backgroundColor: "rgba(250,250,250,0.78)",
+            backgroundColor: theme.labelBg,
             padding: [1, 3],
           },
           emphasis: {
@@ -405,9 +437,9 @@ function ParetoChart() {
               show: true,
               formatter: (p) => cfgLabel(p.data.a.m),
               fontSize: 10,
-              color: PAPER.ink,
-              backgroundColor: "#FAFAFA",
-              borderColor: PAPER.rule,
+              color: theme.ink,
+              backgroundColor: theme.tooltipBg,
+              borderColor: theme.rule,
               borderWidth: 1,
               padding: [2, 4],
             },
@@ -438,7 +470,9 @@ function ParetoChart() {
    PLOT 3 — Reward-hacking incidence by model family
    ============================================================ */
 function RewardHackingChart() {
-  const ref = useEcharts(() => {
+  const ref = useEcharts((theme) => {
+    const axis = axisCommon(theme);
+    const tooltip = tooltipCommon(theme);
     const rows = RH_CLASSIFICATIONS
       .map((row) => ({
         ...row,
@@ -450,13 +484,13 @@ function RewardHackingChart() {
       backgroundColor: "transparent",
       grid: { left: 190, right: 52, top: 42, bottom: 48 },
       xAxis: {
-        ...AXIS_COMMON,
+        ...axis,
         type: "value",
         name: "Share of trials (%)",
         nameLocation: "middle",
         nameGap: 34,
         max: Math.ceil(Math.max(...rows.map((r) => r.hackedPct)) / 10) * 10,
-        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "%" },
+        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
       },
       yAxis: {
         type: "category",
@@ -464,17 +498,17 @@ function RewardHackingChart() {
         data: rows.map((r) => `${r.name} / ${r.harness}`),
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { color: PAPER.ink2, fontFamily: "Inter, sans-serif", fontSize: 11 },
+        axisLabel: { color: theme.ink2, fontFamily: "Inter, sans-serif", fontSize: 11 },
       },
       legend: {
         top: 0,
         right: 0,
         itemWidth: 10,
         itemHeight: 10,
-        textStyle: { color: PAPER.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 10 },
+        textStyle: { color: theme.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 10 },
       },
       tooltip: {
-        ...TOOLTIP_COMMON,
+        ...tooltip,
         trigger: "axis",
         axisPointer: { type: "shadow" },
         formatter: (params) => {
@@ -482,12 +516,12 @@ function RewardHackingChart() {
           const criteria = Object.entries(row.criteria)
             .map(([name, count]) => `${name}: <b>${count}</b>`)
             .join("<br />") || "No failed reward-hacking criteria";
-          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${row.name}</div>
-                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${row.harness}</div>
+          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${theme.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${row.name}</div>
+                  <div style="color:${theme.ink2};font-size:11px;margin-bottom:6px;">${row.harness}</div>
                   <div>Trials: <b>${row.n}</b></div>
                   <div>Classifier-positive: <b>${row.hacked}</b> (${row.hackedPct.toFixed(1)}%)</div>
                   <div>Earned reward after hacking: <b>${row.success}</b> (${row.successPct.toFixed(1)}%)</div>
-                  <div style="margin-top:6px;color:${PAPER.ink2};">${criteria}</div>`;
+                  <div style="margin-top:6px;color:${theme.ink2};">${criteria}</div>`;
         },
       },
       animation: false,
@@ -497,12 +531,12 @@ function RewardHackingChart() {
           type: "bar",
           data: rows.map((r) => +r.hackedPct.toFixed(1)),
           barWidth: 18,
-          itemStyle: { color: "oklch(0.55 0.18 25)", borderColor: "#18181B", borderWidth: 0.8 },
+          itemStyle: { color: theme.rewardHack, borderColor: theme.pointBorder, borderWidth: 0.8 },
           label: {
             show: true,
             position: "right",
             formatter: (p) => p.value > 0 ? `${p.value.toFixed(1)}%` : "0%",
-            color: PAPER.ink2,
+            color: theme.ink2,
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10,
           },
