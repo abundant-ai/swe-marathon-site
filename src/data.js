@@ -131,11 +131,11 @@ export const TASK_CAT = {
 /* ---------------- Headline numbers (paper §1, §5, §7) ---------------- */
 export const HEADLINE = {
   nTasks: 20,
-  nConfigs: 11,
+  nConfigs: 13,
   nTrials: 1100,             // 11 × 20 × 5
   nContributors: 11,
-  bestPass1Pct: 19.0,
-  bestPass1Label: "Codex CLI · GPT-5.5",
+  bestPass1Pct: 27.4,
+  bestPass1Label: "Claude Code · Claude Opus 4.8",
   agentBudgetMinH: 2,
   agentBudgetMaxH: 10,
   humanEstMinH: 40,
@@ -200,7 +200,7 @@ export const MARATHON_ANATOMY = {
   ],
 };
 
-/* ---------------- 13 leaderboard rows (11 configs + 2 baselines) ----------------
+/* ---------------- 15 leaderboard rows (13 configs + 2 baselines) ----------------
    pass1   = pass@1 (%) over the canonical 5×20=100-trial sweep
    perCat  = pass@1 (%) within each of the 4 task families
    costAvg = mean USD per trial (manifest cost_usd avg)
@@ -211,47 +211,55 @@ export const LEADERBOARD = [
     pass1: 84.0, costAvg: null, tokAvg: null,
     perCat: { library: 92.5, clone: 76.0, ml: 76.0, algo: 90.0 } },
 
-  { rank: 1, id: "gpt55-codex", name: "GPT-5.5", scaffold: "Codex CLI v0.128.0", highlight: true,
+  { rank: 1, id: "claude48-cc", name: "Claude Opus 4.8", scaffold: "Claude Code v2.1.123", highlight: true,
+    pass1: 27.4, costAvg: 33.16, tokAvg: 56.35,
+    perCat: { library: 25.0, clone: 0.0, ml: 47.8, algo: 62.5 } },
+
+  { rank: 2, id: "gpt55-codex", name: "GPT-5.5", scaffold: "Codex CLI v0.128.0",
     pass1: 19.0, costAvg: 13.88, tokAvg: 12.38,
     perCat: { library: 0.0, clone: 0.0, ml: 76.0, algo: 0.0 } },
 
-  { rank: 2, id: "claude47-cc", name: "Claude Opus 4.7", scaffold: "Claude Code v2.1.123",
+  { rank: 3, id: "claude47-cc", name: "Claude Opus 4.7", scaffold: "Claude Code v2.1.123",
     pass1: 15.0, costAvg: 36.91, tokAvg: 50.30,
     perCat: { library: 0.0, clone: 0.0, ml: 52.0, algo: 20.0 } },
 
-  { rank: 3, id: "gpt55-term", name: "GPT-5.5", scaffold: "Terminus 2",
+  { rank: 4, id: "gpt55-term", name: "GPT-5.5", scaffold: "Terminus 2",
     pass1: 13.0, costAvg: 44.87, tokAvg: 51.14,
     perCat: { library: 2.5, clone: 0.0, ml: 48.0, algo: 0.0 } },
 
-  { rank: 4, id: "gemini31-term", name: "Gemini 3.1 Pro Preview", scaffold: "Terminus 2",
+  { rank: 5, id: "gemini31-term", name: "Gemini 3.1 Pro Preview", scaffold: "Terminus 2",
     pass1: 12.0, costAvg: 3.77, tokAvg: 5.82,
     perCat: { library: 12.5, clone: 0.0, ml: 24.0, algo: 10.0 } },
 
-  { rank: 5, id: "gemini31-cli", name: "Gemini 3.1 Pro Preview", scaffold: "Gemini CLI v0.40.0",
+  { rank: 6, id: "gemini31-cli", name: "Gemini 3.1 Pro Preview", scaffold: "Gemini CLI v0.40.0",
     pass1: 8.1, costAvg: 4.85, tokAvg: 9.88,
     perCat: { library: 7.5, clone: 0.0, ml: 23.0, algo: 0.0 } },
 
-  { rank: 6, id: "claude47-term", name: "Claude Opus 4.7", scaffold: "Terminus 2",
+  { rank: 7, id: "claude47-term", name: "Claude Opus 4.7", scaffold: "Terminus 2",
     pass1: 8.0, costAvg: 19.83, tokAvg: 32.37,
     perCat: { library: 2.5, clone: 0.0, ml: 28.0, algo: 0.0 } },
 
-  { rank: 7, id: "deepseek-term", name: "DeepSeek V4 Pro", scaffold: "Terminus 2",
+  { rank: 8, id: "gemini35-cli", name: "Gemini 3.5 Flash", scaffold: "Gemini CLI v0.40.0",
+    pass1: 7.1, costAvg: 6.61, tokAvg: 24.62,
+    perCat: { library: 7.7, clone: 0.0, ml: 16.0, algo: 0.0 } },
+
+  { rank: 9, id: "deepseek-term", name: "DeepSeek V4 Pro", scaffold: "Terminus 2",
     pass1: 6.1, costAvg: 9.29, tokAvg: 38.84,
     perCat: { library: 0.0, clone: 0.0, ml: 24.0, algo: 0.0 } },
 
-  { rank: 8, id: "glm-term", name: "GLM 5.1", scaffold: "Terminus 2",
+  { rank: 10, id: "glm-term", name: "GLM 5.1", scaffold: "Terminus 2",
     pass1: 6.1, costAvg: 41.01, tokAvg: 40.00,
     perCat: { library: 0.0, clone: 0.0, ml: 24.0, algo: 0.0 } },
 
-  { rank: 9, id: "kimi-term", name: "Kimi K2.6", scaffold: "Terminus 2",
+  { rank: 11, id: "kimi-term", name: "Kimi K2.6", scaffold: "Terminus 2",
     pass1: 3.1, costAvg: 5.58, tokAvg: 19.83,
     perCat: { library: 0.0, clone: 0.0, ml: 12.0, algo: 0.0 } },
 
-  { rank: 10, id: "minimax-term", name: "MiniMax M2.7", scaffold: "Terminus 2",
+  { rank: 12, id: "minimax-term", name: "MiniMax M2.7", scaffold: "Terminus 2",
     pass1: 2.0, costAvg: 1.90, tokAvg: 25.32,
     perCat: { library: 0.0, clone: 0.0, ml: 8.0, algo: 0.0 } },
 
-  { rank: 11, id: "kimi-cli", name: "Kimi K2.6", scaffold: "Kimi Code CLI v1.41.0",
+  { rank: 13, id: "kimi-cli", name: "Kimi K2.6", scaffold: "Kimi Code CLI v1.41.0",
     pass1: 2.0, costAvg: null, tokAvg: 5.50,
     perCat: { library: 0.0, clone: 0.0, ml: 8.0, algo: 0.0 } },
 
@@ -262,11 +270,13 @@ export const LEADERBOARD = [
 
 /* Mapping from leaderboard id → echarts color (used in analysis.jsx) */
 export const MODEL_COLORS = {
+  "claude48-cc":   "#b95f2e",
   "claude47-cc":   "#c7733b",
   "gpt55-codex":   "#3a7d5f",
   "gpt55-term":    "#5d8a72",
   "gemini31-term": "#7a83b3",
   "gemini31-cli":  "#5a6cb8",
+  "gemini35-cli":  "#8c6dd8",
   "claude47-term": "#a86237",
   "deepseek-term": "#6b8da3",
   "glm-term":      "#9a7daa",
@@ -1862,6 +1872,15 @@ export const CASE_STUDIES = [
 /* Rows = leaderboard config id; columns = task id (note post-train-ifeval has the
    "-tmp" suffix in the manifest; we display it as "post-train-ifeval"). */
 export const PER_TASK_PASS1 = {
+  "claude48-cc": {
+    "biofabric-rust-rewrite": 0,   "kubernetes-rust-rewrite": 0,  "nextjs-vite-rewrite": 0,
+    "ruby-rust-port": 0,           "rust-c-compiler": 0,          "rust-java-lsp": 0,
+    "wasm-simd": 100,              "zstd-decoder": 100,           "excel-clone": 0,
+    "mastodon-clone": 0,           "s3-clone": 0,                 "slack-clone": 0,
+    "stripe-clone": 0,             "jax-pytorch-rewrite": 20,     "embedding-eval": 80,
+    "post-train-ifeval": 60,       "trimul-cuda": 75,             "parameter-golf": 0,
+    "find-network-alignments": 33.3, "vliw-kernel-optimization": 80,
+  },
   "claude47-cc": {
     "biofabric-rust-rewrite": 0,   "kubernetes-rust-rewrite": 0,  "nextjs-vite-rewrite": 0,
     "ruby-rust-port": 0,           "rust-c-compiler": 0,          "rust-java-lsp": 0,
@@ -1905,6 +1924,15 @@ export const PER_TASK_PASS1 = {
     "mastodon-clone": 0,           "s3-clone": 0,                 "slack-clone": 0,
     "stripe-clone": 0,             "jax-pytorch-rewrite": 20,     "embedding-eval": 20,
     "post-train-ifeval": 0,        "trimul-cuda": 0,              "parameter-golf": 75,
+    "find-network-alignments": 0,  "vliw-kernel-optimization": 0,
+  },
+  "gemini35-cli": {
+    "biofabric-rust-rewrite": 0,   "kubernetes-rust-rewrite": 0,  "nextjs-vite-rewrite": 0,
+    "ruby-rust-port": 0,           "rust-c-compiler": 0,          "rust-java-lsp": 0,
+    "wasm-simd": 50,               "zstd-decoder": 20,            "excel-clone": 0,
+    "mastodon-clone": 0,           "s3-clone": 0,                 "slack-clone": 0,
+    "stripe-clone": 0,             "jax-pytorch-rewrite": 20,     "embedding-eval": 60,
+    "post-train-ifeval": 0,        "trimul-cuda": 0,              "parameter-golf": 0,
     "find-network-alignments": 0,  "vliw-kernel-optimization": 0,
   },
   "claude47-term": {

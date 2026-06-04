@@ -13,8 +13,8 @@
       "ux": 0.526,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-zw52ds__N5RminQ",
-          "trial": "task-excel-clone-685bff89-zw52ds__N5RminQ",
+          "id": "excel-clone-220",
+          "trial": "excel-clone-220",
           "agent": "Claude Code",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -27,12 +27,13 @@
           "duration": "52m 42s",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-zw52ds__N5RminQ.json",
-          "steps": 204
+          "trajectoryUrl": "/trajectories/excel-clone-220.json",
+          "steps": 204,
+          "liveUrl": "https://swe-marathon-excel-trial-1-production.up.railway.app/"
         },
         {
-          "id": "task-excel-clone-685bff89-sm2g5d__q3EUXfB",
-          "trial": "task-excel-clone-685bff89-sm2g5d__q3EUXfB",
+          "id": "excel-clone-222",
+          "trial": "excel-clone-222",
           "agent": "Claude Code",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -45,12 +46,12 @@
           "duration": "57m 48s",
           "startedAt": "2026-05-20 01:49 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-sm2g5d__q3EUXfB.json",
+          "trajectoryUrl": "/trajectories/excel-clone-222.json",
           "steps": 155
         },
         {
-          "id": "task-excel-clone-685bff89-rv68u3__cUuSeSS",
-          "trial": "task-excel-clone-685bff89-rv68u3__cUuSeSS",
+          "id": "excel-clone-221",
+          "trial": "excel-clone-221",
           "agent": "Claude Code",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -63,12 +64,12 @@
           "duration": "42m 27s",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-rv68u3__cUuSeSS.json",
+          "trajectoryUrl": "/trajectories/excel-clone-221.json",
           "steps": 104
         },
         {
-          "id": "task-excel-clone-685bff89-i0eofy__BJRqJ3X",
-          "trial": "task-excel-clone-685bff89-i0eofy__BJRqJ3X",
+          "id": "excel-clone-237",
+          "trial": "excel-clone-237",
           "agent": "Claude Code",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -81,12 +82,12 @@
           "duration": "55m 25s",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-i0eofy__BJRqJ3X.json",
+          "trajectoryUrl": "/trajectories/excel-clone-237.json",
           "steps": 181
         },
         {
-          "id": "task-excel-clone-685bff89-1zhant__uwhG9ik",
-          "trial": "task-excel-clone-685bff89-1zhant__uwhG9ik",
+          "id": "excel-clone-239",
+          "trial": "excel-clone-239",
           "agent": "Claude Code",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -99,7 +100,7 @@
           "duration": "4h 21m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-1zhant__uwhG9ik.json",
+          "trajectoryUrl": "/trajectories/excel-clone-239.json",
           "steps": 276
         }
       ],
@@ -116,8 +117,8 @@
       "ux": 0.459,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-bthdwy__3HFwKhL",
-          "trial": "task-excel-clone-685bff89-bthdwy__3HFwKhL",
+          "id": "excel-clone-251",
+          "trial": "excel-clone-251",
           "agent": "Terminus 2",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -130,12 +131,13 @@
           "duration": "1h 20m",
           "startedAt": "2026-05-20 08:19 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-bthdwy__3HFwKhL.json",
-          "steps": 121
+          "trajectoryUrl": "/trajectories/excel-clone-251.json",
+          "steps": 121,
+          "liveUrl": "https://swe-marathon-excel-trial-3-production.up.railway.app/"
         },
         {
-          "id": "task-excel-clone-685bff89-_j_c2o__3G4eJy6",
-          "trial": "task-excel-clone-685bff89-_j_c2o__3G4eJy6",
+          "id": "excel-clone-255",
+          "trial": "excel-clone-255",
           "agent": "Terminus 2",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -148,30 +150,12 @@
           "duration": "1h 35m",
           "startedAt": "2026-05-20 07:28 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-_j_c2o__3G4eJy6.json",
+          "trajectoryUrl": "/trajectories/excel-clone-255.json",
           "steps": 145
         },
         {
-          "id": "task-excel-clone-685bff89-4yj7wt__pEe4ynU",
-          "trial": "task-excel-clone-685bff89-4yj7wt__pEe4ynU",
-          "agent": "Terminus 2",
-          "model": "Claude Opus 4.7",
-          "reward": 0.0,
-          "partial": 0.485,
-          "correctness": 0.5,
-          "ux": 0.471,
-          "gates": "9 / 18",
-          "tokens": "27.5M",
-          "cost": "$18.81",
-          "duration": "1h 28m",
-          "startedAt": "2026-05-20 07:25 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-4yj7wt__pEe4ynU.json",
-          "steps": 241
-        },
-        {
-          "id": "task-excel-clone-685bff89-9xo5ug__wG4dskm",
-          "trial": "task-excel-clone-685bff89-9xo5ug__wG4dskm",
+          "id": "excel-clone-252",
+          "trial": "excel-clone-252",
           "agent": "Terminus 2",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -184,12 +168,30 @@
           "duration": "1h 11m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-9xo5ug__wG4dskm.json",
+          "trajectoryUrl": "/trajectories/excel-clone-252.json",
           "steps": 131
         },
         {
-          "id": "task-excel-clone-685bff89-o_337g__Ath2FZZ",
-          "trial": "task-excel-clone-685bff89-o_337g__Ath2FZZ",
+          "id": "excel-clone-254",
+          "trial": "excel-clone-254",
+          "agent": "Terminus 2",
+          "model": "Claude Opus 4.7",
+          "reward": 0.0,
+          "partial": 0.485,
+          "correctness": 0.5,
+          "ux": 0.471,
+          "gates": "9 / 18",
+          "tokens": "27.5M",
+          "cost": "$18.81",
+          "duration": "1h 28m",
+          "startedAt": "2026-05-20 07:25 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-254.json",
+          "steps": 241
+        },
+        {
+          "id": "excel-clone-253",
+          "trial": "excel-clone-253",
           "agent": "Terminus 2",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
@@ -202,7 +204,7 @@
           "duration": "1h 4m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-o_337g__Ath2FZZ.json",
+          "trajectoryUrl": "/trajectories/excel-clone-253.json",
           "steps": 120
         }
       ],
@@ -219,8 +221,8 @@
       "ux": 0.435,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-tij53u__B7rozje",
-          "trial": "task-excel-clone-685bff89-tij53u__B7rozje",
+          "id": "excel-clone-223",
+          "trial": "excel-clone-223",
           "agent": "Codex",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -233,12 +235,13 @@
           "duration": "31m 33s",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-tij53u__B7rozje.json",
-          "steps": 70
+          "trajectoryUrl": "/trajectories/excel-clone-223.json",
+          "steps": 70,
+          "liveUrl": "https://swe-marathon-excel-trial-2-production.up.railway.app/"
         },
         {
-          "id": "task-excel-clone-685bff89-shjxsw__yKtNwhR",
-          "trial": "task-excel-clone-685bff89-shjxsw__yKtNwhR",
+          "id": "excel-clone-242",
+          "trial": "excel-clone-242",
           "agent": "Codex",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -251,12 +254,12 @@
           "duration": "32m 20s",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-shjxsw__yKtNwhR.json",
+          "trajectoryUrl": "/trajectories/excel-clone-242.json",
           "steps": 53
         },
         {
-          "id": "task-excel-clone-685bff89-8a5wyp__7UQie8d",
-          "trial": "task-excel-clone-685bff89-8a5wyp__7UQie8d",
+          "id": "excel-clone-240",
+          "trial": "excel-clone-240",
           "agent": "Codex",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -269,12 +272,12 @@
           "duration": "32m 25s",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-8a5wyp__7UQie8d.json",
+          "trajectoryUrl": "/trajectories/excel-clone-240.json",
           "steps": 76
         },
         {
-          "id": "task-excel-clone-685bff89-7z6nsm__R3wMsE6",
-          "trial": "task-excel-clone-685bff89-7z6nsm__R3wMsE6",
+          "id": "excel-clone-241",
+          "trial": "excel-clone-241",
           "agent": "Codex",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -287,12 +290,12 @@
           "duration": "29m 15s",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-7z6nsm__R3wMsE6.json",
+          "trajectoryUrl": "/trajectories/excel-clone-241.json",
           "steps": 67
         },
         {
-          "id": "task-excel-clone-685bff89-qt58o9__UBT6TJX",
-          "trial": "task-excel-clone-685bff89-qt58o9__UBT6TJX",
+          "id": "excel-clone-224",
+          "trial": "excel-clone-224",
           "agent": "Codex",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -305,11 +308,114 @@
           "duration": "33m 58s",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-qt58o9__UBT6TJX.json",
+          "trajectoryUrl": "/trajectories/excel-clone-224.json",
           "steps": 57
         }
       ],
       "rank": 3
+    },
+    {
+      "agent": "Claude Code",
+      "model": "Claude Opus 4.8",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.413,
+      "best": 0.456,
+      "correctness": 0.0,
+      "ux": 0.826,
+      "trials": [
+        {
+          "id": "excel-clone-306",
+          "trial": "excel-clone-306",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.456,
+          "correctness": 0.0,
+          "ux": 0.912,
+          "gates": "",
+          "tokens": "20.1M",
+          "cost": "$19.25",
+          "duration": "4h 19m",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-306.json",
+          "steps": 138
+        },
+        {
+          "id": "excel-clone-307",
+          "trial": "excel-clone-307",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.426,
+          "correctness": 0.0,
+          "ux": 0.853,
+          "gates": "",
+          "tokens": "20.1M",
+          "cost": "$17.56",
+          "duration": "4h 20m",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-307.json",
+          "steps": 133
+        },
+        {
+          "id": "excel-clone-316",
+          "trial": "excel-clone-316",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.426,
+          "correctness": 0.0,
+          "ux": 0.853,
+          "gates": "",
+          "tokens": "24.9M",
+          "cost": "$52.84",
+          "duration": "4h 30m",
+          "startedAt": "2026-06-03 04:02 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-316.json",
+          "steps": 156
+        },
+        {
+          "id": "excel-clone-314",
+          "trial": "excel-clone-314",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.39,
+          "correctness": 0.0,
+          "ux": 0.779,
+          "gates": "",
+          "tokens": "23.3M",
+          "cost": "$49.53",
+          "duration": "55m 15s",
+          "startedAt": "2026-06-03 03:14 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-314.json",
+          "steps": 155
+        },
+        {
+          "id": "excel-clone-310",
+          "trial": "excel-clone-310",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.368,
+          "correctness": 0.0,
+          "ux": 0.735,
+          "gates": "",
+          "tokens": "18.5M",
+          "cost": "$40.48",
+          "duration": "43m 51s",
+          "startedAt": "2026-06-03 01:44 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-310.json",
+          "steps": 133
+        }
+      ],
+      "rank": 4
     },
     {
       "agent": "Gemini CLI",
@@ -322,8 +428,8 @@
       "ux": 0.076,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-8b1gir__X6BCyXL",
-          "trial": "task-excel-clone-685bff89-8b1gir__X6BCyXL",
+          "id": "excel-clone-244",
+          "trial": "excel-clone-244",
           "agent": "Gemini CLI",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -336,12 +442,12 @@
           "duration": "1h 2m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-8b1gir__X6BCyXL.json",
+          "trajectoryUrl": "/trajectories/excel-clone-244.json",
           "steps": 203
         },
         {
-          "id": "task-excel-clone-685bff89-7m_4_y__kTXAZzC",
-          "trial": "task-excel-clone-685bff89-7m_4_y__kTXAZzC",
+          "id": "excel-clone-226",
+          "trial": "excel-clone-226",
           "agent": "Gemini CLI",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -354,12 +460,12 @@
           "duration": "29m 25s",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-7m_4_y__kTXAZzC.json",
+          "trajectoryUrl": "/trajectories/excel-clone-226.json",
           "steps": 153
         },
         {
-          "id": "task-excel-clone-685bff89-s0xkfi__KawYxwQ",
-          "trial": "task-excel-clone-685bff89-s0xkfi__KawYxwQ",
+          "id": "excel-clone-243",
+          "trial": "excel-clone-243",
           "agent": "Gemini CLI",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -372,12 +478,12 @@
           "duration": "48m 17s",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-s0xkfi__KawYxwQ.json",
+          "trajectoryUrl": "/trajectories/excel-clone-243.json",
           "steps": 120
         },
         {
-          "id": "task-excel-clone-685bff89-jncf7s__edHEK5t",
-          "trial": "task-excel-clone-685bff89-jncf7s__edHEK5t",
+          "id": "excel-clone-245",
+          "trial": "excel-clone-245",
           "agent": "Gemini CLI",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -390,12 +496,12 @@
           "duration": "1h 24m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-jncf7s__edHEK5t.json",
+          "trajectoryUrl": "/trajectories/excel-clone-245.json",
           "steps": 238
         },
         {
-          "id": "task-excel-clone-685bff89-g5yda7__6s7oRw8",
-          "trial": "task-excel-clone-685bff89-g5yda7__6s7oRw8",
+          "id": "excel-clone-227",
+          "trial": "excel-clone-227",
           "agent": "Gemini CLI",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -408,11 +514,11 @@
           "duration": "44m 11s",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-g5yda7__6s7oRw8.json",
+          "trajectoryUrl": "/trajectories/excel-clone-227.json",
           "steps": 182
         }
       ],
-      "rank": 4
+      "rank": 5
     },
     {
       "agent": "Terminus 2",
@@ -425,8 +531,8 @@
       "ux": 0.218,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-s40nl2__s6rLZQz",
-          "trial": "task-excel-clone-685bff89-s40nl2__s6rLZQz",
+          "id": "excel-clone-274",
+          "trial": "excel-clone-274",
           "agent": "Terminus 2",
           "model": "DeepSeek V4 Pro",
           "reward": 0.0,
@@ -439,12 +545,12 @@
           "duration": "3h 22m",
           "startedAt": "2026-05-20 09:13 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-s40nl2__s6rLZQz.json",
+          "trajectoryUrl": "/trajectories/excel-clone-274.json",
           "steps": 336
         },
         {
-          "id": "task-excel-clone-685bff89-7wqv52__jNZXTGJ",
-          "trial": "task-excel-clone-685bff89-7wqv52__jNZXTGJ",
+          "id": "excel-clone-271",
+          "trial": "excel-clone-271",
           "agent": "Terminus 2",
           "model": "DeepSeek V4 Pro",
           "reward": 0.0,
@@ -457,12 +563,12 @@
           "duration": "2h 15m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-7wqv52__jNZXTGJ.json",
+          "trajectoryUrl": "/trajectories/excel-clone-271.json",
           "steps": 149
         },
         {
-          "id": "task-excel-clone-685bff89-qsbf41__TYYMDnz",
-          "trial": "task-excel-clone-685bff89-qsbf41__TYYMDnz",
+          "id": "excel-clone-234",
+          "trial": "excel-clone-234",
           "agent": "Terminus 2",
           "model": "DeepSeek V4 Pro",
           "reward": 0.0,
@@ -475,12 +581,12 @@
           "duration": "3h 36m",
           "startedAt": "2026-05-20 03:40 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-qsbf41__TYYMDnz.json",
+          "trajectoryUrl": "/trajectories/excel-clone-234.json",
           "steps": 352
         },
         {
-          "id": "task-excel-clone-685bff89-q1w5d6__QZHAPcv",
-          "trial": "task-excel-clone-685bff89-q1w5d6__QZHAPcv",
+          "id": "excel-clone-273",
+          "trial": "excel-clone-273",
           "agent": "Terminus 2",
           "model": "DeepSeek V4 Pro",
           "reward": 0.0,
@@ -493,12 +599,12 @@
           "duration": "4h 16m",
           "startedAt": "2026-05-20 09:16 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-q1w5d6__QZHAPcv.json",
+          "trajectoryUrl": "/trajectories/excel-clone-273.json",
           "steps": 547
         },
         {
-          "id": "task-excel-clone-685bff89-s8924l__NtHRBVj",
-          "trial": "task-excel-clone-685bff89-s8924l__NtHRBVj",
+          "id": "excel-clone-275",
+          "trial": "excel-clone-275",
           "agent": "Terminus 2",
           "model": "DeepSeek V4 Pro",
           "reward": 0.0,
@@ -511,11 +617,11 @@
           "duration": "4h 11m",
           "startedAt": "2026-05-20 10:49 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-s8924l__NtHRBVj.json",
+          "trajectoryUrl": "/trajectories/excel-clone-275.json",
           "steps": 609
         }
       ],
-      "rank": 5
+      "rank": 6
     },
     {
       "agent": "Terminus 2",
@@ -528,8 +634,8 @@
       "ux": 0.041,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-akqemj__rNRafuM",
-          "trial": "task-excel-clone-685bff89-akqemj__rNRafuM",
+          "id": "excel-clone-231",
+          "trial": "excel-clone-231",
           "agent": "Terminus 2",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -542,12 +648,12 @@
           "duration": "25m 10s",
           "startedAt": "2026-05-20 01:49 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-akqemj__rNRafuM.json",
+          "trajectoryUrl": "/trajectories/excel-clone-231.json",
           "steps": 44
         },
         {
-          "id": "task-excel-clone-685bff89-9nga7w__Rsknr8s",
-          "trial": "task-excel-clone-685bff89-9nga7w__Rsknr8s",
+          "id": "excel-clone-260",
+          "trial": "excel-clone-260",
           "agent": "Terminus 2",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -560,12 +666,12 @@
           "duration": "30m 31s",
           "startedAt": "2026-05-20 07:28 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-9nga7w__Rsknr8s.json",
+          "trajectoryUrl": "/trajectories/excel-clone-260.json",
           "steps": 38
         },
         {
-          "id": "task-excel-clone-685bff89-pymuoc__xYeg7qv",
-          "trial": "task-excel-clone-685bff89-pymuoc__xYeg7qv",
+          "id": "excel-clone-256",
+          "trial": "excel-clone-256",
           "agent": "Terminus 2",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -578,12 +684,12 @@
           "duration": "26m 58s",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-pymuoc__xYeg7qv.json",
+          "trajectoryUrl": "/trajectories/excel-clone-256.json",
           "steps": 37
         },
         {
-          "id": "task-excel-clone-685bff89-mg_glz__riCtVnq",
-          "trial": "task-excel-clone-685bff89-mg_glz__riCtVnq",
+          "id": "excel-clone-257",
+          "trial": "excel-clone-257",
           "agent": "Terminus 2",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -596,12 +702,12 @@
           "duration": "20m 12s",
           "startedAt": "2026-05-20 07:31 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-mg_glz__riCtVnq.json",
+          "trajectoryUrl": "/trajectories/excel-clone-257.json",
           "steps": 30
         },
         {
-          "id": "task-excel-clone-685bff89-p_fio9__JyXmzTj",
-          "trial": "task-excel-clone-685bff89-p_fio9__JyXmzTj",
+          "id": "excel-clone-258",
+          "trial": "excel-clone-258",
           "agent": "Terminus 2",
           "model": "GPT-5.5",
           "reward": 0.0,
@@ -614,11 +720,11 @@
           "duration": "25m 19s",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-p_fio9__JyXmzTj.json",
+          "trajectoryUrl": "/trajectories/excel-clone-258.json",
           "steps": 70
         }
       ],
-      "rank": 6
+      "rank": 7
     },
     {
       "agent": "Terminus 2",
@@ -631,8 +737,8 @@
       "ux": 0.144,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-2uccrm__NHa74TQ",
-          "trial": "task-excel-clone-685bff89-2uccrm__NHa74TQ",
+          "id": "excel-clone-263",
+          "trial": "excel-clone-263",
           "agent": "Terminus 2",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -645,12 +751,12 @@
           "duration": "1h 6m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-2uccrm__NHa74TQ.json",
+          "trajectoryUrl": "/trajectories/excel-clone-263.json",
           "steps": 175
         },
         {
-          "id": "task-excel-clone-685bff89-67fbbs__o6ykzwU",
-          "trial": "task-excel-clone-685bff89-67fbbs__o6ykzwU",
+          "id": "excel-clone-261",
+          "trial": "excel-clone-261",
           "agent": "Terminus 2",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -663,12 +769,12 @@
           "duration": "1h 15m",
           "startedAt": "2026-05-20 08:22 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-67fbbs__o6ykzwU.json",
+          "trajectoryUrl": "/trajectories/excel-clone-261.json",
           "steps": 199
         },
         {
-          "id": "task-excel-clone-685bff89-eg76vn__Phmm283",
-          "trial": "task-excel-clone-685bff89-eg76vn__Phmm283",
+          "id": "excel-clone-232",
+          "trial": "excel-clone-232",
           "agent": "Terminus 2",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -681,12 +787,12 @@
           "duration": "38m 29s",
           "startedAt": "2026-05-20 01:54 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-eg76vn__Phmm283.json",
+          "trajectoryUrl": "/trajectories/excel-clone-232.json",
           "steps": 173
         },
         {
-          "id": "task-excel-clone-685bff89-_2kh9e__H2djrJT",
-          "trial": "task-excel-clone-685bff89-_2kh9e__H2djrJT",
+          "id": "excel-clone-262",
+          "trial": "excel-clone-262",
           "agent": "Terminus 2",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -699,12 +805,12 @@
           "duration": "17m 33s",
           "startedAt": "2026-05-20 07:58 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-_2kh9e__H2djrJT.json",
+          "trajectoryUrl": "/trajectories/excel-clone-262.json",
           "steps": 82
         },
         {
-          "id": "task-excel-clone-685bff89-ooml5e__J2izWRq",
-          "trial": "task-excel-clone-685bff89-ooml5e__J2izWRq",
+          "id": "excel-clone-265",
+          "trial": "excel-clone-265",
           "agent": "Terminus 2",
           "model": "Gemini 3.1 Pro",
           "reward": 0.0,
@@ -717,11 +823,11 @@
           "duration": "30m 56s",
           "startedAt": "2026-05-20 07:28 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-ooml5e__J2izWRq.json",
+          "trajectoryUrl": "/trajectories/excel-clone-265.json",
           "steps": 158
         }
       ],
-      "rank": 7
+      "rank": 8
     },
     {
       "agent": "Terminus 2",
@@ -734,8 +840,8 @@
       "ux": 0.071,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-ub9nt1__3fhEGe9",
-          "trial": "task-excel-clone-685bff89-ub9nt1__3fhEGe9",
+          "id": "excel-clone-235",
+          "trial": "excel-clone-235",
           "agent": "Terminus 2",
           "model": "GLM 5.1",
           "reward": 0.0,
@@ -748,12 +854,12 @@
           "duration": "2h 36m",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-ub9nt1__3fhEGe9.json",
+          "trajectoryUrl": "/trajectories/excel-clone-235.json",
           "steps": 257
         },
         {
-          "id": "task-excel-clone-685bff89-_3dp86__cEiMETW",
-          "trial": "task-excel-clone-685bff89-_3dp86__cEiMETW",
+          "id": "excel-clone-279",
+          "trial": "excel-clone-279",
           "agent": "Terminus 2",
           "model": "GLM 5.1",
           "reward": 0.0,
@@ -766,12 +872,12 @@
           "duration": "2h 29m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-_3dp86__cEiMETW.json",
+          "trajectoryUrl": "/trajectories/excel-clone-279.json",
           "steps": 210
         },
         {
-          "id": "task-excel-clone-685bff89-s1gbz4__umNeAjS",
-          "trial": "task-excel-clone-685bff89-s1gbz4__umNeAjS",
+          "id": "excel-clone-277",
+          "trial": "excel-clone-277",
           "agent": "Terminus 2",
           "model": "GLM 5.1",
           "reward": 0.0,
@@ -784,12 +890,12 @@
           "duration": "4h 30m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-s1gbz4__umNeAjS.json",
+          "trajectoryUrl": "/trajectories/excel-clone-277.json",
           "steps": 249
         },
         {
-          "id": "task-excel-clone-685bff89-vletcn__GzYCpbR",
-          "trial": "task-excel-clone-685bff89-vletcn__GzYCpbR",
+          "id": "excel-clone-278",
+          "trial": "excel-clone-278",
           "agent": "Terminus 2",
           "model": "GLM 5.1",
           "reward": 0.0,
@@ -802,12 +908,12 @@
           "duration": "4h 27m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-vletcn__GzYCpbR.json",
+          "trajectoryUrl": "/trajectories/excel-clone-278.json",
           "steps": 129
         },
         {
-          "id": "task-excel-clone-685bff89-5uvjmf__wYkkztD",
-          "trial": "task-excel-clone-685bff89-5uvjmf__wYkkztD",
+          "id": "excel-clone-280",
+          "trial": "excel-clone-280",
           "agent": "Terminus 2",
           "model": "GLM 5.1",
           "reward": 0.0,
@@ -820,11 +926,11 @@
           "duration": "5h 3m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-5uvjmf__wYkkztD.json",
+          "trajectoryUrl": "/trajectories/excel-clone-280.json",
           "steps": 252
         }
       ],
-      "rank": 8
+      "rank": 9
     },
     {
       "agent": "Terminus 2",
@@ -837,8 +943,8 @@
       "ux": 0.076,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-5tfmcr__oVuQsZH",
-          "trial": "task-excel-clone-685bff89-5tfmcr__oVuQsZH",
+          "id": "excel-clone-266",
+          "trial": "excel-clone-266",
           "agent": "Terminus 2",
           "model": "Kimi K2.6",
           "reward": 0.0,
@@ -851,12 +957,12 @@
           "duration": "4h 29m",
           "startedAt": "2026-05-20 13:43 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-5tfmcr__oVuQsZH.json",
+          "trajectoryUrl": "/trajectories/excel-clone-266.json",
           "steps": 400
         },
         {
-          "id": "task-excel-clone-685bff89-jaz1_k__HyjixsP",
-          "trial": "task-excel-clone-685bff89-jaz1_k__HyjixsP",
+          "id": "excel-clone-267",
+          "trial": "excel-clone-267",
           "agent": "Terminus 2",
           "model": "Kimi K2.6",
           "reward": 0.0,
@@ -869,30 +975,12 @@
           "duration": "4h 10m",
           "startedAt": "2026-05-20 10:49 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-jaz1_k__HyjixsP.json",
+          "trajectoryUrl": "/trajectories/excel-clone-267.json",
           "steps": 76
         },
         {
-          "id": "task-excel-clone-685bff89-iuhlh3__rjiKMk5",
-          "trial": "task-excel-clone-685bff89-iuhlh3__rjiKMk5",
-          "agent": "Terminus 2",
-          "model": "Kimi K2.6",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "0 / 18",
-          "tokens": "2.6M",
-          "cost": "$0.92",
-          "duration": "4h 10m",
-          "startedAt": "2026-05-20 07:28 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-iuhlh3__rjiKMk5.json",
-          "steps": 141
-        },
-        {
-          "id": "task-excel-clone-685bff89-uqr5_n__kSexWTu",
-          "trial": "task-excel-clone-685bff89-uqr5_n__kSexWTu",
+          "id": "excel-clone-233",
+          "trial": "excel-clone-233",
           "agent": "Terminus 2",
           "model": "Kimi K2.6",
           "reward": 0.0,
@@ -905,12 +993,12 @@
           "duration": "4h 1m",
           "startedAt": "2026-05-20 01:49 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-uqr5_n__kSexWTu.json",
+          "trajectoryUrl": "/trajectories/excel-clone-233.json",
           "steps": 0
         },
         {
-          "id": "task-excel-clone-685bff89-okvtkp__Rvui4JG",
-          "trial": "task-excel-clone-685bff89-okvtkp__Rvui4JG",
+          "id": "excel-clone-268",
+          "trial": "excel-clone-268",
           "agent": "Terminus 2",
           "model": "Kimi K2.6",
           "reward": 0.0,
@@ -923,11 +1011,132 @@
           "duration": "4h 4m",
           "startedAt": "2026-05-20 08:55 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-okvtkp__Rvui4JG.json",
+          "trajectoryUrl": "/trajectories/excel-clone-268.json",
           "steps": 23
+        },
+        {
+          "id": "excel-clone-269",
+          "trial": "excel-clone-269",
+          "agent": "Terminus 2",
+          "model": "Kimi K2.6",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 18",
+          "tokens": "2.6M",
+          "cost": "$0.92",
+          "duration": "4h 10m",
+          "startedAt": "2026-05-20 07:28 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-269.json",
+          "steps": 141
         }
       ],
-      "rank": 9
+      "rank": 10
+    },
+    {
+      "agent": "Gemini CLI",
+      "model": "Gemini 3.5 Flash",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.062,
+      "best": 0.309,
+      "correctness": 0.0,
+      "ux": 0.124,
+      "trials": [
+        {
+          "id": "excel-clone-309",
+          "trial": "excel-clone-309",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.309,
+          "correctness": 0.0,
+          "ux": 0.618,
+          "gates": "",
+          "tokens": "44.6M",
+          "cost": "$11.03",
+          "duration": "57m 46s",
+          "startedAt": "2026-06-03 01:44 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-309.json",
+          "steps": 193
+        },
+        {
+          "id": "excel-clone-305",
+          "trial": "excel-clone-305",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "1.5M",
+          "cost": "$1.80",
+          "duration": "12m 8s",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-305.json",
+          "steps": 35
+        },
+        {
+          "id": "excel-clone-308",
+          "trial": "excel-clone-308",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "678K",
+          "cost": "$0.53",
+          "duration": "4m 39s",
+          "startedAt": "2026-06-03 01:44 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-308.json",
+          "steps": 24
+        },
+        {
+          "id": "excel-clone-311",
+          "trial": "excel-clone-311",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "1.9M",
+          "cost": "$1.07",
+          "duration": "8m 16s",
+          "startedAt": "2026-06-03 02:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-311.json",
+          "steps": 49
+        },
+        {
+          "id": "excel-clone-312",
+          "trial": "excel-clone-312",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "1.2M",
+          "cost": "$0.84",
+          "duration": "4m 45s",
+          "startedAt": "2026-06-03 02:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-312.json",
+          "steps": 38
+        }
+      ],
+      "rank": 11
     },
     {
       "agent": "Kimi CLI",
@@ -940,8 +1149,8 @@
       "ux": 0.082,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-cmsqvx__yC9iigz",
-          "trial": "task-excel-clone-685bff89-cmsqvx__yC9iigz",
+          "id": "excel-clone-250",
+          "trial": "excel-clone-250",
           "agent": "Kimi CLI",
           "model": "Kimi K2.6",
           "reward": 0.0,
@@ -950,16 +1159,16 @@
           "ux": 0.412,
           "gates": "0 / 18",
           "tokens": "4.4M",
-          "cost": "$0.00",
+          "cost": "$3.57",
           "duration": "1h 38m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-cmsqvx__yC9iigz.json",
+          "trajectoryUrl": "/trajectories/excel-clone-250.json",
           "steps": 108
         },
         {
-          "id": "task-excel-clone-685bff89-j513v7__r9sVXQ6",
-          "trial": "task-excel-clone-685bff89-j513v7__r9sVXQ6",
+          "id": "excel-clone-248",
+          "trial": "excel-clone-248",
           "agent": "Kimi CLI",
           "model": "Kimi K2.6",
           "reward": 0.0,
@@ -968,52 +1177,16 @@
           "ux": 0.0,
           "gates": "3 / 18",
           "tokens": "3.9M",
-          "cost": "$0.00",
+          "cost": "$3.52",
           "duration": "2h 1m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-j513v7__r9sVXQ6.json",
+          "trajectoryUrl": "/trajectories/excel-clone-248.json",
           "steps": 159
         },
         {
-          "id": "task-excel-clone-685bff89-mcbo6i__9ZxNAfD",
-          "trial": "task-excel-clone-685bff89-mcbo6i__9ZxNAfD",
-          "agent": "Kimi CLI",
-          "model": "Kimi K2.6",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "0 / 18",
-          "tokens": "8.1M",
-          "cost": "$0.00",
-          "duration": "1h 58m",
-          "startedAt": "2026-05-20 07:25 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-mcbo6i__9ZxNAfD.json",
-          "steps": 215
-        },
-        {
-          "id": "task-excel-clone-685bff89-3m8hjc__kDWoHfV",
-          "trial": "task-excel-clone-685bff89-3m8hjc__kDWoHfV",
-          "agent": "Kimi CLI",
-          "model": "Kimi K2.6",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "0 / 18",
-          "tokens": "3.0M",
-          "cost": "$0.00",
-          "duration": "54m 55s",
-          "startedAt": "2026-05-20 07:25 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-3m8hjc__kDWoHfV.json",
-          "steps": 100
-        },
-        {
-          "id": "task-excel-clone-685bff89-1ysbgw__6CtS3z2",
-          "trial": "task-excel-clone-685bff89-1ysbgw__6CtS3z2",
+          "id": "excel-clone-229",
+          "trial": "excel-clone-229",
           "agent": "Kimi CLI",
           "model": "Kimi K2.6",
           "reward": 0.0,
@@ -1022,15 +1195,51 @@
           "ux": 0.0,
           "gates": "0 / 18",
           "tokens": "3.2M",
-          "cost": "$0.00",
+          "cost": "$2.58",
           "duration": "58m 37s",
           "startedAt": "2026-05-20 01:48 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-1ysbgw__6CtS3z2.json",
+          "trajectoryUrl": "/trajectories/excel-clone-229.json",
           "steps": 98
+        },
+        {
+          "id": "excel-clone-246",
+          "trial": "excel-clone-246",
+          "agent": "Kimi CLI",
+          "model": "Kimi K2.6",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 18",
+          "tokens": "8.1M",
+          "cost": "$6.52",
+          "duration": "1h 58m",
+          "startedAt": "2026-05-20 07:25 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-246.json",
+          "steps": 215
+        },
+        {
+          "id": "excel-clone-249",
+          "trial": "excel-clone-249",
+          "agent": "Kimi CLI",
+          "model": "Kimi K2.6",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 18",
+          "tokens": "3.0M",
+          "cost": "$2.35",
+          "duration": "54m 55s",
+          "startedAt": "2026-05-20 07:25 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-249.json",
+          "steps": 100
         }
       ],
-      "rank": 10
+      "rank": 12
     },
     {
       "agent": "Terminus 2",
@@ -1043,26 +1252,26 @@
       "ux": 0.047,
       "trials": [
         {
-          "id": "task-excel-clone-685bff89-jm9f_3__K8yXVVF",
-          "trial": "task-excel-clone-685bff89-jm9f_3__K8yXVVF",
+          "id": "excel-clone-236",
+          "trial": "excel-clone-236",
           "agent": "Terminus 2",
           "model": "MiniMax M2.7",
           "reward": 0.0,
           "partial": 0.051,
           "correctness": 0.0,
           "ux": 0.103,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "22.6M",
           "cost": "$1.59",
           "duration": "4h 14m",
           "startedAt": "2026-05-20 02:55 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-jm9f_3__K8yXVVF.json",
+          "trajectoryUrl": "/trajectories/excel-clone-236.json",
           "steps": 292
         },
         {
-          "id": "task-excel-clone-685bff89-20jbdn__DmKcioG",
-          "trial": "task-excel-clone-685bff89-20jbdn__DmKcioG",
+          "id": "excel-clone-285",
+          "trial": "excel-clone-285",
           "agent": "Terminus 2",
           "model": "MiniMax M2.7",
           "reward": 0.0,
@@ -1075,12 +1284,12 @@
           "duration": "5h 29m",
           "startedAt": "2026-05-20 07:25 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-20jbdn__DmKcioG.json",
+          "trajectoryUrl": "/trajectories/excel-clone-285.json",
           "steps": 169
         },
         {
-          "id": "task-excel-clone-685bff89-mfenq7__yGBZFnU",
-          "trial": "task-excel-clone-685bff89-mfenq7__yGBZFnU",
+          "id": "excel-clone-282",
+          "trial": "excel-clone-282",
           "agent": "Terminus 2",
           "model": "MiniMax M2.7",
           "reward": 0.0,
@@ -1093,30 +1302,12 @@
           "duration": "4h 27m",
           "startedAt": "2026-05-20 07:55 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-mfenq7__yGBZFnU.json",
+          "trajectoryUrl": "/trajectories/excel-clone-282.json",
           "steps": 331
         },
         {
-          "id": "task-excel-clone-685bff89-92xt9i__j27Ktpw",
-          "trial": "task-excel-clone-685bff89-92xt9i__j27Ktpw",
-          "agent": "Terminus 2",
-          "model": "MiniMax M2.7",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "0 / 18",
-          "tokens": "11.1M",
-          "cost": "$1.09",
-          "duration": "5h 15m",
-          "startedAt": "2026-05-20 08:43 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-92xt9i__j27Ktpw.json",
-          "steps": 220
-        },
-        {
-          "id": "task-excel-clone-685bff89-uszer2__6EZ2sHv",
-          "trial": "task-excel-clone-685bff89-uszer2__6EZ2sHv",
+          "id": "excel-clone-281",
+          "trial": "excel-clone-281",
           "agent": "Terminus 2",
           "model": "MiniMax M2.7",
           "reward": 0.0,
@@ -1129,11 +1320,29 @@
           "duration": "3h 0m",
           "startedAt": "2026-05-20 09:52 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-excel-clone-685bff89-uszer2__6EZ2sHv.json",
+          "trajectoryUrl": "/trajectories/excel-clone-281.json",
           "steps": 142
+        },
+        {
+          "id": "excel-clone-283",
+          "trial": "excel-clone-283",
+          "agent": "Terminus 2",
+          "model": "MiniMax M2.7",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "0 / 18",
+          "tokens": "11.1M",
+          "cost": "$1.09",
+          "duration": "5h 15m",
+          "startedAt": "2026-05-20 08:43 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/excel-clone-283.json",
+          "steps": 220
         }
       ],
-      "rank": 11
+      "rank": 13
     }
   ]
 }

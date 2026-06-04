@@ -107,6 +107,109 @@
       "rank": 1
     },
     {
+      "agent": "Claude Code",
+      "model": "Claude Opus 4.8",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.45,
+      "best": 0.471,
+      "correctness": 0.0,
+      "ux": 0.9,
+      "trials": [
+        {
+          "id": "mastodon-clone-285",
+          "trial": "mastodon-clone-285",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.471,
+          "correctness": 0.0,
+          "ux": 0.943,
+          "gates": "",
+          "tokens": "24.6M",
+          "cost": "$20.91",
+          "duration": "3h 9m",
+          "startedAt": "2026-06-03 02:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-285.json",
+          "steps": 180
+        },
+        {
+          "id": "mastodon-clone-289",
+          "trial": "mastodon-clone-289",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.471,
+          "correctness": 0.0,
+          "ux": 0.943,
+          "gates": "",
+          "tokens": "19.6M",
+          "cost": "$42.14",
+          "duration": "3h 9m",
+          "startedAt": "2026-06-03 05:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-289.json",
+          "steps": 143
+        },
+        {
+          "id": "mastodon-clone-277",
+          "trial": "mastodon-clone-277",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.443,
+          "correctness": 0.0,
+          "ux": 0.886,
+          "gates": "",
+          "tokens": "25.0M",
+          "cost": "$22.38",
+          "duration": "3h 9m",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-277.json",
+          "steps": 181
+        },
+        {
+          "id": "mastodon-clone-288",
+          "trial": "mastodon-clone-288",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.443,
+          "correctness": 0.0,
+          "ux": 0.886,
+          "gates": "",
+          "tokens": "27.5M",
+          "cost": "$55.82",
+          "duration": "3h 8m",
+          "startedAt": "2026-06-03 05:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-288.json",
+          "steps": 173
+        },
+        {
+          "id": "mastodon-clone-278",
+          "trial": "mastodon-clone-278",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.421,
+          "correctness": 0.0,
+          "ux": 0.843,
+          "gates": "",
+          "tokens": "25.1M",
+          "cost": "$20.31",
+          "duration": "3h 9m",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-278.json",
+          "steps": 178
+        }
+      ],
+      "rank": 2
+    },
+    {
       "agent": "Terminus 2",
       "model": "Claude Opus 4.7",
       "n": 5,
@@ -208,7 +311,7 @@
           "steps": 87
         }
       ],
-      "rank": 2
+      "rank": 3
     },
     {
       "agent": "Claude Code",
@@ -294,25 +397,25 @@
           "steps": 102
         },
         {
-          "id": "task-mastodon-clone-e9964b7a-462__o7WveCL",
-          "trial": "task-mastodon-clone-e9964b7a-462__o7WveCL",
+          "id": "mastodon-clone-248",
+          "trial": "mastodon-clone-248",
           "agent": "Claude Code",
           "model": "Claude Opus 4.7",
           "reward": 0.0,
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "18.8M",
           "cost": "$13.33",
           "duration": "32m 38s",
           "startedAt": "2026-05-28 03:28 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-mastodon-clone-e9964b7a-462__o7WveCL.json",
+          "trajectoryUrl": "/trajectories/mastodon-clone-248.json",
           "steps": 149
         }
       ],
-      "rank": 3
+      "rank": 4
     },
     {
       "agent": "Terminus 2",
@@ -415,7 +518,7 @@
           "steps": 21
         }
       ],
-      "rank": 4
+      "rank": 5
     },
     {
       "agent": "Terminus 2",
@@ -508,7 +611,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "13.6M",
           "cost": "$4.63",
           "duration": "3h 18m",
@@ -518,7 +621,92 @@
           "steps": 653
         }
       ],
-      "rank": 5
+      "rank": 6
+    },
+    {
+      "agent": "Gemini CLI",
+      "model": "Gemini 3.5 Flash",
+      "n": 4,
+      "binary": "0 / 4",
+      "partial": 0.195,
+      "best": 0.386,
+      "correctness": 0.0,
+      "ux": 0.389,
+      "trials": [
+        {
+          "id": "mastodon-clone-280",
+          "trial": "mastodon-clone-280",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.386,
+          "correctness": 0.0,
+          "ux": 0.771,
+          "gates": "",
+          "tokens": "7.9M",
+          "cost": "$3.43",
+          "duration": "22m 30s",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-280.json",
+          "steps": 67
+        },
+        {
+          "id": "mastodon-clone-279",
+          "trial": "mastodon-clone-279",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.236,
+          "correctness": 0.0,
+          "ux": 0.471,
+          "gates": "",
+          "tokens": "12.3M",
+          "cost": "$3.96",
+          "duration": "21m 27s",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-279.json",
+          "steps": 93
+        },
+        {
+          "id": "mastodon-clone-281",
+          "trial": "mastodon-clone-281",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.157,
+          "correctness": 0.0,
+          "ux": 0.314,
+          "gates": "",
+          "tokens": "4.0M",
+          "cost": "$2.23",
+          "duration": "21m 18s",
+          "startedAt": "2026-06-03 01:44 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-281.json",
+          "steps": 46
+        },
+        {
+          "id": "mastodon-clone-284",
+          "trial": "mastodon-clone-284",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "12.7M",
+          "cost": "$3.93",
+          "duration": "21m 38s",
+          "startedAt": "2026-06-03 02:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/mastodon-clone-284.json",
+          "steps": 99
+        }
+      ],
+      "rank": 7
     },
     {
       "agent": "Gemini CLI",
@@ -539,7 +727,7 @@
           "partial": 0.4,
           "correctness": 0.0,
           "ux": 0.8,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "3.6M",
           "cost": "$1.59",
           "duration": "26m 42s",
@@ -621,7 +809,7 @@
           "steps": 70
         }
       ],
-      "rank": 6
+      "rank": 8
     },
     {
       "agent": "Terminus 2",
@@ -642,7 +830,7 @@
           "partial": 0.336,
           "correctness": 0.0,
           "ux": 0.671,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "25.8M",
           "cost": "$4.85",
           "duration": "2h 50m",
@@ -678,7 +866,7 @@
           "partial": 0.207,
           "correctness": 0.0,
           "ux": 0.414,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "5.0M",
           "cost": "$1.92",
           "duration": "1h 18m",
@@ -696,7 +884,7 @@
           "partial": 0.086,
           "correctness": 0.0,
           "ux": 0.171,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "15.8M",
           "cost": "$6.11",
           "duration": "2h 9m",
@@ -714,7 +902,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "36.9M",
           "cost": "$14.16",
           "duration": "3h 14m",
@@ -724,7 +912,7 @@
           "steps": 501
         }
       ],
-      "rank": 7
+      "rank": 9
     },
     {
       "agent": "Terminus 2",
@@ -781,7 +969,7 @@
           "partial": 0.057,
           "correctness": 0.0,
           "ux": 0.114,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "771K",
           "cost": "$0.52",
           "duration": "3h 9m",
@@ -799,7 +987,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "27.9M",
           "cost": "$6.17",
           "duration": "3h 10m",
@@ -817,7 +1005,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "136K",
           "cost": "$0.19",
           "duration": "3h 4m",
@@ -827,7 +1015,7 @@
           "steps": 15
         }
       ],
-      "rank": 8
+      "rank": 10
     },
     {
       "agent": "Terminus 2",
@@ -866,7 +1054,7 @@
           "partial": 0.171,
           "correctness": 0.0,
           "ux": 0.343,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "19.8M",
           "cost": "$1.47",
           "duration": "3h 34m",
@@ -902,7 +1090,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "45.3M",
           "cost": "$3.19",
           "duration": "4h 0m",
@@ -912,25 +1100,25 @@
           "steps": 594
         },
         {
-          "id": "task-mastodon-clone-e9964b7a-0_4__jZ4aDa8",
-          "trial": "task-mastodon-clone-e9964b7a-0_4__jZ4aDa8",
+          "id": "mastodon-clone-249",
+          "trial": "mastodon-clone-249",
           "agent": "Terminus 2",
           "model": "MiniMax M2.7",
           "reward": 0.0,
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "2.1M",
           "cost": "$0.31",
           "duration": "13m 55s",
           "startedAt": "2026-05-28 01:19 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/task-mastodon-clone-e9964b7a-0_4__jZ4aDa8.json",
+          "trajectoryUrl": "/trajectories/mastodon-clone-249.json",
           "steps": 90
         }
       ],
-      "rank": 9
+      "rank": 11
     },
     {
       "agent": "Kimi CLI",
@@ -953,7 +1141,7 @@
           "ux": 0.729,
           "gates": "0 / 19",
           "tokens": "6.0M",
-          "cost": "$0.00",
+          "cost": "$4.64",
           "duration": "1h 29m",
           "startedAt": "2026-05-20 07:31 UTC",
           "status": "success",
@@ -969,9 +1157,9 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "3.5M",
-          "cost": "$0.00",
+          "cost": "$2.68",
           "duration": "1h 5m",
           "startedAt": "2026-05-20 07:28 UTC",
           "status": "success",
@@ -987,9 +1175,9 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "372K",
-          "cost": "$0.00",
+          "cost": "$0.35",
           "duration": "17m 19s",
           "startedAt": "2026-05-20 07:28 UTC",
           "status": "success",
@@ -1007,7 +1195,7 @@
           "ux": 0.0,
           "gates": "0 / 19",
           "tokens": "1.9M",
-          "cost": "$0.00",
+          "cost": "$1.59",
           "duration": "30m 41s",
           "startedAt": "2026-05-20 07:28 UTC",
           "status": "success",
@@ -1023,9 +1211,9 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "995K",
-          "cost": "$0.00",
+          "cost": "$0.85",
           "duration": "15m 9s",
           "startedAt": "2026-05-20 07:31 UTC",
           "status": "success",
@@ -1033,7 +1221,7 @@
           "steps": 39
         }
       ],
-      "rank": 10
+      "rank": 12
     },
     {
       "agent": "Terminus 2",
@@ -1136,7 +1324,7 @@
           "steps": 54
         }
       ],
-      "rank": 11
+      "rank": 13
     }
   ]
 }

@@ -50,6 +50,42 @@ def load_metrics_tolerant(path: pathlib.Path) -> dict:
             return {}
 
 
+def load_result_stage_metrics(path: pathlib.Path) -> dict:
+    """Normalize top-level result.json stage metrics into verifier metrics keys.
+
+    Newer product-clone imports may not have verifier/metrics.json in the
+    selected attempt directory, but Oddish's top-level result.json still carries
+    ``stage:correctness`` and ``stage:ux``. The site expects the older
+    verifier/metrics.json shape, where partial_score is the average of those two
+    components.
+    """
+    if not path.exists():
+        return {}
+    try:
+        result = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return {}
+    evals = (result.get("stats") or {}).get("evals") or {}
+    for ev in evals.values():
+        metric_rows = ev.get("metrics") or []
+        if not metric_rows:
+            continue
+        metrics = metric_rows[0] or {}
+        correctness = metrics.get("stage:correctness")
+        ux = metrics.get("stage:ux")
+        if correctness is None and ux is None:
+            continue
+        correctness = float(correctness or 0.0)
+        ux = float(ux or 0.0)
+        return {
+            "partial_score": 0.5 * correctness + 0.5 * ux,
+            "correctness_partial_score": correctness,
+            "ux_partial_score": ux,
+            "reward": metrics.get("reward", 0.0),
+        }
+    return {}
+
+
 def default_logs() -> pathlib.Path:
     """Resolve the ralphbench-logs ROOT at build time (no personal path baked in)."""
     env = os.environ.get("RALPHBENCH_LOGS")
@@ -342,6 +378,8 @@ def build_task(task: str, logs_root: pathlib.Path, out_traj: pathlib.Path) -> No
         metrics = {}
         if metrics_path.exists():
             metrics = load_metrics_tolerant(metrics_path)
+        if "partial_score" not in metrics:
+            metrics.update(load_result_stage_metrics(trial_dir / "result.json"))
 
         # Clean, stable trial id like "rust-c-compiler-210". Prefer a tidy
         # source_trial_name when present; otherwise derive from the manifest

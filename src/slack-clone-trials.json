@@ -417,6 +417,109 @@
       "rank": 4
     },
     {
+      "agent": "Claude Code",
+      "model": "Claude Opus 4.8",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.5,
+      "best": 0.5,
+      "correctness": 0.0,
+      "ux": 1.0,
+      "trials": [
+        {
+          "id": "slack-clone-348",
+          "trial": "slack-clone-348",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.5,
+          "correctness": 0.0,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "14.2M",
+          "cost": "$31.74",
+          "duration": "3h 16m",
+          "startedAt": "2026-06-03 03:14 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-348.json",
+          "steps": 115
+        },
+        {
+          "id": "slack-clone-349",
+          "trial": "slack-clone-349",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.5,
+          "correctness": 0.0,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "8.7M",
+          "cost": "$22.84",
+          "duration": "36m 21s",
+          "startedAt": "2026-06-03 04:02 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-349.json",
+          "steps": 84
+        },
+        {
+          "id": "slack-clone-350",
+          "trial": "slack-clone-350",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.5,
+          "correctness": 0.0,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "10.1M",
+          "cost": "$25.37",
+          "duration": "36m 35s",
+          "startedAt": "2026-06-03 04:02 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-350.json",
+          "steps": 86
+        },
+        {
+          "id": "slack-clone-354",
+          "trial": "slack-clone-354",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.5,
+          "correctness": 0.0,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "8.4M",
+          "cost": "$21.54",
+          "duration": "38m 35s",
+          "startedAt": "2026-06-03 04:50 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-354.json",
+          "steps": 76
+        },
+        {
+          "id": "slack-clone-359",
+          "trial": "slack-clone-359",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.5,
+          "correctness": 0.0,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "13.7M",
+          "cost": "$32.10",
+          "duration": "39m 41s",
+          "startedAt": "2026-06-03 17:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-359.json",
+          "steps": 111
+        }
+      ],
+      "rank": 5
+    },
+    {
       "agent": "Terminus 2",
       "model": "DeepSeek V4 Pro",
       "n": 5,
@@ -518,7 +621,7 @@
           "steps": 106
         }
       ],
-      "rank": 5
+      "rank": 6
     },
     {
       "agent": "Terminus 2",
@@ -621,7 +724,7 @@
           "steps": 159
         }
       ],
-      "rank": 6
+      "rank": 7
     },
     {
       "agent": "Terminus 2",
@@ -678,7 +781,7 @@
           "partial": 0.266,
           "correctness": 0.0,
           "ux": 0.531,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "685K",
           "cost": "$1.36",
           "duration": "31m 1s",
@@ -696,7 +799,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "595K",
           "cost": "$1.19",
           "duration": "15m 3s",
@@ -714,7 +817,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "415K",
           "cost": "$1.26",
           "duration": "20m 52s",
@@ -724,7 +827,7 @@
           "steps": 28
         }
       ],
-      "rank": 7
+      "rank": 8
     },
     {
       "agent": "Gemini CLI",
@@ -799,7 +902,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "6.1M",
           "cost": "$2.31",
           "duration": "27m 18s",
@@ -827,7 +930,110 @@
           "steps": 45
         }
       ],
-      "rank": 8
+      "rank": 9
+    },
+    {
+      "agent": "Gemini CLI",
+      "model": "Gemini 3.5 Flash",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.2,
+      "best": 0.5,
+      "correctness": 0.0,
+      "ux": 0.4,
+      "trials": [
+        {
+          "id": "slack-clone-339",
+          "trial": "slack-clone-339",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.5,
+          "correctness": 0.0,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "3.3M",
+          "cost": "$1.96",
+          "duration": "20m 4s",
+          "startedAt": "2026-06-03 00:26 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-339.json",
+          "steps": 33
+        },
+        {
+          "id": "slack-clone-344",
+          "trial": "slack-clone-344",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.5,
+          "correctness": 0.0,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "882K",
+          "cost": "$1.43",
+          "duration": "15m 24s",
+          "startedAt": "2026-06-03 02:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-344.json",
+          "steps": 17
+        },
+        {
+          "id": "slack-clone-340",
+          "trial": "slack-clone-340",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "153K",
+          "cost": "$0.34",
+          "duration": "3m 30s",
+          "startedAt": "2026-06-03 01:44 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-340.json",
+          "steps": 7
+        },
+        {
+          "id": "slack-clone-343",
+          "trial": "slack-clone-343",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "142K",
+          "cost": "$0.29",
+          "duration": "3m 40s",
+          "startedAt": "2026-06-03 02:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-343.json",
+          "steps": 7
+        },
+        {
+          "id": "slack-clone-345",
+          "trial": "slack-clone-345",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "207K",
+          "cost": "$0.38",
+          "duration": "4m 44s",
+          "startedAt": "2026-06-03 02:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/slack-clone-345.json",
+          "steps": 9
+        }
+      ],
+      "rank": 10
     },
     {
       "agent": "Kimi CLI",
@@ -850,7 +1056,7 @@
           "ux": 0.578,
           "gates": "0 / 5",
           "tokens": "5.3M",
-          "cost": "$0.00",
+          "cost": "$4.47",
           "duration": "1h 23m",
           "startedAt": "2026-05-19 23:54 UTC",
           "status": "success",
@@ -866,9 +1072,9 @@
           "partial": 0.25,
           "correctness": 0.0,
           "ux": 0.5,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "515K",
-          "cost": "$0.00",
+          "cost": "$0.66",
           "duration": "1h 34m",
           "startedAt": "2026-05-19 05:52 UTC",
           "status": "success",
@@ -884,9 +1090,9 @@
           "partial": 0.016,
           "correctness": 0.0,
           "ux": 0.031,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "1.8M",
-          "cost": "$0.00",
+          "cost": "$1.60",
           "duration": "1h 37m",
           "startedAt": "2026-05-19 05:52 UTC",
           "status": "success",
@@ -902,9 +1108,9 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "57K",
-          "cost": "$0.00",
+          "cost": "$0.08",
           "duration": "21m 32s",
           "startedAt": "2026-05-19 05:52 UTC",
           "status": "success",
@@ -920,9 +1126,9 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "11.0M",
-          "cost": "$0.00",
+          "cost": "$8.83",
           "duration": "2h 44m",
           "startedAt": "2026-05-19 05:52 UTC",
           "status": "success",
@@ -930,7 +1136,7 @@
           "steps": 217
         }
       ],
-      "rank": 9
+      "rank": 11
     },
     {
       "agent": "Terminus 2",
@@ -987,7 +1193,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "7.3M",
           "cost": "$2.70",
           "duration": "2h 20m",
@@ -1033,7 +1239,7 @@
           "steps": 963
         }
       ],
-      "rank": 10
+      "rank": 12
     },
     {
       "agent": "Terminus 2",
@@ -1054,7 +1260,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "15.9M",
           "cost": "$10.56",
           "duration": "3h 25m",
@@ -1072,7 +1278,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "46.0M",
           "cost": "$54.02",
           "duration": "3h 25m",
@@ -1108,7 +1314,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "11.5M",
           "cost": "$5.91",
           "duration": "3h 4m",
@@ -1126,7 +1332,7 @@
           "partial": 0.0,
           "correctness": 0.0,
           "ux": 0.0,
-          "gates": "0 / 5",
+          "gates": "",
           "tokens": "22.0M",
           "cost": "$5.41",
           "duration": "3h 7m",
@@ -1136,7 +1342,7 @@
           "steps": 491
         }
       ],
-      "rank": 11
+      "rank": 13
     }
   ]
 }
