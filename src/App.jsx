@@ -1839,7 +1839,7 @@ function Contributors() {
             {CORE_CONTRIBUTORS.map((name) => (
               <div className="person" key={name}>
                 <ContributorName name={name} />
-                <div className="pa">{name === "Rishi Desai" ? "Project lead, Abundant" : "Abundant"}</div>
+                <div className="pa">Abundant</div>
               </div>
             ))}
           </div>
