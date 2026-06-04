@@ -6,7 +6,6 @@ import {
   CAT_LABEL,
   HEADLINE,
   LEADERBOARD,
-  RH_BY_MODEL,
   TRIAL_BY_ID,
   TASK_DETAILS,
   TASK_INSPIRATION,
@@ -834,7 +833,7 @@ function BenchmarkBullets() {
     <section id="benchmark-design" className="benchmark-design">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 02 / design</div>
+          <div className="section-no"><span className="dot">●</span> 04 / design</div>
           <h2 className="section-title">What makes SWE-Marathon different?</h2>
         </div>
         <figure className="horizon-figure">
@@ -886,7 +885,7 @@ function Tasks() {
     <section id="tasks">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 03 / tasks</div>
+          <div className="section-no"><span className="dot">●</span> 02 / tasks</div>
           <h2 className="section-title">20 marathons. 4 task families.</h2>
         </div>
 
@@ -1740,7 +1739,7 @@ function Findings() {
     <section id="findings">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 04 / failure modes</div>
+          <div className="section-no"><span className="dot">●</span> 05 / failure modes</div>
           <h2 className="section-title">Selected failure modes.</h2>
         </div>
 
@@ -1829,12 +1828,12 @@ function Contributors() {
     <section id="contributors">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 05 / contributors</div>
-          <h2 className="section-title">Built with help from the evals community.</h2>
+          <div className="section-no"><span className="dot">●</span> 06 / contributors</div>
+          <h2 className="section-title">Community Driven</h2>
         </div>
 
         <div className="team-block">
-          <div className="team-kicker">Core contributors</div>
+          <div className="team-kicker">Core Team</div>
           <div className="team-grid core-team-grid">
             {CORE_CONTRIBUTORS.map((name) => (
               <div className="person" key={name}>
@@ -1878,8 +1877,8 @@ function Citation() {
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 06 / paper</div>
-          <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
+          <div className="section-no"><span className="dot">●</span> 07 / paper</div>
+          <h2 className="section-title">Cite SWE-Marathon</h2>
         </div>
         <div className="citation-block">
           <button className="copy-btn" onClick={() => {
@@ -1922,6 +1921,7 @@ function Footer() {
             <div className="foot-list">
               <a href="#leaderboard">Leaderboard</a>
               <a href="#tasks">Tasks</a>
+              <a href="#analysis">Analysis</a>
               <a href="#findings">Observations</a>
               <a href="#contributors">Contributors</a>
             </div>
@@ -1978,11 +1978,11 @@ function App() {
     <>
       <Hero />
       <Leaderboard />
-      <BenchmarkBullets />
+      <Tasks />
       <Suspense fallback={<div className="analysis-loading">Loading analysis...</div>}>
         <Analysis />
       </Suspense>
-      <Tasks />
+      <BenchmarkBullets />
       <Findings />
       <Contributors />
       <Citation />

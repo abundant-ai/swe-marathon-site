@@ -1,131 +1,124 @@
-/* SWE-Marathon analysis section — time-horizon scatter, cost / pass@1 Pareto,
-   family heatmap, task distribution. All numbers come from src/data.js
-   which is derived from the canonical 1,100-trial sweep. */
+/* SWE-Marathon analysis section — cost / pass@1 Pareto, compute-horizon
+   scatter, and reward-hacking incidence. All numbers come from src/data.js. */
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { BarChart, HeatmapChart, LineChart, PieChart, ScatterChart } from "echarts/charts";
+import React, { useEffect, useRef, useState } from "react";
+import { BarChart, LineChart, ScatterChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
   TitleComponent,
   TooltipComponent,
-  VisualMapComponent,
 } from "echarts/components";
 import { init, use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import {
-  CAT_LABEL,
-  HEADLINE,
-  LEADERBOARD,
-  MODEL_COLORS,
-  PER_TASK_PASS1,
-  TASKS,
-} from "./data.js";
+import { LEADERBOARD, MODEL_COLORS } from "./data.js";
 
 use([
   BarChart,
   CanvasRenderer,
   GridComponent,
-  HeatmapChart,
   LegendComponent,
   LineChart,
-  PieChart,
   ScatterChart,
   TitleComponent,
   TooltipComponent,
-  VisualMapComponent,
 ]);
 
-/* ---------- TASKS: keyed by id, with paper-stated expert hours ---------- */
-const ANALYSIS_TASKS = TASKS.map((t) => ({
-  id: t.id,
-  cat: t.cat,
-  title: t.title,
-  humanHours: t.humanH,
-  agentHours: t.agentH,
-  pass1: t.pass1,
-}));
+const agentLabel = (scaffold) => scaffold.replace(/\s+v\d[\d.]*$/i, "");
 
-const FAM_LABEL = CAT_LABEL;
-const FAM_ORDER = ["library", "clone", "ml", "algo"];
-
-/* "Model / Agent" label with version suffixes stripped, so the two
+/* "Model / Agent" label with agent version suffixes stripped, so the two
    same-model configs (e.g. GPT-5.5) are distinguishable in plots. */
-const cfgLabel = (m) => `${m.name} / ${m.scaffold.replace(/\s+v\d[\d.]*$/i, "")}`;
+const cfgLabel = (m) => `${m.name} / ${agentLabel(m.scaffold)}`;
+const pointLabel = (m) => `${m.name}\n${agentLabel(m.scaffold)}`;
 
-/* Drop in a per-(agent, task) uncalibrated partial-score grid here —
-   shape { [agentId]: { [taskId]: 0..100 } } — to switch the task heatmap
-   to partial scores. Until then it falls back to per-task pass@1. */
-const PER_TASK_PARTIAL = null;
+const LABEL_OFFSETS = {
+  horizon: {
+    "claude48-cc": [10, -4],
+    "gpt55-codex": [10, -14],
+    "claude47-cc": [10, 18],
+    "gpt55-term": [10, 16],
+    "gemini31-term": [12, -28],
+    "gemini31-cli": [12, -4],
+    "claude47-term": [12, 22],
+    "gemini35-cli": [12, 24],
+    "deepseek-term": [12, 38],
+    "glm-term": [12, 0],
+    "kimi-term": [10, 24],
+    "minimax-term": [10, -18],
+    "kimi-cli": [10, 8],
+  },
+  pareto: {
+    "claude48-cc": [10, -4],
+    "gpt55-codex": [10, -14],
+    "claude47-cc": [10, 18],
+    "gpt55-term": [10, 18],
+    "gemini31-term": [12, -34],
+    "gemini31-cli": [12, -6],
+    "claude47-term": [12, 22],
+    "gemini35-cli": [12, 18],
+    "deepseek-term": [12, 34],
+    "glm-term": [12, 0],
+    "kimi-term": [10, 28],
+    "minimax-term": [10, -20],
+    "kimi-cli": [10, 10],
+  },
+};
 
-/* ---------- MODELS: 11 real configs from the leaderboard ---------- */
+const labelOffset = (chart, id) => LABEL_OFFSETS[chart]?.[id] || [8, 0];
+
+const LOG_METRIC_OVERRIDES = {
+  "claude48-cc": { n: 96, costPerTrial: 37.57, avgTokensM: 49.65 },
+  "gpt55-codex": { n: 101, costPerTrial: 11.38, avgTokensM: 10.74 },
+  "claude47-cc": { n: 90, costPerTrial: 35.88, avgTokensM: 50.98 },
+  "gpt55-term": { n: 100, costPerTrial: 46.11, avgTokensM: 51.61 },
+  "gemini31-term": { n: 100, costPerTrial: 3.65, avgTokensM: 5.24 },
+  "gemini31-cli": { n: 100, costPerTrial: 5.41, avgTokensM: 14.20 },
+  "claude47-term": { n: 100, costPerTrial: 18.87, avgTokensM: 30.13 },
+  "gemini35-cli": { n: 99, costPerTrial: 6.55, avgTokensM: 19.70 },
+  "deepseek-term": { n: 99, costPerTrial: 11.19, avgTokensM: 36.56 },
+  "glm-term": { n: 99, costPerTrial: 44.55, avgTokensM: 43.94 },
+  "kimi-term": { n: 100, costPerTrial: 5.41, avgTokensM: 19.19 },
+  "minimax-term": { n: 100, costPerTrial: 1.63, avgTokensM: 21.03 },
+  "kimi-cli": { n: 100, costPerTrial: 2.64, avgTokensM: 6.60 },
+};
+
+/* ---------- MODELS: visible configs with log-derived Pareto metrics ---------- */
 const ANALYSIS_MODELS = LEADERBOARD
   .filter((r) => !r.ref)
-  .map((r) => ({
-    id: r.id,
-    name: r.name,
-    scaffold: r.scaffold,
-    color: MODEL_COLORS[r.id] || "#888",
-    pass1: r.pass1,
-    costPerTrial: r.costAvg,
-    avgTokensM: r.tokAvg,
-    perCat: r.perCat,
-  }));
-
-/* Logistic fit to per-task pass-rate vs. human-hours: we fit a single
-   slope per model on points {(humanHours_t, pass1_t)} and report the
-   inferred 50%-horizon. Pure descriptive — used only for the hover
-   curve and the diamond marker. */
-function fitLogistic(points) {
-  // points = [{x: humanHours, y: rate∈[0,1]}, ...]
-  // Search over (logHorizon, slope) by coarse grid + refine.
-  const validPts = points.filter((p) => p.x > 0 && Number.isFinite(p.y));
-  if (validPts.length === 0) return { horizon: 100, slope: 1.2 };
-  const sigm = (x) => 1 / (1 + Math.exp(x));
-  const loss = (logH, slope) =>
-    validPts.reduce((s, p) => {
-      const yhat = sigm(slope * (Math.log(p.x) - logH));
-      return s + (yhat - p.y) ** 2;
-    }, 0);
-  let best = { logH: Math.log(150), slope: 1.2, l: Infinity };
-  for (const slope of [0.6, 0.8, 1.0, 1.2, 1.5, 2.0, 2.5]) {
-    for (let logH = Math.log(20); logH <= Math.log(800); logH += 0.15) {
-      const l = loss(logH, slope);
-      if (l < best.l) best = { logH, slope, l };
-    }
-  }
-  return { horizon: Math.exp(best.logH), slope: best.slope };
-}
-
-/* For each model, build its (task, pass1) point cloud and fit. */
-const FITS = Object.fromEntries(
-  ANALYSIS_MODELS.map((m) => {
-    const points = ANALYSIS_TASKS.map((t) => ({
-      x: t.humanHours,
-      // PER_TASK_PASS1 keys use "post-train-ifeval"; data.js TASKS too — match.
-      y: (PER_TASK_PASS1[m.id]?.[t.id] ?? 0) / 100,
-    }));
-    return [m.id, fitLogistic(points)];
-  })
-);
-
-/* TRIALS-equivalent: pre-aggregated per (model, task) cell. We don't have
-   trial-level cost in the manifest aggregation, so cost is per-config
-   averaged from the leaderboard and shared across that config's trials. */
-const TRIALS = ANALYSIS_MODELS.flatMap((m) =>
-  ANALYSIS_TASKS.map((t) => {
-    const rate = (PER_TASK_PASS1[m.id]?.[t.id] ?? 0) / 100;
+  .map((r) => {
+    const logMetrics = LOG_METRIC_OVERRIDES[r.id];
     return {
-      model: m.id,
-      task: t.id,
-      cat: t.cat,
-      humanHours: t.humanHours,
-      agentHours: t.agentHours,
-      rate,                         // mean@5 for this (model, task)
-      cost: m.costPerTrial,         // per-trial avg cost for this config
-      tokensM: m.avgTokensM,
+      id: r.id,
+      name: r.name,
+      scaffold: r.scaffold,
+      color: MODEL_COLORS[r.id] || "#888",
+      pass1: r.pass1,
+      costPerTrial: logMetrics?.costPerTrial ?? r.costAvg,
+      avgTokensM: logMetrics?.avgTokensM ?? r.tokAvg,
+      nLoggedTrials: logMetrics?.n,
+      perCat: r.perCat,
     };
-  })
+  });
+
+const RH_CLASSIFICATIONS = [
+  { name: "GPT-5.5", harness: "Terminus 2 + Codex", n: 10, hacked: 4, success: 0, criteria: { "Instruct model substitution": 4, "Dataset provenance": 1 } },
+  { name: "Kimi K2.6", harness: "Kimi CLI + Terminus 2", n: 10, hacked: 4, success: 0, criteria: { "Test data contamination": 4 } },
+  { name: "GLM 5.1", harness: "Terminus 2", n: 3, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
+  { name: "Claude Opus 4.8", harness: "Claude Code", n: 5, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
+  { name: "Gemini 3.5 Flash", harness: "Gemini CLI", n: 5, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
+  { name: "Gemini 3.1 Pro", harness: "Gemini CLI + Terminus 2", n: 10, hacked: 1, success: 0, criteria: { "Instruct model substitution": 1, "Dataset provenance": 1 } },
+  { name: "Claude Opus 4.7", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
+  { name: "DeepSeek V4 Pro", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
+  { name: "MiniMax M2.7", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
+];
+
+const RH_CLASSIFIED_TOTALS = RH_CLASSIFICATIONS.reduce(
+  (acc, row) => ({
+    n: acc.n + row.n,
+    hacked: acc.hacked + row.hacked,
+    success: acc.success + row.success,
+  }),
+  { n: 0, hacked: 0, success: 0 }
 );
 
 /* ---------- ECharts theme tokens (sync w/ paper aesthetic) ---------- */
@@ -209,11 +202,12 @@ function ComputeHorizonChart() {
       value: [m.avgTokensM, m.pass1],
       m,
       itemStyle: { color: m.color, opacity: 0.95, borderColor: "#18181B", borderWidth: 1 },
+      label: { show: true, offset: labelOffset("horizon", m.id) },
     }));
 
     return {
       backgroundColor: "transparent",
-      grid: { left: 60, right: 165, top: 30, bottom: 56 },
+      grid: { left: 62, right: 230, top: 48, bottom: 64 },
       xAxis: {
         ...AXIS_COMMON,
         type: "log",
@@ -228,7 +222,7 @@ function ComputeHorizonChart() {
       yAxis: {
         ...AXIS_COMMON,
         type: "value",
-        name: "Pass@1 (%)",
+        name: "Resolution rate (%)",
         nameLocation: "middle",
         nameGap: 40,
         min: 0,
@@ -243,9 +237,10 @@ function ComputeHorizonChart() {
           const m = p.data.m;
           return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${m.name}</div>
                   <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${m.scaffold}</div>
-                  <div>Pass@1: <b>${m.pass1.toFixed(1)}%</b></div>
+                  <div>Resolution rate: <b>${m.pass1.toFixed(1)}%</b></div>
                   <div>Tokens / trial: <b>${m.avgTokensM.toFixed(1)}M</b></div>
-                  <div>Cost / trial: <b>${m.costPerTrial != null ? "$" + m.costPerTrial.toFixed(2) : "—"}</b></div>`;
+                  <div>Cost / trial: <b>${m.costPerTrial != null ? "$" + m.costPerTrial.toFixed(2) : "—"}</b></div>
+                  <div>Logged trials: <b>${m.nLoggedTrials ?? "—"}</b></div>`;
         },
       },
       legend: { show: false },
@@ -258,17 +253,32 @@ function ComputeHorizonChart() {
           data: scatterData,
           symbolSize: 17,
           z: 5,
-          emphasis: { scale: 1.3 },
           label: {
             show: true,
             position: "right",
-            formatter: (p) => cfgLabel(p.data.m),
+            formatter: (p) => pointLabel(p.data.m),
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 9,
+            lineHeight: 12,
             color: PAPER.ink2,
-            distance: 5,
+            distance: 6,
+            backgroundColor: "rgba(250,250,250,0.78)",
+            padding: [1, 3],
           },
-          labelLayout: { moveOverlap: "shiftY", hideOverlap: false },
+          emphasis: {
+            scale: 1.3,
+            label: {
+              show: true,
+              formatter: (p) => cfgLabel(p.data.m),
+              fontSize: 10,
+              color: PAPER.ink,
+              backgroundColor: "#FAFAFA",
+              borderColor: PAPER.rule,
+              borderWidth: 1,
+              padding: [2, 4],
+            },
+          },
+          labelLayout: { hideOverlap: false },
           markLine: {
             silent: true,
             symbol: "none",
@@ -292,13 +302,9 @@ function ComputeHorizonChart() {
       <div className="anal-card-head">
         <div>
           <div className="anal-card-no">FIG · COMPUTE HORIZON</div>
-          <h3 className="anal-card-title">More tokens don't buy more pass@1.</h3>
         </div>
       </div>
       <div ref={ref} className="anal-chart" style={{ height: 420 }}></div>
-      <div className="anal-foot">
-        Tokens are mean (input + output) per trial; pass@1 is the canonical sweep (n = 100 trials per config across the 20 tasks).
-      </div>
     </div>
   );
 }
@@ -323,11 +329,12 @@ function ParetoChart() {
       value: [a.x, a.rate * 100],
       a,
       itemStyle: { color: a.m.color, opacity: 0.95, borderColor: "#18181B", borderWidth: 1 },
+      label: { show: true, offset: labelOffset("pareto", a.m.id) },
     }));
 
     return {
       backgroundColor: "transparent",
-      grid: { left: 60, right: 165, top: 30, bottom: 56 },
+      grid: { left: 62, right: 230, top: 48, bottom: 64 },
       xAxis: {
         ...AXIS_COMMON,
         type: "value",
@@ -342,7 +349,7 @@ function ParetoChart() {
       yAxis: {
         ...AXIS_COMMON,
         type: "value",
-        name: "Pass@1 (%)",
+        name: "Resolution rate (%)",
         nameLocation: "middle",
         nameGap: 44,
         axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "%" },
@@ -355,9 +362,10 @@ function ParetoChart() {
           const a = p.data.a;
           return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${a.m.name}</div>
                   <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${a.m.scaffold}</div>
-                  <div>Pass@1: <b>${a.m.pass1.toFixed(1)}%</b></div>
+                  <div>Resolution rate: <b>${a.m.pass1.toFixed(1)}%</b></div>
                   <div>Cost / trial: <b>${a.m.costPerTrial != null ? "$" + a.m.costPerTrial.toFixed(2) : "—"}</b></div>
-                  <div>Tokens / trial: <b>${a.m.avgTokensM.toFixed(1)}M</b></div>`;
+                  <div>Tokens / trial: <b>${a.m.avgTokensM.toFixed(1)}M</b></div>
+                  <div>Logged trials: <b>${a.m.nLoggedTrials ?? "—"}</b></div>`;
         },
       },
       animation: false,
@@ -382,13 +390,29 @@ function ParetoChart() {
           label: {
             show: true,
             position: "right",
-            formatter: (p) => cfgLabel(p.data.a.m),
+            formatter: (p) => pointLabel(p.data.a.m),
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 9,
+            lineHeight: 12,
             color: PAPER.ink2,
-            distance: 4,
+            distance: 6,
+            backgroundColor: "rgba(250,250,250,0.78)",
+            padding: [1, 3],
           },
-          labelLayout: { moveOverlap: "shiftY", hideOverlap: false },
+          emphasis: {
+            scale: 1.3,
+            label: {
+              show: true,
+              formatter: (p) => cfgLabel(p.data.a.m),
+              fontSize: 10,
+              color: PAPER.ink,
+              backgroundColor: "#FAFAFA",
+              borderColor: PAPER.rule,
+              borderWidth: 1,
+              padding: [2, 4],
+            },
+          },
+          labelLayout: { hideOverlap: false },
         },
       ],
     };
@@ -399,7 +423,6 @@ function ParetoChart() {
       <div className="anal-card-head">
         <div>
           <div className="anal-card-no">FIG · PARETO</div>
-          <h3 className="anal-card-title">Cost-effective configs are not the highest-scoring configs.</h3>
         </div>
         <div className="anal-controls">
           <button className={"pill " + (xAxis === "cost" ? "active" : "")} onClick={() => setXAxis("cost")}>Cost ($)</button>
@@ -407,245 +430,81 @@ function ParetoChart() {
         </div>
       </div>
       <div ref={ref} className="anal-chart" style={{ height: 380 }}></div>
-      <div className="anal-foot">
-        Token spend is mean (input + output) per trial; cost is mean USD per trial from manifest.cost_usd.
-      </div>
     </div>
   );
 }
 
 /* ============================================================
-   PLOT 3 — Task heatmap (20 tasks × agents), uncalibrated partial scores.
-   Uses a per-(agent, task) partial-score grid when available; falls back
-   to PER_TASK_PASS1 otherwise. Values are 0–100.
+   PLOT 3 — Reward-hacking incidence by model family
    ============================================================ */
-function TaskHeatmap() {
-  const usingPartial = !!PER_TASK_PARTIAL;
+function RewardHackingChart() {
   const ref = useEcharts(() => {
-    const grid = PER_TASK_PARTIAL || PER_TASK_PASS1;
-    const data = [];
-    ANALYSIS_MODELS.forEach((m, mi) => {
-      ANALYSIS_TASKS.forEach((t, ti) => {
-        const v = grid[m.id]?.[t.id] ?? 0;
-        data.push({ value: [ti, mi, +v.toFixed(0)], m, t });
-      });
-    });
+    const rows = RH_CLASSIFICATIONS
+      .map((row) => ({
+        ...row,
+        hackedPct: row.hacked / row.n * 100,
+        successPct: row.success / row.n * 100,
+      }))
+      .sort((a, b) => b.hackedPct - a.hackedPct);
     return {
       backgroundColor: "transparent",
-      grid: { left: 230, right: 20, top: 40, bottom: 12 },
+      grid: { left: 190, right: 52, top: 42, bottom: 48 },
       xAxis: {
-        type: "category",
-        data: ANALYSIS_TASKS.map((_, i) => "T" + String(i + 1).padStart(2, "0")),
-        position: "top",
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitArea: { show: false },
-        axisLabel: {
-          color: PAPER.ink3,
-          fontFamily: "JetBrains Mono, monospace",
-          fontSize: 10,
-          interval: 0,
-        },
+        ...AXIS_COMMON,
+        type: "value",
+        name: "Share of trials (%)",
+        nameLocation: "middle",
+        nameGap: 34,
+        max: Math.ceil(Math.max(...rows.map((r) => r.hackedPct)) / 10) * 10,
+        axisLabel: { ...AXIS_COMMON.axisLabel, formatter: (v) => v + "%" },
       },
       yAxis: {
         type: "category",
-        data: ANALYSIS_MODELS.map(cfgLabel),
         inverse: true,
+        data: rows.map((r) => `${r.name} / ${r.harness}`),
         axisLine: { show: false },
         axisTick: { show: false },
-        splitArea: { show: false },
-        axisLabel: { color: PAPER.ink2, fontFamily: "Inter, sans-serif", fontSize: 11, align: "right" },
+        axisLabel: { color: PAPER.ink2, fontFamily: "Inter, sans-serif", fontSize: 11 },
+      },
+      legend: {
+        top: 0,
+        right: 0,
+        itemWidth: 10,
+        itemHeight: 10,
+        textStyle: { color: PAPER.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 10 },
       },
       tooltip: {
         ...TOOLTIP_COMMON,
-        trigger: "item",
-        formatter: (p) => {
-          const { m, t } = p.data;
-          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${cfgLabel(m)}</div>
-                  <div style="font-weight:600;margin-bottom:2px;">${t.title}</div>
-                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:4px;">${FAM_LABEL[t.cat]}</div>
-                  <div>${usingPartial ? "Partial score" : "Pass@1"}: <b>${p.value[2]}${usingPartial ? " / 100" : "%"}</b></div>`;
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        formatter: (params) => {
+          const row = rows[params[0].dataIndex];
+          const criteria = Object.entries(row.criteria)
+            .map(([name, count]) => `${name}: <b>${count}</b>`)
+            .join("<br />") || "No failed reward-hacking criteria";
+          return `<div style="font-family:JetBrains Mono;font-size:11px;color:${PAPER.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${row.name}</div>
+                  <div style="color:${PAPER.ink2};font-size:11px;margin-bottom:6px;">${row.harness}</div>
+                  <div>Trials: <b>${row.n}</b></div>
+                  <div>Classifier-positive: <b>${row.hacked}</b> (${row.hackedPct.toFixed(1)}%)</div>
+                  <div>Earned reward after hacking: <b>${row.success}</b> (${row.successPct.toFixed(1)}%)</div>
+                  <div style="margin-top:6px;color:${PAPER.ink2};">${criteria}</div>`;
         },
-      },
-      visualMap: {
-        min: 0, max: 100,
-        calculable: false,
-        show: false,
-        inRange: { color: ["#F4F4F5", "#E8F5E9", "#A5D6A7", "#4CAF50", "#2d7a4f"] },
       },
       animation: false,
-      series: [{
-        name: "Partial score",
-        type: "heatmap",
-        data,
-        label: {
-          show: true,
-          color: PAPER.ink,
-          fontFamily: "JetBrains Mono, monospace",
-          fontSize: 10,
-          formatter: (p) => p.value[2] > 0 ? p.value[2].toFixed(0) : "·",
-        },
-        itemStyle: { borderColor: "#FAFAFA", borderWidth: 2 },
-        emphasis: { itemStyle: { borderColor: PAPER.ink, borderWidth: 1.5 } },
-      }],
-    };
-  }, []);
-
-  return (
-    <div className="anal-card">
-      <div className="anal-card-head">
-        <div>
-          <div className="anal-card-no">FIG · HEATMAP</div>
-          <h3 className="anal-card-title">Every agent against all 20 tasks.</h3>
-        </div>
-      </div>
-      <div ref={ref} className="anal-chart" style={{ height: 360 }}></div>
-      <div className="anal-task-key">
-        {ANALYSIS_TASKS.map((t, i) => (
-          <span key={t.id} className="anal-task-key-item">
-            <b>T{String(i + 1).padStart(2, "0")}</b>
-            <span>{t.title}</span>
-          </span>
-        ))}
-      </div>
-      <div className="anal-foot">
-        {usingPartial
-          ? "Uncalibrated partial scores (0–100), mean over the 5 canonical trials per (agent, task). Tasks ordered by family (T01–T20)."
-          : "Per-task pass@1 (%), mean@5 across the 5 canonical trials per (agent, task). Tasks ordered by family (T01–T20)."}
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   PLOT 4 — Task distribution (donut: family) + bar (duration buckets)
-   ============================================================ */
-function TaskDistribution() {
-  const ref = useEcharts(() => {
-    const famCount = {};
-    FAM_ORDER.forEach((f) => (famCount[f] = 0));
-    ANALYSIS_TASKS.forEach((t) => famCount[t.cat]++);
-
-    // Human-hour buckets matching the paper's 40–400h range
-    const buckets = [
-      { label: "40–60h",  lo: 0,   hi: 60 },
-      { label: "60–100h", lo: 60,  hi: 100 },
-      { label: "100–200h", lo: 100, hi: 200 },
-      { label: "200h+",   lo: 200, hi: 9999 },
-    ];
-    const bucketCount = buckets.map((b) => ({
-      label: b.label,
-      n: ANALYSIS_TASKS.filter((t) => t.humanHours >= b.lo && t.humanHours < b.hi).length,
-    }));
-
-    const famColor = {
-      library: "#a86237", clone: "#5a7d4f", ml: "#5a6cb8", algo: "#9a7daa",
-    };
-    const famCountByName = Object.fromEntries(
-      FAM_ORDER.map((f) => [FAM_LABEL[f], famCount[f]])
-    );
-
-    return {
-      baseOption: {
-        backgroundColor: "transparent",
-        tooltip: { ...TOOLTIP_COMMON, trigger: "item" },
-        title: [
-          { text: "By family", left: "24%", top: 8, textAlign: "center",
-            textStyle: { color: PAPER.ink3, fontFamily: "JetBrains Mono, monospace", fontSize: 11, fontWeight: 400 } },
-          { text: "By human-expert estimate", left: "72%", top: 8, textAlign: "center",
-            textStyle: { color: PAPER.ink3, fontFamily: "JetBrains Mono, monospace", fontSize: 11, fontWeight: 400 } },
-        ],
-        legend: {
-          selectedMode: false,
-          data: FAM_ORDER.map((f) => FAM_LABEL[f]),
-          orient: "vertical",
-          left: "3%",
-          bottom: 8,
-          itemWidth: 10,
-          itemHeight: 10,
-          itemGap: 7,
-          textStyle: { color: PAPER.ink2, fontFamily: "JetBrains Mono, monospace", fontSize: 10 },
-          formatter: (name) => `${name} · ${famCountByName[name] ?? 0}`,
-        },
-        grid: { left: "55%", right: 24, top: 58, bottom: 44 },
-        xAxis: {
-          ...AXIS_COMMON,
-          type: "category",
-          gridIndex: 0,
-          data: bucketCount.map((b) => b.label),
-        },
-        yAxis: {
-          ...AXIS_COMMON,
-          type: "value",
-          gridIndex: 0,
-          name: "tasks",
-          nameLocation: "middle",
-          nameGap: 30,
-          max: 10,
-          interval: 2,
-        },
-        animation: false,
-        series: [
-          {
-            name: "By family",
-            type: "pie",
-            radius: ["34%", "56%"],
-            center: ["24%", "43%"],
-            label: { show: false },
-            labelLine: { show: false },
-            data: FAM_ORDER.map((f) => ({
-              value: famCount[f], name: FAM_LABEL[f], fam: f,
-              itemStyle: { color: famColor[f], borderColor: "#FAFAFA", borderWidth: 2 },
-            })),
-            emphasis: { itemStyle: { borderColor: PAPER.ink } },
-          },
-          {
-            name: "By duration",
-            type: "bar",
-            xAxisIndex: 0,
-            yAxisIndex: 0,
-            data: bucketCount.map((b) => ({
-              value: b.n,
-              itemStyle: { color: PAPER.accent, opacity: 0.85, borderColor: "#18181B", borderWidth: 1 },
-            })),
-            barWidth: "50%",
-            label: {
-              show: true,
-              position: "top",
-              color: PAPER.ink2,
-              fontFamily: "JetBrains Mono, monospace",
-              fontSize: 11,
-            },
-          },
-        ],
-      },
-      media: [
+      series: [
         {
-          query: { maxWidth: 640 },
-          option: {
-            title: [
-              { left: "50%", top: 6 },
-              { left: "50%", top: 360 },
-            ],
-            legend: {
-              orient: "vertical",
-              left: "14%",
-              right: "auto",
-              top: 238,
-              bottom: "auto",
-              itemGap: 7,
-            },
-            grid: { left: 48, right: 16, top: 405, bottom: 48 },
-            yAxis: { nameGap: 28 },
-            series: [
-              {
-                radius: ["22%", "36%"],
-                center: ["50%", "25%"],
-              },
-              {
-                barWidth: "48%",
-              },
-            ],
+          name: "Reward-hacking classification",
+          type: "bar",
+          data: rows.map((r) => +r.hackedPct.toFixed(1)),
+          barWidth: 18,
+          itemStyle: { color: "oklch(0.55 0.18 25)", borderColor: "#18181B", borderWidth: 0.8 },
+          label: {
+            show: true,
+            position: "right",
+            formatter: (p) => p.value > 0 ? `${p.value.toFixed(1)}%` : "0%",
+            color: PAPER.ink2,
+            fontFamily: "JetBrains Mono, monospace",
+            fontSize: 10,
           },
         },
       ],
@@ -656,57 +515,54 @@ function TaskDistribution() {
     <div className="anal-card">
       <div className="anal-card-head">
         <div>
-          <div className="anal-card-no">FIG · DISTRIBUTION</div>
-          <h3 className="anal-card-title">The 20-task course at a glance.</h3>
+          <div className="anal-card-no">FIG · REWARD HACKING</div>
         </div>
       </div>
-      <div ref={ref} className="anal-chart anal-chart-dist"></div>
+      <div ref={ref} className="anal-chart" style={{ height: 400 }}></div>
+      <div className="anal-foot">
+        Verifier-side reward-hacking classifications over {RH_CLASSIFIED_TOTALS.n} real agent runs:
+        {" "}{RH_CLASSIFIED_TOTALS.hacked} were classifier-positive, and {RH_CLASSIFIED_TOTALS.success} earned reward after being classified as hacked.
+      </div>
     </div>
   );
 }
 
 /* ============================================================
-   ANALYSIS SECTION — wraps all four plots with tab nav
+   ANALYSIS SECTION — wraps plots with tab nav
    ============================================================ */
 function Analysis() {
-  const [tab, setTab] = useState("horizon"); // horizon | pareto | heatmap | dist
+  const [tab, setTab] = useState("pareto"); // pareto | horizon | rewardHack
 
   return (
     <section id="analysis">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 02 / analysis</div>
-          <h2 className="section-title">Compute horizons, Pareto frontiers, where it breaks.</h2>
+          <div className="section-no"><span className="dot">●</span> 03 / analysis</div>
+          <h2 className="section-title">Benchmark Results</h2>
         </div>
 
         <div className="anal-tabs">
-          <button className={"anal-tab " + (tab === "horizon" ? "active" : "")} onClick={() => setTab("horizon")}>
-            <span className="anal-tab-no">01</span>
-            <span className="anal-tab-t">Compute horizon</span>
-            <span className="anal-tab-s">tokens vs pass@1</span>
-          </button>
           <button className={"anal-tab " + (tab === "pareto" ? "active" : "")} onClick={() => setTab("pareto")}>
-            <span className="anal-tab-no">02</span>
+            <span className="anal-tab-no">01</span>
             <span className="anal-tab-t">Cost vs score</span>
             <span className="anal-tab-s">Pareto frontier</span>
           </button>
-          <button className={"anal-tab " + (tab === "heatmap" ? "active" : "")} onClick={() => setTab("heatmap")}>
-            <span className="anal-tab-no">03</span>
-            <span className="anal-tab-t">Per-task scores</span>
-            <span className="anal-tab-s">tasks × agents</span>
+          <button className={"anal-tab " + (tab === "horizon" ? "active" : "")} onClick={() => setTab("horizon")}>
+            <span className="anal-tab-no">02</span>
+            <span className="anal-tab-t">Compute horizon</span>
+            <span className="anal-tab-s">tokens vs resolution</span>
           </button>
-          <button className={"anal-tab " + (tab === "dist" ? "active" : "")} onClick={() => setTab("dist")}>
-            <span className="anal-tab-no">04</span>
-            <span className="anal-tab-t">Task mix</span>
-            <span className="anal-tab-s">20-task spread</span>
+          <button className={"anal-tab " + (tab === "rewardHack" ? "active" : "")} onClick={() => setTab("rewardHack")}>
+            <span className="anal-tab-no">03</span>
+            <span className="anal-tab-t">Reward hacking</span>
+            <span className="anal-tab-s">bypass incidence</span>
           </button>
         </div>
 
         <div className="anal-stage">
-          {tab === "horizon" && <ComputeHorizonChart />}
           {tab === "pareto"  && <ParetoChart />}
-          {tab === "heatmap" && <TaskHeatmap />}
-          {tab === "dist"    && <TaskDistribution />}
+          {tab === "horizon" && <ComputeHorizonChart />}
+          {tab === "rewardHack" && <RewardHackingChart />}
         </div>
       </div>
     </section>

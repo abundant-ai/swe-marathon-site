@@ -17,7 +17,7 @@
     <rect x="192" y="-24" width="202" height="54" fill="#FAFAFA" stroke="#18181B" stroke-width="1.5"/>
     <text x="214" y="6" fill="#18181B">1-10h budget</text>
     <rect x="412" y="-24" width="296" height="54" fill="#E8F5E9" stroke="#18181B" stroke-width="1.5"/>
-    <text x="434" y="6" fill="#18181B">&lt;19% pass@1</text>
+    <text x="434" y="6" fill="#18181B">&lt;19% resolution</text>
   </g>
   <path d="M794 430 C846 398 879 415 915 362 C948 314 986 340 1024 264 C1056 202 1090 178 1128 194" fill="none" stroke="#4CAF50" stroke-width="6"/>
   <g fill="#18181B">
