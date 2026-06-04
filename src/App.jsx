@@ -2009,7 +2009,7 @@ function Citation() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 05 / paper</div>
-          <h2 className="section-title">Paper and citation</h2>
+          <h2 className="section-title">Cite SWE-Marathon</h2>
         </div>
         <div className="citation-block">
           <button className="copy-btn" onClick={() => {
