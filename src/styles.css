@@ -12,9 +12,53 @@
     --accent-light: #E8F5E9;
     --pos: #2d7a4f;
     --warn: #B45309;
-    --sans: "Inter", Arial, sans-serif;
-    --heading: "Courier New", Courier, monospace;
-    --mono: "Courier New", Courier, monospace;
+    --nav-bg: rgba(255, 255, 255, 0.86);
+    --nav-hover-muted: rgba(255, 255, 255, 0.62);
+    --badge-bg: rgba(255, 255, 255, 0.72);
+    --metric-bg: rgba(255, 255, 255, 0.55);
+    --sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --heading: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #121312;
+    --paper: #151713;
+    --bg-2: #1B1F1B;
+    --ink: #F4F4F5;
+    --ink-2: #D4D4D8;
+    --ink-3: #A1A1AA;
+    --rule: #303530;
+    --rule-2: #232823;
+    --accent: #6BCF70;
+    --accent-bg: #18351F;
+    --accent-light: #203D25;
+    --pos: #8BDB91;
+    --warn: #F59E0B;
+    --nav-bg: rgba(18, 19, 18, 0.88);
+    --nav-hover-muted: rgba(18, 19, 18, 0.64);
+    --badge-bg: rgba(18, 19, 18, 0.72);
+    --metric-bg: rgba(18, 19, 18, 0.55);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #121312;
+      --paper: #151713;
+      --bg-2: #1B1F1B;
+      --ink: #F4F4F5;
+      --ink-2: #D4D4D8;
+      --ink-3: #A1A1AA;
+      --rule: #303530;
+      --rule-2: #232823;
+      --accent: #6BCF70;
+      --accent-bg: #18351F;
+      --accent-light: #203D25;
+      --pos: #8BDB91;
+      --warn: #F59E0B;
+      --nav-bg: rgba(18, 19, 18, 0.88);
+      --nav-hover-muted: rgba(18, 19, 18, 0.64);
+      --badge-bg: rgba(18, 19, 18, 0.72);
+      --metric-bg: rgba(18, 19, 18, 0.55);
+    }
   }
   * { box-sizing: border-box; }
   ::selection { background: var(--accent-light); color: var(--ink); }
@@ -39,7 +83,7 @@
   /* Top nav */
   .topnav {
     border-bottom: 1px solid var(--rule);
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--nav-bg);
     position: sticky; top: 0; z-index: 50;
     backdrop-filter: blur(8px);
   }
@@ -91,7 +135,7 @@
   }
   .nav-links a:hover .nl-no,
   .nav-links a:focus-visible .nl-no {
-    color: rgba(255, 255, 255, 0.62);
+    color: var(--nav-hover-muted);
   }
   .nav-links .nl-resource {
     margin-left: 6px;
@@ -102,6 +146,26 @@
   .nav-links .nl-resource:hover {
     background: var(--accent);
     color: var(--bg);
+  }
+  .theme-toggle {
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    color: var(--ink-2);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 9px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  }
+  .theme-toggle:hover,
+  .theme-toggle:focus-visible {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+    outline: 0;
   }
   .topnav::after {
     content: none;
@@ -248,11 +312,11 @@
   h1 .ital { font-style: normal; color: var(--accent); }
   .title-brand {
     display: block;
-    font-family: var(--mono);
+    font-family: var(--heading);
     font-size: 1em;
     line-height: inherit;
     color: var(--accent);
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
     margin-bottom: 0;
   }
   .abundant-brand {
@@ -301,17 +365,36 @@
   .btn:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
   .btn.ghost { background: transparent; color: var(--ink); }
   .btn.ghost:hover { background: var(--ink); color: var(--bg); }
+  .btn.contact {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+  .btn.contact:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
   .btn .arr { font-size: 11px; }
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
 
   .stats-strip {
-    display: grid; grid-template-columns: repeat(5, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 0;
-    margin: 0 0 34px;
+    max-width: 760px;
+    margin: 28px auto 0;
+    border-top: 1px solid var(--rule);
     border-bottom: 1px solid var(--rule);
     padding-top: 0;
   }
   .stat {
-    padding: 0 16px 12px 0;
+    padding: 14px 16px 13px 0;
     border-right: 1px solid var(--rule-2);
     min-width: 0;
   }
@@ -330,12 +413,16 @@
   }
 
   /* Section scaffolding */
-  section { padding: 80px 0; border-bottom: 1px solid var(--rule); }
-  #leaderboard { padding-top: 56px; }
+  section { padding: 72px 0; border-bottom: 1px solid var(--rule); }
+  #leaderboard { padding-top: 64px; }
+  #tasks .container { max-width: 1120px; }
   .section-head {
-    display: grid; grid-template-columns: 200px 1fr; gap: 48px;
-    margin-bottom: 40px; align-items: baseline;
+    display: block;
+    margin-bottom: 26px; align-items: baseline;
   }
+  #leaderboard .section-head { margin-bottom: 18px; }
+  .section-head:not(:has(.section-title)) { display: none; margin: 0; }
+  .section-head > .section-no { display: none; }
   .section-no {
     font-family: var(--mono); font-size: 13px; color: var(--ink-3);
     text-transform: lowercase; letter-spacing: 0;
@@ -343,8 +430,15 @@
   .section-no .dot { color: var(--accent); margin-right: 8px; font-size: 11px; }
   h2.section-title {
     font-family: var(--heading); font-weight: 700;
-    font-size: 34px; line-height: 1.14; letter-spacing: 0;
+    font-size: 31px; line-height: 1.14; letter-spacing: 0;
     margin: 0; text-wrap: balance;
+  }
+  .section-note {
+    max-width: 620px;
+    margin: -10px 0 30px;
+    color: var(--ink-3);
+    font-size: 14px;
+    line-height: 1.55;
   }
   .section-title .ital { font-style: normal; }
   .section-body { display: grid; grid-template-columns: 200px 1fr; gap: 48px; }
@@ -582,7 +676,8 @@
 
   /* Task spec cards */
   .tasks-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0;
     border-top: 1px solid var(--rule);
     border-left: 1px solid var(--rule);
@@ -626,10 +721,6 @@
     min-height: 24px;
     margin-bottom: 12px;
   }
-  .task-id {
-    font-family: var(--mono); font-size: 11px; color: var(--ink-3);
-    text-transform: uppercase; letter-spacing: 0.1em;
-  }
   .task-budget {
     font-family: var(--mono); font-size: 10.5px; color: var(--accent);
     font-weight: 500;
@@ -650,7 +741,7 @@
     max-width: 100%;
     padding: 4px 8px;
     border: 1px solid var(--rule);
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--badge-bg);
     color: var(--ink);
     font-family: var(--mono);
     font-size: 10.5px;
@@ -718,7 +809,7 @@
     margin-top: 12px;
     border-top: 1px solid var(--rule);
     border-left: 1px solid var(--rule);
-    background: rgba(255, 255, 255, 0.55);
+    background: var(--metric-bg);
   }
   .task-metrics > div {
     border-right: 1px solid var(--rule);
@@ -2014,6 +2105,100 @@
     background: var(--bg-2); padding: 1px 5px; font-size: 12px;
     border-radius: 2px;
   }
+  .finding-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+  .finding-card {
+    position: relative;
+    display: flex;
+    min-height: 268px;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px 26px 26px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
+  }
+  .finding-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--finding-color, var(--accent));
+  }
+  .finding-card:hover,
+  .finding-card:focus-visible {
+    background:
+      linear-gradient(135deg, rgba(76, 175, 80, 0.12), transparent 46%),
+      var(--bg);
+    color: var(--ink);
+    outline: 0;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(24, 24, 27, 0.06);
+  }
+  .finding-card-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .finding-detail {
+    color: var(--ink-3);
+  }
+  .finding-model {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    color: var(--ink-2);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .finding-model-id {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+  }
+  .finding-model .lb-model {
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .finding-task {
+    margin-top: 2px;
+    font-family: var(--heading);
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+  .finding-task span {
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 13px;
+    vertical-align: 0.15em;
+  }
+  .finding-card:hover .finding-task span,
+  .finding-card:focus-visible .finding-task span {
+    color: var(--accent);
+  }
+  .finding-card-body {
+    margin: auto 0 0;
+    color: var(--ink-2);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
 
   /* Trace blocks */
   .trace {
@@ -2298,7 +2483,7 @@
     .stat:nth-child(2n) { border-right: none; }
     .stat { padding-bottom: 22px; }
     .anal-task-key { grid-template-columns: repeat(2, 1fr); }
-    .section-head, .section-body { grid-template-columns: 1fr; gap: 16px; }
+    .section-body { grid-template-columns: 1fr; gap: 16px; }
     .benchmark-bullets { grid-template-columns: 1fr; }
     .tasks-grid { grid-template-columns: 1fr; }
     .sample-tabs { display: flex; flex-wrap: wrap; }
@@ -2311,6 +2496,8 @@
     .artifact-selector, .selected-artifact-meta, .metric-grid { grid-template-columns: 1fr; }
     .pipeline { grid-template-columns: 1fr; }
     .pipe-step::after { display: none; }
+    .finding-cards { grid-template-columns: 1fr; }
+    .finding-card { min-height: 0; }
     .findings { grid-template-columns: 1fr; }
     .finding, .finding:nth-child(2n) {
       padding: 24px 0; border-right: none;
@@ -2398,7 +2585,7 @@
 
   .anal-card {
     border: 1px solid var(--rule);
-    background: oklch(0.985 0.005 80);
+    background: var(--paper);
     padding: 28px 28px 22px;
   }
   .anal-card-head {
