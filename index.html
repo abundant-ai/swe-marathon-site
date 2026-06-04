@@ -13,13 +13,13 @@
     <script>
       (() => {
         const STORAGE_KEY = "swe-marathon-theme";
-        const modes = ["system", "light", "dark"];
+        const modes = ["light", "dark"];
         const media = window.matchMedia("(prefers-color-scheme: dark)");
         const themeColor = { light: "#FFFFFF", dark: "#121312" };
 
         function storedMode() {
           const value = localStorage.getItem(STORAGE_KEY);
-          return modes.includes(value) ? value : "system";
+          return modes.includes(value) ? value : effectiveTheme("system");
         }
 
         function effectiveTheme(mode) {
@@ -35,28 +35,29 @@
 
           const button = document.querySelector("[data-theme-toggle]");
           if (button) {
-            button.textContent = `theme: ${mode}`;
-            button.setAttribute("aria-label", `Theme mode: ${mode}. Activate to change theme.`);
-            button.setAttribute("title", `Theme: ${mode}`);
+            const next = mode === "dark" ? "light" : "dark";
+            button.textContent = mode;
+            button.setAttribute("aria-label", `Switch to ${next} mode`);
+            button.setAttribute("title", `Switch to ${next} mode`);
+            button.setAttribute("aria-pressed", String(mode === "dark"));
           }
         }
 
         window.SWEMarathonTheme = {
           set(mode) {
-            const next = modes.includes(mode) ? mode : "system";
-            if (next === "system") localStorage.removeItem(STORAGE_KEY);
-            else localStorage.setItem(STORAGE_KEY, next);
+            const next = modes.includes(mode) ? mode : effectiveTheme("system");
+            localStorage.setItem(STORAGE_KEY, next);
             applyTheme(next);
           },
           cycle() {
             const mode = storedMode();
-            this.set(modes[(modes.indexOf(mode) + 1) % modes.length]);
+            this.set(mode === "dark" ? "light" : "dark");
           },
         };
 
         applyTheme(storedMode());
         media.addEventListener("change", () => {
-          if (storedMode() === "system") applyTheme("system");
+          if (!modes.includes(localStorage.getItem(STORAGE_KEY))) applyTheme(effectiveTheme("system"));
         });
         document.addEventListener("DOMContentLoaded", () => {
           const button = document.querySelector("[data-theme-toggle]");
@@ -119,9 +120,8 @@
           <a href="#findings"><span class="nl-no">[04]</span>observations</a>
           <a href="mailto:jesse@abundant.ai" class="nl-contact">contact</a>
           <a href="#cite" class="nl-resource">paper&nbsp;↗</a>
-          <a href="https://github.com/abundant-ai/long-horizon" class="nl-resource">code&nbsp;↗</a>
         </div>
-        <button class="theme-toggle" type="button" data-theme-toggle>theme: system</button>
+        <button class="theme-toggle" type="button" data-theme-toggle>light</button>
       </div>
     </nav>
     <div id="root"></div>

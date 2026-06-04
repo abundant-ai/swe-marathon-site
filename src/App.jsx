@@ -1784,12 +1784,13 @@ function Findings() {
 }
 
 const CORE_CONTRIBUTORS = [
-  "Rishi Desai",
-  "Jesse Hu",
-  "Joan Santiago Cabezas",
-  "Neel Harsola",
-  "Pratyush Shukla",
-  "Daniel Wang",
+  { name: "Rishi Desai", affiliation: "Abundant" },
+  { name: "Jesse Hu", affiliation: "Abundant" },
+  { name: "Joan Santiago Cabezas", affiliation: "Abundant" },
+  { name: "Neel Harsola", affiliation: "Abundant" },
+  { name: "Pratyush Shukla", affiliation: "Abundant" },
+  { name: "Daniel Wang", affiliation: "Abundant" },
+  { name: "Xiangyi Li", affiliation: "BenchFlow" },
 ];
 
 const BENCHMARK_CONTRIBUTORS = [
@@ -1810,7 +1811,6 @@ const BENCHMARK_CONTRIBUTORS = [
   { name: "Nevasini Sasikumar", affiliation: "UC San Diego" },
   { name: "Luyang Kong", affiliation: "Independent" },
   { name: "Erik Quintanilla", affiliation: "Refresh" },
-  { name: "Xiangyi Li", affiliation: "BenchFlow" },
   { name: "Ivan Bercovich", affiliation: "UC Santa Barbara" },
   { name: "Steven Dillmann", affiliation: "Stanford University" },
 ];
@@ -1819,7 +1819,11 @@ const CONTRIBUTOR_LINKS = {
   "Rishi Desai": "https://www.rishidesai.org/",
   "Jesse Hu": "https://www.linkedin.com/in/jessehu/",
   "Joan Santiago Cabezas": "https://www.linkedin.com/in/joancabezas/",
+  "Neel Harsola": "https://www.neelharsola.in/",
+  "Pratyush Shukla": "https://www.linkedin.com/in/prattyagi/",
   "Daniel Wang": "https://www.linkedin.com/in/daniel04wang/",
+  "Xiangyi Li": "https://www.xiangyi.li/",
+  "Ivan Bercovich": "https://ivanbercovich.com/",
   "Steven Dillmann": "https://stevendillmann.github.io/",
 };
 
@@ -1845,10 +1849,10 @@ function Contributors() {
         <div className="team-block">
           <div className="team-kicker">Core Team</div>
           <div className="team-grid core-team-grid">
-            {CORE_CONTRIBUTORS.map((name) => (
-              <div className="person" key={name}>
-                <ContributorName name={name} />
-                <div className="pa">Abundant</div>
+            {CORE_CONTRIBUTORS.map((person) => (
+              <div className="person" key={person.name}>
+                <ContributorName name={person.name} />
+                <div className="pa">{person.affiliation}</div>
               </div>
             ))}
           </div>
@@ -1872,7 +1876,7 @@ function Contributors() {
 
 function Citation() {
   const citationAuthors = [
-    ...CORE_CONTRIBUTORS,
+    ...CORE_CONTRIBUTORS.map((person) => person.name),
     ...BENCHMARK_CONTRIBUTORS.map((person) => person.name),
   ].join(" and ");
   const bib = `@misc{swemarathon_2026,
