@@ -6,7 +6,6 @@ import {
   CAT_LABEL,
   HEADLINE,
   LEADERBOARD,
-  RH_BY_MODEL,
   TRIAL_BY_ID,
   TASK_DETAILS,
   TASK_INSPIRATION,
@@ -1960,12 +1959,12 @@ function Contributors() {
     <section id="contributors">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 05 / contributors</div>
-          <h2 className="section-title">Built with help from the evals community.</h2>
+          <div className="section-no"><span className="dot">●</span> 06 / contributors</div>
+          <h2 className="section-title">Community Driven</h2>
         </div>
 
         <div className="team-block">
-          <div className="team-kicker">Core contributors</div>
+          <div className="team-kicker">Core Team</div>
           <div className="team-grid core-team-grid">
             {CORE_CONTRIBUTORS.map((name) => (
               <div className="person" key={name}>
@@ -2053,6 +2052,7 @@ function Footer() {
             <div className="foot-list">
               <a href="#leaderboard">Leaderboard</a>
               <a href="#tasks">Tasks</a>
+              <a href="#analysis">Analysis</a>
               <a href="#findings">Observations</a>
               <a href="#contributors">Contributors</a>
             </div>
@@ -2110,11 +2110,11 @@ function App() {
     <>
       <Hero />
       <Leaderboard />
-      <BenchmarkBullets />
+      <Tasks />
       <Suspense fallback={<div className="analysis-loading">Loading analysis...</div>}>
         <Analysis />
       </Suspense>
-      <Tasks />
+      <BenchmarkBullets />
       <Findings />
       <Contributors />
       <Citation />
