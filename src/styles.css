@@ -93,13 +93,13 @@
   .nav-links a:focus-visible .nl-no {
     color: rgba(255, 255, 255, 0.62);
   }
-  .nav-links .nl-paper {
+  .nav-links .nl-resource {
     margin-left: 6px;
     padding-inline: 14px;
     color: var(--bg);
     background: var(--ink);
   }
-  .nav-links .nl-paper:hover {
+  .nav-links .nl-resource:hover {
     background: var(--accent);
     color: var(--bg);
   }
@@ -113,7 +113,7 @@
     .nav-links a { padding: 6px 8px; }
   }
   @media (max-width: 680px) {
-    .nav-links a:not(.nl-paper) { display: none; }
+    .nav-links a:not(.nl-resource) { display: none; }
   }
 
   /* Hero */
