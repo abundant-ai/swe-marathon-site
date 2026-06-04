@@ -467,7 +467,6 @@ function FoxRunner() {
 
 function StatStrip() {
   const stats = [
-  { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
   { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Task resolution rate" },
   { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens per trial" },
   { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Trials with reward-hacking behavior" },
@@ -489,7 +488,6 @@ function Hero() {
   return (
     <header className="hero">
       <div className="container">
-        <StatStrip />
         <h1 className="title">
           <span className="title-brand">SWE-Marathon</span>
         </h1>
@@ -500,6 +498,11 @@ function Hero() {
           <strong>20 multi-hour SWE tasks</strong> spanning library
           reproductions, full-stack product clones, and ML engineering.
         </p>
+        <StatStrip />
+        <div className="hero-actions">
+          <a className="btn contact" href="mailto:jesse@abundant.ai">Get in Touch</a>
+          <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
+        </div>
       </div>
     </header>);
 
@@ -813,7 +816,7 @@ function BenchmarkBullets() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 02 / design</div>
-          <h2 className="section-title">What makes SWE-Marathon different?</h2>
+          <h2 className="section-title">Benchmark design</h2>
         </div>
         <figure className="horizon-figure">
           <img
@@ -852,6 +855,20 @@ const TASK_DISPLAY_ORDER = {
   ],
 };
 
+const TASK_PASS_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "solved", label: "Solved" },
+  { id: "unsolved", label: "Unsolved" },
+  { id: "strong", label: ">=10% pass" },
+];
+
+const TASK_CHEAT_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "any", label: "Any cheating" },
+  { id: "elevated", label: ">=10%" },
+  { id: "high", label: ">=30%" },
+];
+
 function taskDisplayRank(familyId, taskId) {
   const order = TASK_DISPLAY_ORDER[familyId];
   if (!order) return 0;
@@ -859,53 +876,160 @@ function taskDisplayRank(familyId, taskId) {
   return index === -1 ? order.length : index;
 }
 
+function taskFamilyRank(familyId) {
+  const index = TASK_FAMILIES.findIndex((family) => family.id === familyId);
+  return index === -1 ? TASK_FAMILIES.length : index;
+}
+
+function matchesTaskPassFilter(task, filterId) {
+  if (filterId === "solved") return task.pass1 > 0;
+  if (filterId === "unsolved") return task.pass1 === 0;
+  if (filterId === "strong") return task.pass1 >= 10;
+  return true;
+}
+
+function matchesTaskCheatFilter(task, filterId) {
+  if (filterId === "any") return task.exploit > 0;
+  if (filterId === "elevated") return task.exploit >= 10;
+  if (filterId === "high") return task.exploit >= 30;
+  return true;
+}
+
 function Tasks() {
+  const [familyFilter, setFamilyFilter] = useState("all");
+  const [passFilter, setPassFilter] = useState("all");
+  const [cheatFilter, setCheatFilter] = useState("all");
+  const sortedTasks = useMemo(() => {
+    return [...TASKS].sort((a, b) => {
+      const familyDelta = taskFamilyRank(a.cat) - taskFamilyRank(b.cat);
+      if (familyDelta !== 0) return familyDelta;
+      const rankDelta = taskDisplayRank(a.cat, a.id) - taskDisplayRank(b.cat, b.id);
+      if (rankDelta !== 0) return rankDelta;
+      return TASKS.indexOf(a) - TASKS.indexOf(b);
+    });
+  }, []);
+  const visibleTasks = sortedTasks.filter((task) => {
+    if (familyFilter !== "all" && task.cat !== familyFilter) return false;
+    if (!matchesTaskPassFilter(task, passFilter)) return false;
+    if (!matchesTaskCheatFilter(task, cheatFilter)) return false;
+    return true;
+  });
+  const openTask = (taskId) => {
+    window.location.hash = `task/${taskId}`;
+  };
+
   return (
     <section id="tasks">
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 03 / tasks</div>
-          <h2 className="section-title">20 marathons. 4 task families.</h2>
+          <h2 className="section-title">Tasks</h2>
+        </div>
+        <p className="section-note">Click on any task row to explore the full task, detailed per-task leaderboards, individual agent trajectories, and analysis.</p>
+
+        <div className="task-filters" aria-label="Task filters">
+          <div className="task-filter-group">
+            <span className="task-filter-label">Family</span>
+            <div className="task-filter-pills">
+              {TASK_FAMILIES.map((family) => (
+                <button
+                  className={"pill task-filter-pill " + (familyFilter === family.id ? "active" : "")}
+                  key={family.id}
+                  type="button"
+                  onClick={() => setFamilyFilter(family.id)}
+                >
+                  {family.id === "all" ? "All" : family.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="task-filter-group">
+            <span className="task-filter-label">Pass Rate</span>
+            <div className="task-filter-pills">
+              {TASK_PASS_FILTERS.map((filter) => (
+                <button
+                  className={"pill task-filter-pill " + (passFilter === filter.id ? "active" : "")}
+                  key={filter.id}
+                  type="button"
+                  onClick={() => setPassFilter(filter.id)}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="task-filter-group">
+            <span className="task-filter-label">Cheating Attempts</span>
+            <div className="task-filter-pills">
+              {TASK_CHEAT_FILTERS.map((filter) => (
+                <button
+                  className={"pill task-filter-pill " + (cheatFilter === filter.id ? "active" : "")}
+                  key={filter.id}
+                  type="button"
+                  onClick={() => setCheatFilter(filter.id)}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="task-filter-count">
+            {visibleTasks.length} / {TASKS.length} tasks
+          </div>
         </div>
 
-        {TASK_FAMILIES.filter((f) => f.id !== "all").map((fam) => {
-          const famTasks = TASKS
-            .filter((t) => t.cat === fam.id)
-            .sort((a, b) => taskDisplayRank(fam.id, a.id) - taskDisplayRank(fam.id, b.id));
-          if (famTasks.length === 0) return null;
-          return (
-            <div className="task-family-group" key={fam.id}>
-              <div className="task-family-head">
-                <b>{fam.label}</b>
-                <span>{famTasks.length} tasks</span>
-              </div>
-              <div className="tasks-grid">
-                {famTasks.map((t) => {
-                  return (
-                  <a className={"task task-link " + (TASK_DETAILS[t.id] ? "has-detail" : "")} href={`#task/${t.id}`} key={t.id}>
-                    <div className="task-head">
-                      <TaskCompanyBadges taskId={t.id} />
-                      <div className="task-budget">{t.agentH}h agent timeout</div>
+        <div className="task-table-wrap">
+          <table className="task-table">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Verifier Surface</th>
+                <th>Budget</th>
+                <th className="num">Pass Rate</th>
+                <th className="num">Cheating Attempts</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleTasks.length === 0 && (
+                <tr className="task-empty-row">
+                  <td className="task-empty" colSpan={5}>No tasks match these filters.</td>
+                </tr>
+              )}
+              {visibleTasks.map((task) => (
+                <tr
+                  className={"task-row " + (TASK_DETAILS[task.id] ? "has-detail" : "")}
+                  key={task.id}
+                  onClick={() => openTask(task.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openTask(task.id);
+                    }
+                  }}
+                  role="link"
+                  tabIndex={0}
+                >
+                  <td className="task-cell">
+                    <div className="task-title-line">
+                      <span className="task-table-title">{task.title}</span>
+                      <span className="task-family-tag">{CAT_LABEL[task.cat]}</span>
                     </div>
-                    <h3 className="task-title">{t.title}</h3>
-                    <p className="task-desc">{t.desc}</p>
-                    <div className="task-metrics">
-                      <div>
-                        <span className="k">Pass Rate</span>
-                        <span className="v">{formatTaskRate(t.pass1)}</span>
-                      </div>
-                      <div>
-                        <span className="k">Cheating Attempts</span>
-                        <span className="v">{formatTaskRate(t.exploit)}</span>
-                      </div>
-                    </div>
-                  </a>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+                    <p className="task-table-desc">{task.desc}</p>
+                  </td>
+                  <td className="task-verifier">{task.verifier}</td>
+                  <td className="task-budget-cell">
+                    <span className="budget-strong">{task.agentH}h</span>
+                    <span>agent</span>
+                    <span className="budget-strong">{task.humanH}h</span>
+                    <span>human est.</span>
+                  </td>
+                  <td className="num metric-strong">{formatTaskRate(task.pass1)}</td>
+                  <td className="num metric-warn">{formatTaskRate(task.exploit)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>);
 
@@ -1716,31 +1840,38 @@ function Findings() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 04 / failure modes</div>
-          <h2 className="section-title">Selected failure modes.</h2>
+          <h2 className="section-title">Failure Modes</h2>
         </div>
 
-        <div>
+        <div className="finding-cards">
           {CASE_STUDIES.map((c) => {
             const [agent, model] = c.config.split(" · ");
+            const [bucketLabel, bucketDetail] = c.bucket.split(" · ");
             const taskId = c.trial.replace(/-\d+$/, "");
             const task = TASKS.find((t) => t.id === taskId);
             const color = bucketColor(c.bucket);
             return (
-              <div className="trace" key={c.trial} style={{ borderLeftColor: color }}>
-                <div className="tr-head">
-                  <span className="tr-bucket" style={{ color }}>{c.bucket}</span>
-                  <span className="tr-id">
+              <a
+                className="finding-card"
+                href={`#trajectory/${encodeURIComponent(c.trial)}`}
+                key={c.trial}
+                style={{ "--finding-color": color }}
+              >
+                <div className="finding-card-top">
+                  <span className="finding-bucket" style={{ color }}>{bucketLabel}</span>
+                  {bucketDetail && <span className="finding-detail">{bucketDetail}</span>}
+                </div>
+                <div className="finding-model">
+                  <span className="finding-model-id">
                     <BrandLogo name={model} />
                     <span className="lb-model">{model}</span>
                     <span className="lb-sep">/</span>
                     <span className="lb-agent">{agent}</span>
                   </span>
-                  <a className="tr-task" href={`#trajectory/${encodeURIComponent(c.trial)}`}>
-                    {task ? task.title : taskId} <span className="tr-arr">↗</span>
-                  </a>
                 </div>
-                <div className="tr-quote">{c.pattern}</div>
-              </div>
+                <div className="finding-task">{task ? task.title : taskId} <span>↗</span></div>
+                <p className="finding-card-body">{c.pattern}</p>
+              </a>
             );
           })}
         </div>
@@ -1763,7 +1894,7 @@ function Citation() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 05 / paper</div>
-          <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
+          <h2 className="section-title">Paper and citation</h2>
         </div>
         <div className="citation-block">
           <button className="copy-btn" onClick={() => {
@@ -1812,6 +1943,7 @@ function Footer() {
           <div>
             <div className="foot-h">Resources</div>
             <div className="foot-list">
+              <a href="mailto:jesse@abundant.ai">Get in Touch</a>
               <a href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
             </div>
           </div>
