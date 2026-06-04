@@ -1819,7 +1819,7 @@ const CONTRIBUTOR_LINKS = {
   "Rishi Desai": "https://www.rishidesai.org/",
   "Jesse Hu": "https://www.linkedin.com/in/jessehu/",
   "Joan Santiago Cabezas": "https://www.linkedin.com/in/joancabezas/",
-  "Neel Harsola": "https://www.neelharsola.in/",
+  "Neel Harsola": "https://www.linkedin.com/in/neelharsola/",
   "Pratyush Shukla": "https://www.linkedin.com/in/prattyagi/",
   "Daniel Wang": "https://www.linkedin.com/in/daniel04wang/",
   "Xiangyi Li": "https://www.xiangyi.li/",
