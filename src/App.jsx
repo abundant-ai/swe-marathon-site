@@ -466,7 +466,6 @@ function FoxRunner() {
 
 function StatStrip() {
   const stats = [
-  { num: String(HEADLINE.nTasks), unit: "", label: "Long-horizon tasks" },
   { num: `<${Math.ceil(HEADLINE.bestPass1Pct)}`, unit: "%", label: "Task resolution rate" },
   { num: String(Math.round(HEADLINE.avgTokensPerTrialM)), unit: "M", label: "Mean tokens per trial" },
   { num: String(HEADLINE.rhAttemptPct), unit: "%", label: "Trials with reward-hacking behavior" },
@@ -488,7 +487,6 @@ function Hero() {
   return (
     <header className="hero">
       <div className="container">
-        <StatStrip />
         <h1 className="title">
           <span className="title-brand">SWE-Marathon</span>
         </h1>
@@ -499,6 +497,11 @@ function Hero() {
           <strong>20 multi-hour SWE tasks</strong> spanning library
           reproductions, full-stack product clones, and ML engineering.
         </p>
+        <StatStrip />
+        <div className="hero-actions">
+          <a className="btn contact" href="mailto:jesse@abundant.ai">Get in Touch</a>
+          <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
+        </div>
       </div>
     </header>);
 
@@ -510,7 +513,7 @@ const BRANDS = {
   openai: {
     grad: ["#2563eb", "#7aa7f7"],
     logo: (
-      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#18181B" }}>
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "var(--ink)" }}>
         <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" />
       </svg>
     ),
@@ -518,7 +521,7 @@ const BRANDS = {
   anthropic: {
     grad: ["#d97757", "#e9b15a"],
     logo: (
-      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#18181B" }}>
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "var(--ink)" }}>
         <path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.541Zm-.3712 10.2188 2.2914-5.9456 2.2914 5.9456Z" />
       </svg>
     ),
@@ -550,7 +553,7 @@ const BRANDS = {
   moonshot: {
     grad: ["#6b4ea0", "#a78fd0"],
     logo: (
-      <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" style={{ color: "#18181B" }}>
+      <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" style={{ color: "var(--ink)" }}>
         <path d="M21.846 0a1.923 1.923 0 110 3.846H20.15a.226.226 0 01-.227-.226V1.923C19.923.861 20.784 0 21.846 0z" />
         <path d="M11.065 11.199l7.257-7.2c.137-.136.06-.41-.116-.41H14.3a.164.164 0 00-.117.051l-7.82 7.756c-.122.12-.302.013-.302-.179V3.82c0-.127-.083-.23-.185-.23H3.186c-.103 0-.186.103-.186.23V19.77c0 .128.083.23.186.23h2.69c.103 0 .186-.102.186-.23v-3.25c0-.069.025-.135.069-.178l2.424-2.406a.158.158 0 01.205-.023l6.484 4.772a7.677 7.677 0 003.453 1.283c.108.012.2-.095.2-.23v-3.06c0-.117-.07-.212-.164-.227a5.028 5.028 0 01-2.027-.807l-5.613-4.064c-.117-.078-.132-.279-.028-.381z" />
       </svg>
@@ -597,9 +600,6 @@ const TASK_COMPANIES = {
   "rust-c-compiler": [{ name: "Anthropic", mark: "A" }],
   "rust-java-lsp": [{ name: "Cursor", mark: "C" }],
   "excel-clone": [{ name: "Cursor", mark: "C" }],
-  "s3-clone": [{ name: "Amazon S3", mark: "S3" }],
-  "slack-clone": [{ name: "Slack", mark: "SL" }],
-  "stripe-clone": [{ name: "Stripe", mark: "ST" }],
   "parameter-golf": [{ name: "OpenAI", mark: "O" }],
   "vliw-kernel-optimization": [{ name: "Anthropic", mark: "A" }],
 };
@@ -760,8 +760,8 @@ function Leaderboard() {
 
         <div className="lb-chart">
           <div className="lb-chart-head">
-            <span>Model</span>
-            <span>Score</span>
+            <span>Model / Agent</span>
+            <span>Resolution rate (pass@1)</span>
           </div>
 
           {sorted.map((row) => {
@@ -812,12 +812,12 @@ function Leaderboard() {
 function BenchmarkBullets() {
   const bullets = [
     {
-      label: "Eval-community tasks",
+      label: "Community-inspired tasks",
       text: "Tasks draw from the evals community and frontier-lab case studies, including Anthropic, OpenAI, and Cursor, alongside product clones, ML systems, and optization.",
     },
     {
       label: "Handcrafted, not farmed",
-      text: "Tasks are handcrafted with a unique environment, verifier, and human-written reference solution. No GitHub pull requests or task farming.",
+      text: "Diverse, handcrafted, and contamination-free. Tasks are built with a unique environment, verifier, and human-written reference solution. No automated task generation from GitHub.",
     },
     {
       label: "CUA-verified product clones",
@@ -833,8 +833,8 @@ function BenchmarkBullets() {
     <section id="benchmark-design" className="benchmark-design">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 04 / design</div>
-          <h2 className="section-title">What makes SWE-Marathon different?</h2>
+          <div className="section-no"><span className="dot">●</span> 02 / design</div>
+          <h2 className="section-title">Benchmark design</h2>
         </div>
         <figure className="horizon-figure">
           <img
@@ -885,44 +885,47 @@ function Tasks() {
     <section id="tasks">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 02 / tasks</div>
-          <h2 className="section-title">20 marathons. 4 task families.</h2>
+          <div className="section-no"><span className="dot">●</span> 03 / tasks</div>
+          <h2 className="section-title">Dataset Breakdown</h2>
         </div>
+        <p className="section-note">20 marathon-length tasks over 4 diverse task families</p>
 
-        {TASK_FAMILIES.filter((f) => f.id !== "all").map((fam) => {
-          const famTasks = TASKS
-            .filter((t) => t.cat === fam.id)
-            .sort((a, b) => taskDisplayRank(fam.id, a.id) - taskDisplayRank(fam.id, b.id));
-          if (famTasks.length === 0) return null;
+        {TASK_FAMILIES.filter((family) => family.id !== "all").map((family) => {
+          const familyTasks = TASKS
+            .filter((task) => task.cat === family.id)
+            .sort((a, b) => taskDisplayRank(family.id, a.id) - taskDisplayRank(family.id, b.id));
+          if (familyTasks.length === 0) return null;
           return (
-            <div className="task-family-group" key={fam.id}>
+            <div className="task-family-group" key={family.id}>
               <div className="task-family-head">
-                <b>{fam.label}</b>
-                <span>{famTasks.length} tasks</span>
+                <b>{family.label}</b>
+                <span>{familyTasks.length} tasks</span>
               </div>
               <div className="tasks-grid">
-                {famTasks.map((t) => {
-                  return (
-                  <a className={"task task-link " + (TASK_DETAILS[t.id] ? "has-detail" : "")} href={`#task/${t.id}`} key={t.id}>
+                {familyTasks.map((task) => (
+                  <a
+                    className={"task task-link " + (TASK_DETAILS[task.id] ? "has-detail" : "")}
+                    href={`#task/${task.id}`}
+                    key={task.id}
+                  >
                     <div className="task-head">
-                      <TaskCompanyBadges taskId={t.id} />
-                      <div className="task-budget">{t.agentH}h agent timeout</div>
+                      <TaskCompanyBadges taskId={task.id} />
+                      <div className="task-budget">{task.agentH}h agent timeout</div>
                     </div>
-                    <h3 className="task-title">{t.title}</h3>
-                    <p className="task-desc">{t.desc}</p>
+                    <h3 className="task-title">{task.title}</h3>
+                    <p className="task-desc">{task.desc}</p>
                     <div className="task-metrics">
                       <div>
                         <span className="k">Pass Rate</span>
-                        <span className="v">{formatTaskRate(t.pass1)}</span>
+                        <span className="v">{formatTaskRate(task.pass1)}</span>
                       </div>
                       <div>
                         <span className="k">Cheating Attempts</span>
-                        <span className="v">{formatTaskRate(t.exploit)}</span>
+                        <span className="v">{formatTaskRate(task.exploit)}</span>
                       </div>
                     </div>
                   </a>
-                  );
-                })}
+                ))}
               </div>
             </div>
           );
@@ -1739,32 +1742,39 @@ function Findings() {
     <section id="findings">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 05 / failure modes</div>
-          <h2 className="section-title">Selected failure modes.</h2>
+          <div className="section-no"><span className="dot">●</span> 04 / failure modes</div>
+          <h2 className="section-title">Failure Modes</h2>
         </div>
 
-        <div>
+        <div className="finding-cards">
           {CASE_STUDIES.map((c) => {
             const [agent, model] = c.config.split(" · ");
+            const [bucketLabel, bucketDetail] = c.bucket.split(" · ");
             const taskId = c.trial.replace(/-\d+$/, "");
             const task = TASKS.find((t) => t.id === taskId);
             const color = bucketColor(c.bucket);
             return (
-              <div className="trace" key={c.trial} style={{ borderLeftColor: color }}>
-                <div className="tr-head">
-                  <span className="tr-bucket" style={{ color }}>{c.bucket}</span>
-                  <span className="tr-id">
+              <a
+                className="finding-card"
+                href={`#trajectory/${encodeURIComponent(c.trial)}`}
+                key={c.trial}
+                style={{ "--finding-color": color }}
+              >
+                <div className="finding-card-top">
+                  <span className="finding-bucket" style={{ color }}>{bucketLabel}</span>
+                  {bucketDetail && <span className="finding-detail">{bucketDetail}</span>}
+                </div>
+                <div className="finding-model">
+                  <span className="finding-model-id">
                     <BrandLogo name={model} />
                     <span className="lb-model">{model}</span>
                     <span className="lb-sep">/</span>
                     <span className="lb-agent">{agent}</span>
                   </span>
-                  <a className="tr-task" href={`#trajectory/${encodeURIComponent(c.trial)}`}>
-                    {task ? task.title : taskId} <span className="tr-arr">↗</span>
-                  </a>
                 </div>
-                <div className="tr-quote">{c.pattern}</div>
-              </div>
+                <div className="finding-task">{task ? task.title : taskId} <span>↗</span></div>
+                <p className="finding-card-body">{c.pattern}</p>
+              </a>
             );
           })}
         </div>
@@ -1877,7 +1887,7 @@ function Citation() {
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 07 / paper</div>
+          <div className="section-no"><span className="dot">●</span> 05 / paper</div>
           <h2 className="section-title">Cite SWE-Marathon</h2>
         </div>
         <div className="citation-block">
@@ -1929,6 +1939,7 @@ function Footer() {
           <div>
             <div className="foot-h">Resources</div>
             <div className="foot-list">
+              <a href="mailto:jesse@abundant.ai">Get in Touch</a>
               <a href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
             </div>
           </div>
