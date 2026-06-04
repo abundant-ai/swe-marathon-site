@@ -703,6 +703,28 @@ function TaskCompanyBadges({ taskId }) {
   );
 }
 
+const TASK_DETAIL_SUMMARIES = {
+  "slack-clone": "Build a Slack-like team chat app with realtime channels, threads, search, and a browser UI verified by CUA.",
+  "mastodon-clone": "Build a Mastodon-compatible social server with timelines, OAuth, notifications, and a usable web UI.",
+  "excel-clone": "Build an Excel-style spreadsheet with formulas, collaboration, file round-tripping, and a browser interface.",
+  "s3-clone": "Build an S3-compatible object store with standard SDK support, multi-tenant auth, lifecycle features, and an admin console.",
+  "rust-c-compiler": "Build a multi-pass C compiler in Rust, from preprocessing through x86-64 code generation.",
+  "zstd-decoder": "Implement a C99 Zstandard decoder from the RFC, producing byte-identical output without using libzstd.",
+  "nextjs-vite-rewrite": "Rebuild core Next.js behavior on top of Vite, covering routing, middleware, rendering, and server actions.",
+  "kubernetes-rust-rewrite": "Reimplement core Kubernetes control-plane and node components in Rust while preserving API behavior.",
+  "rust-java-lsp": "Build a Rust Java language server that analyzes source and matches production LSP responses.",
+  "biofabric-rust-rewrite": "Port BioFabric and its alignment plugin from Java to Rust with close behavioral parity.",
+  "ruby-rust-port": "Port a production-style Sinatra blog to Rust while preserving externally visible behavior.",
+  "wasm-simd": "Complete a WebAssembly interpreter and add full 128-bit SIMD instruction support.",
+  "stripe-clone": "Build an offline Stripe-compatible payments API that works with the real Stripe SDK.",
+  "jax-pytorch-rewrite": "Port a JAX vision-language-action policy to PyTorch and optimize inference without changing outputs.",
+  "embedding-eval": "Build an offline embedding-evaluation harness matching reference scores across many datasets and task types.",
+  "trimul-cuda": "Implement and optimize an AlphaFold-3 Triton kernel under strict correctness and H100 latency targets.",
+  "parameter-golf": "Train a compact language model under a tight compressed-checkpoint budget.",
+  "vliw-kernel-optimization": "Optimize a compute kernel for a custom VLIW SIMD architecture while preserving randomized correctness.",
+  "find-network-alignments": "Find high-quality alignments between biological networks under graph-conservation objectives.",
+};
+
 function formatTaskRate(value) {
   if (value == null) return "—";
   if (value === 0) return "0%";
@@ -839,7 +861,7 @@ const TASK_DISPLAY_ORDER = {
     "slack-clone",
     "excel-clone",
     "s3-clone",
-    
+
     "mastodon-clone",
     "stripe-clone",
   ],
@@ -1622,7 +1644,7 @@ function TaskDetailPage({ taskId }) {
           <a className="back-link" href="#tasks">← Back to all tasks</a>
           <div className="eyebrow">{detail.taskNo} · {detail.kicker}</div>
           <h1 className="title">{detail.title}</h1>
-          <p className="lede">{detail.summary}</p>
+          <p className="lede">{TASK_DETAIL_SUMMARIES[detail.slug] || detail.summary}</p>
           {TASK_INSPIRATION[detail.slug]?.length > 0 && (
             <p className="task-inspiration">
               <span className="task-insp-label">Inspired by</span>
@@ -1749,10 +1771,83 @@ function Findings() {
 
 }
 
+const CORE_CONTRIBUTORS = [
+  "Rishi Desai",
+  "Jesse Hu",
+  "Joan Santiago Cabezas",
+  "Neel Harsola",
+  "Pratyush Shukla",
+  "Daniel Wang",
+];
+
+const BENCHMARK_CONTRIBUTORS = [
+  { name: "Roey Ben Chaim", affiliation: "Zenity" },
+  { name: "Adnan El Assadi", affiliation: "Harvard University" },
+  { name: "Omkaar Mukund Kamath", affiliation: "University of Waterloo" },
+  { name: "Fenil Faldu", affiliation: "Gujarat Technological University" },
+  { name: "Prannay Hebbar", affiliation: "Warping" },
+  { name: "Jiankai Sun", affiliation: "Stanford University" },
+  { name: "Yiyuan Li", affiliation: "UNC-Chapel Hill" },
+  { name: "Pramod Srinivasan", affiliation: "Independent" },
+  { name: "Ishan Gupta", affiliation: "Independent" },
+  { name: "Christopher Settles", affiliation: "Refresh" },
+  { name: "Derek Chen", affiliation: "Soleda AI" },
+  { name: "Pranav Raja", affiliation: "Near AI" },
+  { name: "Albert Liu", affiliation: "Georgia Tech" },
+  { name: "Marek Šuppa", affiliation: "Comenius University in Bratislava" },
+  { name: "Nevasini Sasikumar", affiliation: "UC San Diego" },
+  { name: "Luyang Kong", affiliation: "Independent" },
+  { name: "Erik Quintanilla", affiliation: "Refresh" },
+  { name: "Xiangyi Li", affiliation: "BenchFlow" },
+  { name: "Ivan Bercovich", affiliation: "UC Santa Barbara" },
+  { name: "Steven Dillmann", affiliation: "Stanford University" },
+];
+
+function Contributors() {
+  return (
+    <section id="contributors">
+      <div className="container">
+        <div className="section-head">
+          <div className="section-no"><span className="dot">●</span> 05 / contributors</div>
+          <h2 className="section-title">Built with help from the evals community.</h2>
+        </div>
+
+        <div className="team-block">
+          <div className="team-kicker">Core contributors</div>
+          <div className="team-grid core-team-grid">
+            {CORE_CONTRIBUTORS.map((name) => (
+              <div className="person" key={name}>
+                <div className="pn">{name}</div>
+                <div className="pa">Abundant</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="team-block">
+          <div className="team-kicker">Benchmark contributors</div>
+          <div className="team-grid">
+            {BENCHMARK_CONTRIBUTORS.map((person) => (
+              <div className="person" key={person.name}>
+                <div className="pn">{person.name}</div>
+                <div className="pa">{person.affiliation}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Citation() {
+  const citationAuthors = [
+    ...CORE_CONTRIBUTORS,
+    ...BENCHMARK_CONTRIBUTORS.map((person) => person.name),
+  ].join(" and ");
   const bib = `@misc{swemarathon_2026,
   title        = {{SWE-Marathon: Can Agents Autonomously Complete Ultra-Long-Horizon Software Work?}},
-  author       = {{SWE-Marathon Authors}},
+  author       = {${citationAuthors}},
   year         = {2026},
   howpublished = {\\url{https://github.com/abundant-ai/long-horizon}},
   note         = {Benchmark and evaluation code.}
@@ -1762,7 +1857,7 @@ function Citation() {
     <section id="cite">
       <div className="container">
         <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 05 / paper</div>
+          <div className="section-no"><span className="dot">●</span> 06 / paper</div>
           <h2 className="section-title">If SWE-Marathon is useful,<br />please cite us.</h2>
         </div>
         <div className="citation-block">
@@ -1807,6 +1902,7 @@ function Footer() {
               <a href="#leaderboard">Leaderboard</a>
               <a href="#tasks">Tasks</a>
               <a href="#findings">Observations</a>
+              <a href="#contributors">Contributors</a>
             </div>
           </div>
           <div>
@@ -1867,6 +1963,7 @@ function App() {
       </Suspense>
       <Tasks />
       <Findings />
+      <Contributors />
       <Citation />
       <Footer />
     </>);

@@ -763,12 +763,16 @@
     font-size: 48px;
     line-height: 1.05;
     margin-bottom: 12px;
+    text-align: left;
   }
   .task-hero .lede {
-    font-size: 17px;
-    line-height: 1.4;
+    font-size: 15.5px;
+    line-height: 1.45;
     margin-bottom: 0;
-    max-width: 680px;
+    max-width: 620px;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
   }
   .task-inspiration {
     margin: 18px 0 0;
@@ -796,7 +800,9 @@
   .task-page-lede {
     max-width: 660px;
     color: var(--ink-2);
-    font-size: 18px;
+    font-size: 15.5px;
+    line-height: 1.45;
+    text-align: left;
   }
   .detail-placeholder {
     border: 1px solid var(--rule);
@@ -2030,15 +2036,30 @@
   .trace .tr-quote { color: var(--ink); font-style: normal; }
 
   /* Team */
-  .team-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 24px 32px;
+  #contributors { padding: 56px 0; }
+  .team-block {
+    padding: 14px 0 18px;
+    border-top: 1px solid var(--rule);
   }
-  .person { font-size: 14px; }
+  .team-block:first-of-type { border-top: 0; padding-top: 0; }
+  .team-kicker {
+    margin-bottom: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .team-grid {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px 24px;
+  }
+  .core-team-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .person { font-size: 13px; line-height: 1.25; }
   .person .pn { font-weight: 500; }
   .person .pa {
-    font-family: var(--mono); font-size: 11px; color: var(--ink-3);
-    margin-top: 2px;
+    font-family: var(--mono); font-size: 10px; color: var(--ink-3);
+    margin-top: 1px;
   }
   .affiliations {
     margin-top: 40px;
