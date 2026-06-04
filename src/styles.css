@@ -1600,6 +1600,15 @@
   }
   .task-lb-id {
     display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+  }
+  .task-lb-id .lb-logo {
+    margin-top: 1px;
+  }
+  .task-lb-model-text {
+    display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     gap: 2px 8px;
@@ -2057,6 +2066,8 @@
   .core-team-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .person { font-size: 13px; line-height: 1.25; }
   .person .pn { font-weight: 500; }
+  .person a.pn { color: inherit; text-decoration: none; }
+  .person a.pn:hover { color: var(--accent); }
   .person .pa {
     font-family: var(--mono); font-size: 10px; color: var(--ink-3);
     margin-top: 1px;

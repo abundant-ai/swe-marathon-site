@@ -1345,13 +1345,16 @@ function TaskLeaderboard({ leaderboard }) {
             >
               <span className="rank-badge">{row.rank}</span>
               <div className="task-lb-id">
-                <span className="task-lb-name">{row.model}</span>
-                <span className="task-lb-agent">{row.agent}</span>
-                {rowHackCount > 0 && (
-                  <span className="task-lb-hack" title={`${rowHackCount} trial${rowHackCount > 1 ? "s" : ""} flagged for reward hacking`}>
-                    ⚠ Reward hack{rowHackCount > 1 ? ` ×${rowHackCount}` : ""}
-                  </span>
-                )}
+                <BrandLogo name={row.model} />
+                <span className="task-lb-model-text">
+                  <span className="task-lb-name">{row.model}</span>
+                  <span className="task-lb-agent">{row.agent}</span>
+                  {rowHackCount > 0 && (
+                    <span className="task-lb-hack" title={`${rowHackCount} trial${rowHackCount > 1 ? "s" : ""} flagged for reward hacking`}>
+                      ⚠ Reward hack{rowHackCount > 1 ? ` ×${rowHackCount}` : ""}
+                    </span>
+                  )}
+                </span>
               </div>
               <div className="task-lb-metrics">
                 <span><b>Reward</b> {row.binary}</span>
@@ -1803,6 +1806,24 @@ const BENCHMARK_CONTRIBUTORS = [
   { name: "Steven Dillmann", affiliation: "Stanford University" },
 ];
 
+const CONTRIBUTOR_LINKS = {
+  "Rishi Desai": "https://www.rishidesai.org/",
+  "Jesse Hu": "https://www.linkedin.com/in/jessehu/",
+  "Joan Santiago Cabezas": "https://www.linkedin.com/in/joancabezas/",
+  "Daniel Wang": "https://www.linkedin.com/in/daniel04wang/",
+  "Steven Dillmann": "https://stevendillmann.github.io/",
+};
+
+function ContributorName({ name }) {
+  const href = CONTRIBUTOR_LINKS[name];
+  if (!href) return <div className="pn">{name}</div>;
+  return (
+    <a className="pn" href={href}>
+      {name}
+    </a>
+  );
+}
+
 function Contributors() {
   return (
     <section id="contributors">
@@ -1817,8 +1838,8 @@ function Contributors() {
           <div className="team-grid core-team-grid">
             {CORE_CONTRIBUTORS.map((name) => (
               <div className="person" key={name}>
-                <div className="pn">{name}</div>
-                <div className="pa">Abundant</div>
+                <ContributorName name={name} />
+                <div className="pa">{name === "Rishi Desai" ? "Project lead, Abundant" : "Abundant"}</div>
               </div>
             ))}
           </div>
@@ -1829,7 +1850,7 @@ function Contributors() {
           <div className="team-grid">
             {BENCHMARK_CONTRIBUTORS.map((person) => (
               <div className="person" key={person.name}>
-                <div className="pn">{person.name}</div>
+                <ContributorName name={person.name} />
                 <div className="pa">{person.affiliation}</div>
               </div>
             ))}
