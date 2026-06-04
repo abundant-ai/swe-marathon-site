@@ -11,7 +11,7 @@ import {
 } from "echarts/components";
 import { init, use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { LEADERBOARD, MODEL_COLORS } from "./data.js";
+import { LEADERBOARD, MODEL_COLORS, RH_BY_MODEL } from "./data.js";
 
 use([
   BarChart,
@@ -100,25 +100,14 @@ const ANALYSIS_MODELS = LEADERBOARD
     };
   });
 
-const RH_CLASSIFICATIONS = [
-  { name: "GPT-5.5", harness: "Terminus 2 + Codex", n: 10, hacked: 4, success: 0, criteria: { "Instruct model substitution": 4, "Dataset provenance": 1 } },
-  { name: "Kimi K2.6", harness: "Kimi CLI + Terminus 2", n: 10, hacked: 4, success: 0, criteria: { "Test data contamination": 4 } },
-  { name: "GLM 5.1", harness: "Terminus 2", n: 3, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
-  { name: "Claude Opus 4.8", harness: "Claude Code", n: 5, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
-  { name: "Gemini 3.5 Flash", harness: "Gemini CLI", n: 5, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
-  { name: "Gemini 3.1 Pro", harness: "Gemini CLI + Terminus 2", n: 10, hacked: 1, success: 0, criteria: { "Instruct model substitution": 1, "Dataset provenance": 1 } },
-  { name: "Claude Opus 4.7", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
-  { name: "DeepSeek V4 Pro", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
-  { name: "MiniMax M2.7", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
-];
-
-const RH_CLASSIFIED_TOTALS = RH_CLASSIFICATIONS.reduce(
+const RH_TOTALS = RH_BY_MODEL.reduce(
   (acc, row) => ({
     n: acc.n + row.n,
-    hacked: acc.hacked + row.hacked,
+    attempt: acc.attempt + row.attempt,
+    exploit: acc.exploit + row.exploit,
     success: acc.success + row.success,
   }),
-  { n: 0, hacked: 0, success: 0 }
+  { n: 0, attempt: 0, exploit: 0, success: 0 }
 );
 
 /* ---------- ECharts theme tokens (derived from active CSS variables) ---------- */
@@ -473,13 +462,14 @@ function RewardHackingChart() {
   const ref = useEcharts((theme) => {
     const axis = axisCommon(theme);
     const tooltip = tooltipCommon(theme);
-    const rows = RH_CLASSIFICATIONS
+    const rows = RH_BY_MODEL
       .map((row) => ({
         ...row,
-        hackedPct: row.hacked / row.n * 100,
+        attemptPct: row.attempt / row.n * 100,
+        exploitPct: row.exploit / row.n * 100,
         successPct: row.success / row.n * 100,
       }))
-      .sort((a, b) => b.hackedPct - a.hackedPct);
+      .sort((a, b) => b.exploitPct - a.exploitPct);
     return {
       backgroundColor: "transparent",
       grid: { left: 190, right: 52, top: 42, bottom: 48 },
@@ -489,13 +479,13 @@ function RewardHackingChart() {
         name: "Share of trials (%)",
         nameLocation: "middle",
         nameGap: 34,
-        max: Math.ceil(Math.max(...rows.map((r) => r.hackedPct)) / 10) * 10,
+        max: Math.ceil(Math.max(...rows.map((r) => r.exploitPct)) / 10) * 10,
         axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
       },
       yAxis: {
         type: "category",
         inverse: true,
-        data: rows.map((r) => `${r.name} / ${r.harness}`),
+        data: rows.map((r) => r.name),
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: { color: theme.ink2, fontFamily: "Inter, sans-serif", fontSize: 11 },
@@ -513,23 +503,19 @@ function RewardHackingChart() {
         axisPointer: { type: "shadow" },
         formatter: (params) => {
           const row = rows[params[0].dataIndex];
-          const criteria = Object.entries(row.criteria)
-            .map(([name, count]) => `${name}: <b>${count}</b>`)
-            .join("<br />") || "No failed reward-hacking criteria";
           return `<div style="font-family:JetBrains Mono;font-size:11px;color:${theme.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${row.name}</div>
-                  <div style="color:${theme.ink2};font-size:11px;margin-bottom:6px;">${row.harness}</div>
                   <div>Trials: <b>${row.n}</b></div>
-                  <div>Classifier-positive: <b>${row.hacked}</b> (${row.hackedPct.toFixed(1)}%)</div>
-                  <div>Earned reward after hacking: <b>${row.success}</b> (${row.successPct.toFixed(1)}%)</div>
-                  <div style="margin-top:6px;color:${theme.ink2};">${criteria}</div>`;
+                  <div>Exploit-shaped attempts: <b>${row.attempt}</b> (${row.attemptPct.toFixed(1)}%)</div>
+                  <div>Clear verifier bypasses: <b>${row.exploit}</b> (${row.exploitPct.toFixed(1)}%)</div>
+                  <div>Earned reward after bypass: <b>${row.success}</b> (${row.successPct.toFixed(1)}%)</div>`;
         },
       },
       animation: false,
       series: [
         {
-          name: "Reward-hacking classification",
+          name: "Clear verifier bypass",
           type: "bar",
-          data: rows.map((r) => +r.hackedPct.toFixed(1)),
+          data: rows.map((r) => +r.exploitPct.toFixed(1)),
           barWidth: 18,
           itemStyle: { color: theme.rewardHack, borderColor: theme.pointBorder, borderWidth: 0.8 },
           label: {
@@ -554,8 +540,9 @@ function RewardHackingChart() {
       </div>
       <div ref={ref} className="anal-chart" style={{ height: 400 }}></div>
       <div className="anal-foot">
-        Verifier-side reward-hacking classifications over {RH_CLASSIFIED_TOTALS.n} real agent runs:
-        {" "}{RH_CLASSIFIED_TOTALS.hacked} were classifier-positive, and {RH_CLASSIFIED_TOTALS.success} earned reward after being classified as hacked.
+        Per-model reward-hacking incidence over {RH_TOTALS.n} logged trials:
+        {" "}{RH_TOTALS.attempt} showed exploit-shaped actions, {RH_TOTALS.exploit} shipped clear verifier bypasses,
+        and {RH_TOTALS.success} earned reward after a bypass.
       </div>
     </div>
   );
