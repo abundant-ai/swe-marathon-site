@@ -495,14 +495,12 @@ function Hero() {
           by Abundant AI
         </a>
         <p className="lede">
-          <strong>20 multi-hour SWE tasks</strong> spanning library
-          reproductions, full-stack product clones, and ML engineering.
+          20 realistic, multi-hour SWE tasks to challenge frontier coding agents.
         </p>
         <StatStrip />
         <div className="hero-actions">
-          <a className="btn contact" href={PAPER_URL} target="_blank" rel="noreferrer">Paper ↗</a>
-          <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
-          <a className="btn ghost" href="mailto:jesse@abundant.ai">Get in Touch</a>
+          <a className="btn ghost" href={PAPER_URL} target="_blank" rel="noreferrer">Paper ↗</a>
+          <a className="btn ghost" href="https://github.com/abundant-ai/swe-marathon">GitHub ↗</a>
         </div>
       </div>
     </header>);
@@ -815,15 +813,23 @@ function BenchmarkBullets() {
   const bullets = [
     {
       label: "Community-inspired tasks",
-      text: "Tasks draw from the evals community and frontier-lab case studies, including Anthropic, OpenAI, and Cursor, alongside product clones, ML systems, and optization.",
-    },
-    {
-      label: "Handcrafted, not farmed",
-      text: "Diverse, handcrafted, and contamination-free. Tasks are built with a unique environment, verifier, and human-written reference solution. No automated task generation from GitHub.",
+      text: (
+        <>
+          Tasks are drawn from the evals community and frontier-lab case studies, including{" "}
+          <a href="#task/rust-c-compiler">Anthropic's C compiler</a>,{" "}
+          <a href="#task/parameter-golf">OpenAI's Parameter Golf</a>, and{" "}
+          <a href="#task/rust-java-lsp">Cursor's long-running agent work</a>.
+        </>
+      ),
     },
     {
       label: "CUA-verified product clones",
-      text: "Full-stack clone tasks combine unit-test checks with a Computer-Use-Agent browser rubric, where a CUA agent operates the UI like a real user.",
+      text: (
+        <>
+          Full-stack clone tasks combine unit-test checks with a Computer-Use-Agent browser rubric, where a CUA agent operates the UI like a real user.{" "}
+          <a href="#task/excel-clone/artifacts">See the Excel clone live artifacts.</a>
+        </>
+      ),
     },
     {
       label: "Reward-hacking resistant",
@@ -834,10 +840,6 @@ function BenchmarkBullets() {
   return (
     <section id="benchmark-design" className="benchmark-design">
       <div className="container">
-        <div className="section-head">
-          <div className="section-no"><span className="dot">●</span> 02 / design</div>
-          <h2 className="section-title">Benchmark design</h2>
-        </div>
         <figure className="horizon-figure">
           <img
             src="/benchmark-horizons.svg"
@@ -875,6 +877,22 @@ const TASK_DISPLAY_ORDER = {
   ],
 };
 
+const CUA_TASK_IDS = new Set(["slack-clone", "excel-clone", "s3-clone", "mastodon-clone"]);
+
+function isCuaTask(taskId) {
+  return CUA_TASK_IDS.has(taskId);
+}
+
+function TaskCuaBadge({ taskId }) {
+  if (!isCuaTask(taskId)) return null;
+  return (
+    <span className="task-cua-badge">
+      <span className="task-cua-play" aria-hidden="true" />
+      <span>Interactive</span>
+    </span>
+  );
+}
+
 function taskDisplayRank(familyId, taskId) {
   const order = TASK_DISPLAY_ORDER[familyId];
   if (!order) return 0;
@@ -888,9 +906,8 @@ function Tasks() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 03 / tasks</div>
-          <h2 className="section-title">Dataset Breakdown</h2>
+          <h2 className="section-title">Tasks</h2>
         </div>
-        <p className="section-note">20 marathon-length tasks over 4 diverse task families</p>
 
         {TASK_FAMILIES.filter((family) => family.id !== "all").map((family) => {
           const familyTasks = TASKS
@@ -906,13 +923,19 @@ function Tasks() {
               <div className="tasks-grid">
                 {familyTasks.map((task) => (
                   <a
-                    className={"task task-link " + (TASK_DETAILS[task.id] ? "has-detail" : "")}
+                    className={
+                      "task task-link " +
+                      (TASK_DETAILS[task.id] ? "has-detail " : "") +
+                      (isCuaTask(task.id) ? "is-cua" : "")
+                    }
                     href={`#task/${task.id}`}
                     key={task.id}
                   >
                     <div className="task-head">
-                      <TaskCompanyBadges taskId={task.id} />
-                      <div className="task-budget">{task.agentH}h agent timeout</div>
+                      <div className="task-tags">
+                        <TaskCompanyBadges taskId={task.id} />
+                        <TaskCuaBadge taskId={task.id} />
+                      </div>
                     </div>
                     <h3 className="task-title">{task.title}</h3>
                     <p className="task-desc">{task.desc}</p>
@@ -1631,9 +1654,26 @@ function TrajectoryPage({ trialId }) {
   );
 }
 
-function TaskDetailPage({ taskId }) {
+function TaskDetailPage({ taskId, targetSection }) {
   const detail = TASK_DETAILS[taskId];
   const task = TASKS.find((t) => t.id === taskId);
+
+  useEffect(() => {
+    if (targetSection !== "artifacts") return;
+    const id = `task-${taskId}-artifacts`;
+    let frame = 0;
+    let attempts = 0;
+    const scrollToTarget = () => {
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ block: "start" });
+        return;
+      }
+      if (attempts++ < 30) frame = requestAnimationFrame(scrollToTarget);
+    };
+    frame = requestAnimationFrame(scrollToTarget);
+    return () => cancelAnimationFrame(frame);
+  }, [taskId, targetSection]);
 
   if (!task) {
     return (
@@ -1742,7 +1782,7 @@ function TaskDetailPage({ taskId }) {
       )}
 
       {(detail.artifacts || detail.evidence) && (
-        <section className="task-page">
+        <section className="task-page" id={`task-${taskId}-artifacts`}>
           <div className="container">
             <div className="section-head">
               <div className="section-no"><span className="dot">●</span> {detail.artifacts ? "agent trials" : "result"}</div>
@@ -1903,7 +1943,7 @@ function Citation() {
   title        = {{SWE-Marathon: Can Agents Autonomously Complete Ultra-Long-Horizon Software Work?}},
   author       = {${citationAuthors}},
   year         = {2026},
-  howpublished = {\\url{https://github.com/abundant-ai/long-horizon}},
+  howpublished = {\\url{https://github.com/abundant-ai/swe-marathon}},
   note         = {Benchmark and evaluation code.}
 }`;
   const [copied, setCopied] = useState(false);
@@ -1965,7 +2005,7 @@ function Footer() {
             <div className="foot-list">
               <a href={PAPER_URL} target="_blank" rel="noreferrer">Paper PDF</a>
               <a href="mailto:jesse@abundant.ai">Get in Touch</a>
-              <a href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
+              <a href="https://github.com/abundant-ai/swe-marathon">GitHub ↗</a>
             </div>
           </div>
         </div>
@@ -2017,11 +2057,14 @@ function App() {
     );
   }
 
-  const taskMatch = hash.match(/^#task\/(.+)$/);
+  const taskMatch = hash.match(/^#task\/([^/]+)(?:\/(.+))?$/);
   if (taskMatch) {
     return (
       <>
-        <TaskDetailPage taskId={decodeURIComponent(taskMatch[1])} />
+        <TaskDetailPage
+          taskId={decodeURIComponent(taskMatch[1])}
+          targetSection={taskMatch[2] ? decodeURIComponent(taskMatch[2]) : null}
+        />
         <Footer />
       </>
     );
@@ -2031,11 +2074,11 @@ function App() {
     <>
       <Hero />
       <Leaderboard />
+      <BenchmarkBullets />
       <Tasks />
       <Suspense fallback={<div className="analysis-loading">Loading analysis...</div>}>
         <Analysis />
       </Suspense>
-      <BenchmarkBullets />
       <Findings />
       <Contributors />
       <Citation />

@@ -193,7 +193,7 @@ function ComputeHorizonChart() {
   const ref = useEcharts((theme) => {
     const axis = axisCommon(theme);
     const tooltip = tooltipCommon(theme);
-    const configs = ANALYSIS_MODELS.filter((m) => m.avgTokensM != null && m.avgTokensM > 0);
+    const configs = ANALYSIS_MODELS.filter((m) => m.avgTokensM != null && m.avgTokensM > 0 && m.pass1 > 0);
     const maxPass = Math.max(...configs.map((m) => m.pass1));
 
     // Connectors: same model name, ordered by token spend.
@@ -224,7 +224,7 @@ function ComputeHorizonChart() {
 
     return {
       backgroundColor: "transparent",
-      grid: { left: 62, right: 230, top: 48, bottom: 64 },
+      grid: { left: 82, right: 230, top: 50, bottom: 70 },
       xAxis: {
         ...axis,
         type: "log",
@@ -340,7 +340,7 @@ function ParetoChart({ metric = "pass1" }) {
     const yAxisName = metric === "partial" ? "Uncalibrated partial score (%)" : "Resolution rate (%)";
     const yTooltip = metric === "partial" ? "Partial score" : "Resolution rate";
     const agg = ANALYSIS_MODELS
-      .filter((m) => m[xKey] != null && m[xKey] >= 0)
+      .filter((m) => m[xKey] != null && m[xKey] >= 0 && m[yKey] > 0)
       .map((m) => ({ m, x: m[xKey], rate: m[yKey] / 100 }));
 
     const frontierPts = agg
@@ -450,14 +450,14 @@ function ParetoChart({ metric = "pass1" }) {
     <div className="anal-card">
       <div className="anal-card-head">
         <div>
-          <div className="anal-card-no">{metric === "partial" ? "FIG · PARTIAL PARETO" : "FIG · PARETO"}</div>
+          <div className="anal-card-no">{metric === "partial" ? "FIG · COST VS PARTIAL SCORE" : "FIG · PARETO"}</div>
         </div>
         <div className="anal-controls">
           <button className={"pill " + (xAxis === "cost" ? "active" : "")} onClick={() => setXAxis("cost")}>Cost ($)</button>
           <button className={"pill " + (xAxis === "tokens" ? "active" : "")} onClick={() => setXAxis("tokens")}>Tokens (M)</button>
         </div>
       </div>
-      <div ref={ref} className="anal-chart" style={{ height: 380 }}></div>
+      <div ref={ref} className="anal-chart" style={{ height: 500 }}></div>
       {metric === "partial" && (
         <div className="anal-foot">
           Partial scores are diagnostic only and should not be interpreted as task success. They are computed as the fraction of unit tests passed. Rollouts caught by anti-cheating guard tests receive reward 0.0, but may still obtain high partial scores by satisfying or gaming other checks.
@@ -605,8 +605,8 @@ function Analysis() {
           </button>
           <button className={"anal-tab " + (tab === "partialPareto" ? "active" : "")} onClick={() => setTab("partialPareto")}>
             <span className="anal-tab-no">02</span>
-            <span className="anal-tab-t">Partial score</span>
-            <span className="anal-tab-s">uncalibrated Pareto</span>
+            <span className="anal-tab-t">Cost vs partial score</span>
+            <span className="anal-tab-s">uncalibrated progress</span>
           </button>
           <button className={"anal-tab " + (tab === "horizon" ? "active" : "")} onClick={() => setTab("horizon")}>
             <span className="anal-tab-no">03</span>
