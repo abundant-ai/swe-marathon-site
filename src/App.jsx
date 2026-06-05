@@ -1334,6 +1334,11 @@ function TaskLeaderboard({ leaderboard }) {
   return (
     <div className="task-lb-card">
       <p className="task-lb-note">{leaderboard.note}</p>
+      <p className="task-lb-note">
+        Reward is the final binary task score. Partial is a diagnostic pass-rate
+        signal and can be high even when anti-cheat or a strict verifier zeros
+        the final reward.
+      </p>
       <div className="task-lb-list">
         {leaderboard.rows.map((row) => {
           const hasTrials = Array.isArray(row.trials) && row.trials.length > 0;
@@ -1381,6 +1386,7 @@ function TaskLeaderboard({ leaderboard }) {
                       {hackSet.has(t.id) && <span className="trial-chip-hack">⚠ Reward hack</span>}
                     </span>
                     <span className="trial-chip-metrics">
+                      <span><i>reward</i>{t.reward.toFixed(1)}</span>
                       <span><i>partial</i>{t.partial.toFixed(3)}</span>
                       <span><i>tokens</i>{t.tokens}</span>
                       <span><i>duration</i>{t.duration || "—"}</span>
@@ -1563,6 +1569,9 @@ function TrajectoryPage({ trialId }) {
     );
   }
 
+  const taskHackIds = TASK_DETAILS[backTask]?.leaderboard?.hackIds || [];
+  const isRewardHack = taskHackIds.includes(trial.id);
+  const needsPartialNote = trial.reward === 0 && trial.partial > 0;
   const stats = [
     { label: "Rank", value: `#${trial.rank}` },
     { label: "Reward", value: trial.reward.toFixed(1) },
@@ -1601,6 +1610,15 @@ function TrajectoryPage({ trialId }) {
               <div key={s.label}><span>{s.label}</span><b>{s.value}</b></div>
             ))}
           </div>
+          {needsPartialNote && (
+            <p className="artifact-note">
+              Partial is a diagnostic pass-rate signal, not the final task score.
+              This run received reward 0.0
+              {isRewardHack
+                ? " because the verifier flagged reward-hacking behavior."
+                : " because the binary verifier still failed one or more required gates."}
+            </p>
+          )}
           <TrajectoryExplorer
             trial={trial.id}
             label={`${trial.configAgent} · ${trial.configModel}`}
