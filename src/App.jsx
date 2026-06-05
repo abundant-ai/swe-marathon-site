@@ -14,6 +14,7 @@ import {
 
 const Analysis = lazy(() => import("./analysis.jsx"));
 
+const PAPER_URL = "/swe-marathon-paper.pdf";
 const TASK_FAMILIES = CATEGORIES;
 
 /* ---------------- COMPONENTS ---------------- */
@@ -499,8 +500,9 @@ function Hero() {
         </p>
         <StatStrip />
         <div className="hero-actions">
-          <a className="btn contact" href="mailto:jesse@abundant.ai">Get in Touch</a>
+          <a className="btn contact" href={PAPER_URL} target="_blank" rel="noreferrer">Paper ↗</a>
           <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
+          <a className="btn ghost" href="mailto:jesse@abundant.ai">Get in Touch</a>
         </div>
       </div>
     </header>);
@@ -1356,6 +1358,11 @@ function TaskLeaderboard({ leaderboard }) {
   return (
     <div className="task-lb-card">
       <p className="task-lb-note">{leaderboard.note}</p>
+      <p className="task-lb-note">
+        Reward is the final binary task score. Partial is a diagnostic pass-rate
+        signal and can be high even when anti-cheat or a strict verifier zeros
+        the final reward.
+      </p>
       <div className="task-lb-list">
         {leaderboard.rows.map((row) => {
           const hasTrials = Array.isArray(row.trials) && row.trials.length > 0;
@@ -1403,6 +1410,7 @@ function TaskLeaderboard({ leaderboard }) {
                       {hackSet.has(t.id) && <span className="trial-chip-hack">⚠ Reward hack</span>}
                     </span>
                     <span className="trial-chip-metrics">
+                      <span><i>reward</i>{t.reward.toFixed(1)}</span>
                       <span><i>partial</i>{t.partial.toFixed(3)}</span>
                       <span><i>tokens</i>{t.tokens}</span>
                       <span><i>duration</i>{t.duration || "—"}</span>
@@ -1585,6 +1593,9 @@ function TrajectoryPage({ trialId }) {
     );
   }
 
+  const taskHackIds = TASK_DETAILS[backTask]?.leaderboard?.hackIds || [];
+  const isRewardHack = taskHackIds.includes(trial.id);
+  const needsPartialNote = trial.reward === 0 && trial.partial > 0;
   const stats = [
     { label: "Rank", value: `#${trial.rank}` },
     { label: "Run", value: trajectoryRunLabel(trial) },
@@ -1624,6 +1635,15 @@ function TrajectoryPage({ trialId }) {
               <div key={s.label}><span>{s.label}</span><b>{s.value}</b></div>
             ))}
           </div>
+          {needsPartialNote && (
+            <p className="artifact-note">
+              Partial is a diagnostic pass-rate signal, not the final task score.
+              This run received reward 0.0
+              {isRewardHack
+                ? " because the verifier flagged reward-hacking behavior."
+                : " because the binary verifier still failed one or more required gates."}
+            </p>
+          )}
           <TrajectoryExplorer
             trial={trial.id}
             label={`${trial.configAgent} · ${trial.configModel}`}
@@ -1809,12 +1829,13 @@ function Findings() {
 }
 
 const CORE_CONTRIBUTORS = [
-  "Rishi Desai",
-  "Jesse Hu",
-  "Joan Santiago Cabezas",
-  "Neel Harsola",
-  "Pratyush Shukla",
-  "Daniel Wang",
+  { name: "Rishi Desai", affiliation: "Abundant" },
+  { name: "Jesse Hu", affiliation: "Abundant" },
+  { name: "Joan Cabezas", affiliation: "Abundant" },
+  { name: "Neel Harsola", affiliation: "Abundant" },
+  { name: "Pratyush Shukla", affiliation: "Abundant" },
+  { name: "Daniel Wang", affiliation: "Abundant" },
+  { name: "Xiangyi Li", affiliation: "BenchFlow" },
 ];
 
 const BENCHMARK_CONTRIBUTORS = [
@@ -1835,16 +1856,19 @@ const BENCHMARK_CONTRIBUTORS = [
   { name: "Nevasini Sasikumar", affiliation: "UC San Diego" },
   { name: "Luyang Kong", affiliation: "Independent" },
   { name: "Erik Quintanilla", affiliation: "Refresh" },
-  { name: "Xiangyi Li", affiliation: "BenchFlow" },
   { name: "Ivan Bercovich", affiliation: "UC Santa Barbara" },
-  { name: "Steven Dillmann", affiliation: "Stanford University" },
+  { name: "Steven Dillmann", affiliation: "Stanford University" },  
 ];
 
 const CONTRIBUTOR_LINKS = {
   "Rishi Desai": "https://www.rishidesai.org/",
   "Jesse Hu": "https://www.linkedin.com/in/jessehu/",
-  "Joan Santiago Cabezas": "https://www.linkedin.com/in/joancabezas/",
+  "Joan Cabezas": "https://www.linkedin.com/in/joancabezas/",
+  "Neel Harsola": "https://www.linkedin.com/in/neelharsola/",
+  "Pratyush Shukla": "https://www.linkedin.com/in/prattyagi/",
   "Daniel Wang": "https://www.linkedin.com/in/daniel04wang/",
+  "Xiangyi Li": "https://www.xiangyi.li/",
+  "Ivan Bercovich": "https://ivanbercovich.com/",
   "Steven Dillmann": "https://stevendillmann.github.io/",
 };
 
@@ -1870,10 +1894,10 @@ function Contributors() {
         <div className="team-block">
           <div className="team-kicker">Core Team</div>
           <div className="team-grid core-team-grid">
-            {CORE_CONTRIBUTORS.map((name) => (
-              <div className="person" key={name}>
-                <ContributorName name={name} />
-                <div className="pa">Abundant</div>
+            {CORE_CONTRIBUTORS.map((person) => (
+              <div className="person" key={person.name}>
+                <ContributorName name={person.name} />
+                <div className="pa">{person.affiliation}</div>
               </div>
             ))}
           </div>
@@ -1897,7 +1921,7 @@ function Contributors() {
 
 function Citation() {
   const citationAuthors = [
-    ...CORE_CONTRIBUTORS,
+    ...CORE_CONTRIBUTORS.map((person) => person.name),
     ...BENCHMARK_CONTRIBUTORS.map((person) => person.name),
   ].join(" and ");
   const bib = `@misc{swemarathon_2026,
@@ -1964,6 +1988,7 @@ function Footer() {
           <div>
             <div className="foot-h">Resources</div>
             <div className="foot-list">
+              <a href={PAPER_URL} target="_blank" rel="noreferrer">Paper PDF</a>
               <a href="mailto:jesse@abundant.ai">Get in Touch</a>
               <a href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
             </div>
@@ -1989,6 +2014,23 @@ function App() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  useEffect(() => {
+    if (!hash || /^#(task|trajectory)\//.test(hash)) return;
+    const id = decodeURIComponent(hash.slice(1));
+    let frame = 0;
+    let attempts = 0;
+    const scrollToTarget = () => {
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ block: "start" });
+        return;
+      }
+      if (attempts++ < 30) frame = requestAnimationFrame(scrollToTarget);
+    };
+    frame = requestAnimationFrame(scrollToTarget);
+    return () => cancelAnimationFrame(frame);
+  }, [hash]);
 
   const trajMatch = hash.match(/^#trajectory\/(.+)$/);
   if (trajMatch) {

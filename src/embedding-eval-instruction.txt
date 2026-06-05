@@ -4,7 +4,7 @@ Implement `/app/evaluate.py` accepting `--output`, `--task`, and `--type`. It mu
 
 ## Setup
 
-- **Model**: `sentence-transformers/all-MiniLM-L6-v2` — pre-downloaded under `$HF_HOME` (`/opt/hf_cache`); load it the normal way and the cache resolves offline.
+- **Model**: `sentence-transformers/all-MiniLM-L6-v2` — pre-downloaded under `$HF_HOME` (`/opt/[REDACTED_HF_TOKEN]`); load it the normal way and the cache resolves offline.
 - **Datasets**: `/app/datasets/` — JSONL files per dataset. Read them directly; do **not** call `datasets.load_dataset(...)` against Hugging Face Hub.
 - **Task configs**: `/app/tasks/` — one JSON per dataset (type, paths, eval params).
 - **Output**: `/app/results.json` as `{task_name: {main_score, ...metrics}}`.

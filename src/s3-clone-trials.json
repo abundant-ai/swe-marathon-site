@@ -4,6 +4,109 @@
   "configs": [
     {
       "agent": "Claude Code",
+      "model": "Claude Opus 4.8",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.788,
+      "best": 0.841,
+      "correctness": 0.591,
+      "ux": 0.985,
+      "trials": [
+        {
+          "id": "s3-clone-282",
+          "trial": "s3-clone-282",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.841,
+          "correctness": 0.682,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "18.8M",
+          "cost": "$40.29",
+          "duration": "37m 33s",
+          "startedAt": "2026-06-03 17:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/s3-clone-282.json",
+          "steps": 135
+        },
+        {
+          "id": "s3-clone-285",
+          "trial": "s3-clone-285",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.841,
+          "correctness": 0.682,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "15.4M",
+          "cost": "$33.99",
+          "duration": "34m 51s",
+          "startedAt": "2026-06-03 17:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/s3-clone-285.json",
+          "steps": 129
+        },
+        {
+          "id": "s3-clone-279",
+          "trial": "s3-clone-279",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.795,
+          "correctness": 0.591,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "14.6M",
+          "cost": "$32.18",
+          "duration": "38m 54s",
+          "startedAt": "2026-06-03 05:32 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/s3-clone-279.json",
+          "steps": 116
+        },
+        {
+          "id": "s3-clone-257",
+          "trial": "s3-clone-257",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.734,
+          "correctness": 0.545,
+          "ux": 0.923,
+          "gates": "",
+          "tokens": "14.3M",
+          "cost": "$12.78",
+          "duration": "45m 53s",
+          "startedAt": "2026-06-03 00:56 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/s3-clone-257.json",
+          "steps": 136
+        },
+        {
+          "id": "s3-clone-292",
+          "trial": "s3-clone-292",
+          "agent": "Claude Code",
+          "model": "Claude Opus 4.8",
+          "reward": 0.0,
+          "partial": 0.727,
+          "correctness": 0.455,
+          "ux": 1.0,
+          "gates": "",
+          "tokens": "17.4M",
+          "cost": "$36.13",
+          "duration": "36m 11s",
+          "startedAt": "2026-06-03 19:14 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/s3-clone-292.json",
+          "steps": 141
+        }
+      ],
+      "rank": 1
+    },
+    {
+      "agent": "Claude Code",
       "model": "Claude Opus 4.7",
       "n": 5,
       "binary": "0 / 5",
@@ -104,7 +207,7 @@
           "steps": 142
         }
       ],
-      "rank": 1
+      "rank": 2
     },
     {
       "agent": "Codex",
@@ -208,7 +311,7 @@
           "steps": 53
         }
       ],
-      "rank": 2
+      "rank": 3
     },
     {
       "agent": "Terminus 2",
@@ -311,7 +414,7 @@
           "steps": 22
         }
       ],
-      "rank": 3
+      "rank": 4
     },
     {
       "agent": "Terminus 2",
@@ -415,92 +518,110 @@
           "steps": 119
         }
       ],
-      "rank": 4
+      "rank": 5
     },
     {
-      "agent": "Claude Code",
-      "model": "Claude Opus 4.8",
-      "n": 4,
-      "binary": "0 / 4",
-      "partial": 0.49,
-      "best": 0.5,
-      "correctness": 0.0,
-      "ux": 0.981,
+      "agent": "Gemini CLI",
+      "model": "Gemini 3.5 Flash",
+      "n": 5,
+      "binary": "0 / 5",
+      "partial": 0.488,
+      "best": 0.682,
+      "correctness": 0.191,
+      "ux": 0.785,
       "trials": [
         {
-          "id": "s3-clone-279",
-          "trial": "s3-clone-279",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
+          "id": "s3-clone-265",
+          "trial": "s3-clone-265",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
           "reward": 0.0,
-          "partial": 0.5,
-          "correctness": 0.0,
+          "partial": 0.682,
+          "correctness": 0.364,
           "ux": 1.0,
           "gates": "",
-          "tokens": "14.6M",
-          "cost": "$32.18",
-          "duration": "38m 54s",
-          "startedAt": "2026-06-03 05:32 UTC",
+          "tokens": "9.1M",
+          "cost": "$3.36",
+          "duration": "18m 38s",
+          "startedAt": "2026-06-03 02:32 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-279.json",
-          "steps": 116
+          "trajectoryUrl": "/trajectories/s3-clone-265.json",
+          "steps": 67
         },
         {
-          "id": "s3-clone-282",
-          "trial": "s3-clone-282",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
+          "id": "s3-clone-268",
+          "trial": "s3-clone-268",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
           "reward": 0.0,
-          "partial": 0.5,
-          "correctness": 0.0,
+          "partial": 0.636,
+          "correctness": 0.273,
           "ux": 1.0,
           "gates": "",
-          "tokens": "18.8M",
-          "cost": "$40.29",
-          "duration": "37m 33s",
-          "startedAt": "2026-06-03 17:32 UTC",
+          "tokens": "16.1M",
+          "cost": "$4.87",
+          "duration": "21m 37s",
+          "startedAt": "2026-06-03 03:14 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-282.json",
-          "steps": 135
+          "trajectoryUrl": "/trajectories/s3-clone-268.json",
+          "steps": 103
         },
         {
-          "id": "s3-clone-285",
-          "trial": "s3-clone-285",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
+          "id": "s3-clone-260",
+          "trial": "s3-clone-260",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
           "reward": 0.0,
-          "partial": 0.5,
-          "correctness": 0.0,
+          "partial": 0.591,
+          "correctness": 0.182,
           "ux": 1.0,
           "gates": "",
-          "tokens": "15.4M",
-          "cost": "$33.99",
-          "duration": "34m 51s",
-          "startedAt": "2026-06-03 17:32 UTC",
+          "tokens": "1.8M",
+          "cost": "$1.58",
+          "duration": "14m 1s",
+          "startedAt": "2026-06-03 00:26 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-285.json",
-          "steps": 129
+          "trajectoryUrl": "/trajectories/s3-clone-260.json",
+          "steps": 23
         },
         {
-          "id": "s3-clone-257",
-          "trial": "s3-clone-257",
-          "agent": "Claude Code",
-          "model": "Claude Opus 4.8",
+          "id": "s3-clone-259",
+          "trial": "s3-clone-259",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
           "reward": 0.0,
-          "partial": 0.462,
-          "correctness": 0.0,
+          "partial": 0.53,
+          "correctness": 0.136,
           "ux": 0.923,
           "gates": "",
-          "tokens": "14.3M",
-          "cost": "$12.78",
-          "duration": "45m 53s",
-          "startedAt": "2026-06-03 00:56 UTC",
+          "tokens": "3.0M",
+          "cost": "$1.71",
+          "duration": "17m 51s",
+          "startedAt": "2026-06-03 00:26 UTC",
           "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-257.json",
-          "steps": 136
+          "trajectoryUrl": "/trajectories/s3-clone-259.json",
+          "steps": 31
+        },
+        {
+          "id": "s3-clone-267",
+          "trial": "s3-clone-267",
+          "agent": "Gemini CLI",
+          "model": "Gemini 3.5 Flash",
+          "reward": 0.0,
+          "partial": 0.0,
+          "correctness": 0.0,
+          "ux": 0.0,
+          "gates": "",
+          "tokens": "58K",
+          "cost": "$0.14",
+          "duration": "3m 35s",
+          "startedAt": "2026-06-03 03:14 UTC",
+          "status": "success",
+          "trajectoryUrl": "/trajectories/s3-clone-267.json",
+          "steps": 3
         }
       ],
-      "rank": 5
+      "rank": 6
     },
     {
       "agent": "Terminus 2",
@@ -603,7 +724,7 @@
           "steps": 131
         }
       ],
-      "rank": 6
+      "rank": 7
     },
     {
       "agent": "Terminus 2",
@@ -706,7 +827,7 @@
           "steps": 184
         }
       ],
-      "rank": 7
+      "rank": 8
     },
     {
       "agent": "Terminus 2",
@@ -807,109 +928,6 @@
           "status": "success",
           "trajectoryUrl": "/trajectories/s3-clone-197.json",
           "steps": 227
-        }
-      ],
-      "rank": 8
-    },
-    {
-      "agent": "Gemini CLI",
-      "model": "Gemini 3.5 Flash",
-      "n": 5,
-      "binary": "0 / 5",
-      "partial": 0.392,
-      "best": 0.5,
-      "correctness": 0.0,
-      "ux": 0.785,
-      "trials": [
-        {
-          "id": "s3-clone-260",
-          "trial": "s3-clone-260",
-          "agent": "Gemini CLI",
-          "model": "Gemini 3.5 Flash",
-          "reward": 0.0,
-          "partial": 0.5,
-          "correctness": 0.0,
-          "ux": 1.0,
-          "gates": "",
-          "tokens": "1.8M",
-          "cost": "$1.58",
-          "duration": "14m 1s",
-          "startedAt": "2026-06-03 00:26 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-260.json",
-          "steps": 23
-        },
-        {
-          "id": "s3-clone-265",
-          "trial": "s3-clone-265",
-          "agent": "Gemini CLI",
-          "model": "Gemini 3.5 Flash",
-          "reward": 0.0,
-          "partial": 0.5,
-          "correctness": 0.0,
-          "ux": 1.0,
-          "gates": "",
-          "tokens": "9.1M",
-          "cost": "$3.36",
-          "duration": "18m 38s",
-          "startedAt": "2026-06-03 02:32 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-265.json",
-          "steps": 67
-        },
-        {
-          "id": "s3-clone-268",
-          "trial": "s3-clone-268",
-          "agent": "Gemini CLI",
-          "model": "Gemini 3.5 Flash",
-          "reward": 0.0,
-          "partial": 0.5,
-          "correctness": 0.0,
-          "ux": 1.0,
-          "gates": "",
-          "tokens": "16.1M",
-          "cost": "$4.87",
-          "duration": "21m 37s",
-          "startedAt": "2026-06-03 03:14 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-268.json",
-          "steps": 103
-        },
-        {
-          "id": "s3-clone-259",
-          "trial": "s3-clone-259",
-          "agent": "Gemini CLI",
-          "model": "Gemini 3.5 Flash",
-          "reward": 0.0,
-          "partial": 0.462,
-          "correctness": 0.0,
-          "ux": 0.923,
-          "gates": "",
-          "tokens": "3.0M",
-          "cost": "$1.71",
-          "duration": "17m 51s",
-          "startedAt": "2026-06-03 00:26 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-259.json",
-          "steps": 31
-        },
-        {
-          "id": "s3-clone-267",
-          "trial": "s3-clone-267",
-          "agent": "Gemini CLI",
-          "model": "Gemini 3.5 Flash",
-          "reward": 0.0,
-          "partial": 0.0,
-          "correctness": 0.0,
-          "ux": 0.0,
-          "gates": "",
-          "tokens": "58K",
-          "cost": "$0.14",
-          "duration": "3m 35s",
-          "startedAt": "2026-06-03 03:14 UTC",
-          "status": "success",
-          "trajectoryUrl": "/trajectories/s3-clone-267.json",
-          "steps": 3
         }
       ],
       "rank": 9
