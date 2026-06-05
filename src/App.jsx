@@ -732,17 +732,6 @@ function formatTaskRate(value) {
   return `${value.toFixed(1)}%`;
 }
 
-// Per-failure-bucket accent. Reward hacking is red, consistent with the
-// cheat chips elsewhere on the site; the rest get distinct muted hues.
-function bucketColor(bucket) {
-  if (/reward hack/i.test(bucket)) return "oklch(0.55 0.18 25)";    // red
-  if (/premature/i.test(bucket)) return "var(--warn)";              // amber
-  if (/implementation/i.test(bucket)) return "oklch(0.52 0.12 250)"; // blue
-  if (/self-verif/i.test(bucket)) return "oklch(0.52 0.14 300)";    // purple
-  if (/timeout/i.test(bucket)) return "var(--ink-3)";               // gray
-  return "var(--accent)";
-}
-
 function Leaderboard() {
   const sorted = useMemo(
     () => LEADERBOARD.filter((r) => !r.ref).sort((a, b) => b.pass1 - a.pass1),
@@ -900,35 +889,42 @@ function Tasks() {
           return (
             <div className="task-family-group" key={family.id}>
               <div className="task-family-head">
-                <b>{family.label}</b>
+                <div>
+                  <span className="task-family-kicker">Collection</span>
+                  <h3>{family.label}</h3>
+                </div>
                 <span>{familyTasks.length} tasks</span>
               </div>
-              <div className="tasks-grid">
-                {familyTasks.map((task) => (
-                  <a
-                    className={"task task-link " + (TASK_DETAILS[task.id] ? "has-detail" : "")}
-                    href={`#task/${task.id}`}
-                    key={task.id}
-                  >
-                    <div className="task-head">
-                      <TaskCompanyBadges taskId={task.id} />
-                      <div className="task-budget">{task.agentH}h agent timeout</div>
-                    </div>
-                    <h3 className="task-title">{task.title}</h3>
-                    <p className="task-desc">{task.desc}</p>
-                    <div className="task-metrics">
-                      <div>
-                        <span className="k">Pass Rate</span>
-                        <span className="v">{formatTaskRate(task.pass1)}</span>
+              <ul className="tasks-list">
+                {familyTasks.map((task, taskIndex) => (
+                  <li className="task-list-item" key={task.id}>
+                    <a className="task task-link task-card" href={`#task/${task.id}`}>
+                      <div className="task-card-top">
+                        <span className="task-index">Task {String(taskIndex + 1).padStart(2, "0")}</span>
+                        <span className="task-budget">{task.agentH}h timeout</span>
                       </div>
-                      <div>
-                        <span className="k">Cheating Attempts</span>
-                        <span className="v">{formatTaskRate(task.exploit)}</span>
+                      <div className="task-main">
+                        <h4 className="task-title">{task.title}</h4>
+                        <p className="task-desc">{task.desc}</p>
+                        <TaskCompanyBadges taskId={task.id} />
                       </div>
-                    </div>
-                  </a>
+                      <div className="task-card-bottom">
+                        <div className="task-card-meta">
+                          <div className="task-stat">
+                            <span className="task-stat-label">Pass@1</span>
+                            <span className="task-stat-value">{formatTaskRate(task.pass1)}</span>
+                          </div>
+                          <div className="task-stat">
+                            <span className="task-stat-label">Cheat attempts</span>
+                            <span className="task-stat-value">{formatTaskRate(task.exploit)}</span>
+                          </div>
+                        </div>
+                        <span className="task-details-cta">View task →</span>
+                      </div>
+                    </a>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           );
         })}
@@ -1764,40 +1760,49 @@ function Findings() {
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 04 / failure modes</div>
           <h2 className="section-title">Failure Modes</h2>
+          <p className="section-note">Representative trajectories showing how agents fail, exploit, or stop short on marathon-length tasks.</p>
         </div>
 
-        <div className="finding-cards">
-          {CASE_STUDIES.map((c) => {
+        <ul className="finding-cards">
+          {CASE_STUDIES.map((c, index) => {
             const [agent, model] = c.config.split(" · ");
             const [bucketLabel, bucketDetail] = c.bucket.split(" · ");
             const taskId = c.trial.replace(/-\d+$/, "");
+            const trialNo = c.trial.match(/-(\d+)$/)?.[1] ?? c.trial;
             const task = TASKS.find((t) => t.id === taskId);
-            const color = bucketColor(c.bucket);
             return (
-              <a
-                className="finding-card"
-                href={`#trajectory/${encodeURIComponent(c.trial)}`}
-                key={c.trial}
-                style={{ "--finding-color": color }}
-              >
-                <div className="finding-card-top">
-                  <span className="finding-bucket" style={{ color }}>{bucketLabel}</span>
-                  {bucketDetail && <span className="finding-detail">{bucketDetail}</span>}
-                </div>
-                <div className="finding-model">
-                  <span className="finding-model-id">
-                    <BrandLogo name={model} />
-                    <span className="lb-model">{model}</span>
-                    <span className="lb-sep">/</span>
-                    <span className="lb-agent">{agent}</span>
-                  </span>
-                </div>
-                <div className="finding-task">{task ? task.title : taskId} <span>↗</span></div>
-                <p className="finding-card-body">{c.pattern}</p>
-              </a>
+              <li className="finding-card-item" key={c.trial}>
+                <a className="finding-card" href={`#trajectory/${encodeURIComponent(c.trial)}`}>
+                  <div className="finding-card-top">
+                    <span className="finding-index">Observation {String(index + 1).padStart(2, "0")}</span>
+                    <span className="finding-trial">Trial {trialNo}</span>
+                  </div>
+                  <div className="finding-main">
+                    <h3 className="finding-title">{bucketLabel}</h3>
+                    {bucketDetail && <p className="finding-detail">{bucketDetail}</p>}
+                    <p className="finding-card-body">{c.pattern}</p>
+                  </div>
+                  <div className="finding-facts">
+                    <div className="finding-fact">
+                      <span className="finding-fact-label">Task</span>
+                      <span className="finding-fact-value">{task ? task.title : taskId}</span>
+                    </div>
+                    <div className="finding-fact">
+                      <span className="finding-fact-label">Run</span>
+                      <span className="finding-fact-value finding-model-id">
+                        <BrandLogo name={model} />
+                        <span className="lb-model">{model}</span>
+                        <span className="lb-sep">/</span>
+                        <span className="lb-agent">{agent}</span>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="finding-details-cta">Open trajectory →</span>
+                </a>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
     </section>);
 
