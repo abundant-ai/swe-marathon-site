@@ -711,7 +711,7 @@
   }
   .task-link.has-detail {
     background:
-      linear-gradient(135deg, rgba(76, 175, 80, 0.12), transparent 42%),
+      linear-gradient(135deg, rgba(61, 90, 254, 0.12), transparent 42%),
       var(--bg);
   }
   .task-link.has-detail:hover { background: var(--accent-bg); }
@@ -1626,7 +1626,7 @@
   .task-lb-row.clickable { cursor: pointer; }
   .task-lb-row.clickable:hover { border-color: var(--accent); background: var(--bg-2); }
   .task-lb-row.top {
-    background: linear-gradient(90deg, rgba(76, 175, 80, 0.12), transparent 70%), var(--accent-bg);
+    background: linear-gradient(90deg, rgba(61, 90, 254, 0.12), transparent 70%), var(--accent-bg);
   }
   .task-lb-row.open { border-color: var(--accent); }
   .task-lb-chev {
@@ -2135,7 +2135,7 @@
   .finding-card:hover,
   .finding-card:focus-visible {
     background:
-      linear-gradient(135deg, rgba(76, 175, 80, 0.12), transparent 46%),
+      linear-gradient(135deg, rgba(61, 90, 254, 0.12), transparent 46%),
       var(--bg);
     color: var(--ink);
     outline: 0;
