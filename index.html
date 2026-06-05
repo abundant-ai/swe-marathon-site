@@ -66,6 +66,37 @@
         });
       })();
     </script>
+    <style>
+      /* Critical above-the-fold CSS so the themed background and static nav
+         render on first paint, before the JS-bundled styles.css loads (dev) —
+         otherwise the page flashes unstyled white then snaps to the theme.
+         Mirrors the corresponding rules in src/styles.css (accent-independent). */
+      :root {
+        --bg: #FFFFFF; --paper: #FFFFFF; --bg-2: #F4F4F5;
+        --ink: #18181B; --ink-2: #3F3F46; --ink-3: #71717A;
+        --rule: #E4E4E7; --rule-2: #F4F4F5;
+        --nav-bg: rgba(255, 255, 255, 0.86); --nav-hover-muted: rgba(255, 255, 255, 0.62);
+        --sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+      :root[data-theme="dark"] {
+        --bg: #121312; --paper: #151713; --bg-2: #1B1F1B;
+        --ink: #F4F4F5; --ink-2: #D4D4D8; --ink-3: #A1A1AA;
+        --rule: #303530; --rule-2: #232823;
+        --nav-bg: rgba(18, 19, 18, 0.88); --nav-hover-muted: rgba(18, 19, 18, 0.64);
+      }
+      html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+      .topnav { border-bottom: 1px solid var(--rule); background: var(--nav-bg); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); }
+      .topnav-inner { max-width: 1080px; margin: 0 auto; padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+      .brand { display: flex; align-items: center; gap: 9px; font-family: var(--mono); font-weight: 600; font-size: 13px; color: var(--ink); text-decoration: none; }
+      .brand-mark { width: 26px; height: 26px; color: var(--ink); display: grid; place-items: center; flex-shrink: 0; }
+      .brand-mark svg { width: 26px; height: 26px; display: block; }
+      .nav-links { display: flex; gap: 3px; font-family: var(--mono); font-size: 13px; font-weight: 700; align-items: center; }
+      .nav-links a { text-decoration: none; color: var(--ink); padding: 8px 10px; display: inline-flex; align-items: baseline; gap: 6px; }
+      .nav-links a .nl-no { font-size: 12px; color: var(--ink-3); }
+      .nav-links .nl-resource { margin-left: 6px; padding-inline: 14px; color: var(--bg); background: var(--ink); }
+      .theme-toggle { border: 1px solid var(--rule); background: var(--bg); color: var(--ink-2); font-family: var(--mono); font-size: 12px; font-weight: 700; line-height: 1; padding: 9px 10px; cursor: pointer; white-space: nowrap; }
+    </style>
     <link rel="canonical" href="https://swe-marathon.vercel.app/" />
 
     <meta property="og:type" content="website" />
