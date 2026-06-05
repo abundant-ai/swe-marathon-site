@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://swe-marathon.vercel.app/sitemap.xml
+Sitemap: https://www.swe-marathon.org/sitemap.xml
