@@ -14,6 +14,7 @@ import {
 
 const Analysis = lazy(() => import("./analysis.jsx"));
 
+const PAPER_URL = "/swe-marathon-paper.pdf";
 const TASK_FAMILIES = CATEGORIES;
 
 /* ---------------- COMPONENTS ---------------- */
@@ -499,8 +500,9 @@ function Hero() {
         </p>
         <StatStrip />
         <div className="hero-actions">
-          <a className="btn contact" href="mailto:jesse@abundant.ai">Get in Touch</a>
+          <a className="btn contact" href={PAPER_URL} target="_blank" rel="noreferrer">Paper ↗</a>
           <a className="btn ghost" href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
+          <a className="btn ghost" href="mailto:jesse@abundant.ai">Get in Touch</a>
         </div>
       </div>
     </header>);
@@ -1786,7 +1788,7 @@ function Findings() {
 const CORE_CONTRIBUTORS = [
   { name: "Rishi Desai", affiliation: "Abundant" },
   { name: "Jesse Hu", affiliation: "Abundant" },
-  { name: "Joan Santiago Cabezas", affiliation: "Abundant" },
+  { name: "Joan Cabezas", affiliation: "Abundant" },
   { name: "Neel Harsola", affiliation: "Abundant" },
   { name: "Pratyush Shukla", affiliation: "Abundant" },
   { name: "Daniel Wang", affiliation: "Abundant" },
@@ -1818,7 +1820,7 @@ const BENCHMARK_CONTRIBUTORS = [
 const CONTRIBUTOR_LINKS = {
   "Rishi Desai": "https://www.rishidesai.org/",
   "Jesse Hu": "https://www.linkedin.com/in/jessehu/",
-  "Joan Santiago Cabezas": "https://www.linkedin.com/in/joancabezas/",
+  "Joan Cabezas": "https://www.linkedin.com/in/joancabezas/",
   "Neel Harsola": "https://www.linkedin.com/in/neelharsola/",
   "Pratyush Shukla": "https://www.linkedin.com/in/prattyagi/",
   "Daniel Wang": "https://www.linkedin.com/in/daniel04wang/",
@@ -1943,6 +1945,7 @@ function Footer() {
           <div>
             <div className="foot-h">Resources</div>
             <div className="foot-list">
+              <a href={PAPER_URL} target="_blank" rel="noreferrer">Paper PDF</a>
               <a href="mailto:jesse@abundant.ai">Get in Touch</a>
               <a href="https://github.com/abundant-ai/long-horizon">GitHub ↗</a>
             </div>

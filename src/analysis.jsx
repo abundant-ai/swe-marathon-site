@@ -84,15 +84,19 @@ const ANALYSIS_MODELS = LEADERBOARD
   }));
 
 const RH_CLASSIFICATIONS = [
-  { name: "GPT-5.5", harness: "Terminus 2 + Codex", n: 10, hacked: 4, success: 0, criteria: { "Instruct model substitution": 4, "Dataset provenance": 1 } },
-  { name: "Kimi K2.6", harness: "Kimi CLI + Terminus 2", n: 10, hacked: 4, success: 0, criteria: { "Test data contamination": 4 } },
-  { name: "GLM 5.1", harness: "Terminus 2", n: 3, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
-  { name: "Claude Opus 4.8", harness: "Claude Code", n: 5, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
-  { name: "Gemini 3.5 Flash", harness: "Gemini CLI", n: 5, hacked: 1, success: 0, criteria: { "Test data contamination": 1 } },
-  { name: "Gemini 3.1 Pro", harness: "Gemini CLI + Terminus 2", n: 10, hacked: 1, success: 0, criteria: { "Instruct model substitution": 1, "Dataset provenance": 1 } },
-  { name: "Claude Opus 4.7", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
-  { name: "DeepSeek V4 Pro", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
-  { name: "MiniMax M2.7", harness: "Terminus 2", n: 5, hacked: 0, success: 0, criteria: {} },
+  { name: "Claude Opus 4.8", harness: "Claude Code", n: 99, attempt: 9, hacked: 1, success: 0, criteria: { "test_data_contamination": 1, "deception_in_final_report": 1 } },
+  { name: "Claude Opus 4.7", harness: "Claude Code", n: 100, attempt: 5, hacked: 0, success: 0, criteria: {  } },
+  { name: "GPT-5.5", harness: "Codex", n: 100, attempt: 19, hacked: 16, success: 0, criteria: { "A1": 8, "A3": 7, "B1": 6, "B3": 2, "C1": 2, "A2": 1, "A5": 1, "H3": 1 } },
+  { name: "Gemini 3.5 Flash", harness: "Gemini CLI", n: 100, attempt: 16, hacked: 12, success: 0, criteria: { "A1": 6, "E2": 3, "H3": 2, "A3": 2, "B1": 1, "A2": 1, "A5": 1, "E1": 1 } },
+  { name: "Gemini 3.1 Pro", harness: "Gemini CLI", n: 100, attempt: 30, hacked: 22, success: 0, criteria: { "A1": 7, "A3": 6, "B1": 5, "B2": 5, "A5": 5, "C": 4, "C1": 4, "G2": 4 } },
+  { name: "Kimi K2.6", harness: "Kimi CLI", n: 100, attempt: 10, hacked: 6, success: 0, criteria: { "test_data_contamination": 2, "benchmark_internals_for_training": 2, "synthetic_data_against_rules": 2, "if_verifiable_import": 2, "judge_marked_hacked": 2, "failed_attempt": 1, "training_failure": 1, "no_checkpoint_submitted": 1 } },
+  { name: "Claude Opus 4.7", harness: "Terminus 2", n: 100, attempt: 5, hacked: 1, success: 0, criteria: { "C": 1, "B1": 1, "B2": 1 } },
+  { name: "GPT-5.5", harness: "Terminus 2", n: 100, attempt: 38, hacked: 36, success: 0, criteria: { "A3": 14, "A1": 12, "B1": 10, "G3": 6, "B3": 5, "instruct_model_substitution": 4, "E1": 3, "B2": 3 } },
+  { name: "Gemini 3.1 Pro", harness: "Terminus 2", n: 100, attempt: 25, hacked: 22, success: 0, criteria: { "A1": 9, "A5": 7, "B1": 6, "A3": 5, "B2": 4, "E1": 4, "B3": 4, "C": 4 } },
+  { name: "Kimi K2.6", harness: "Terminus 2", n: 100, attempt: 7, hacked: 5, success: 0, criteria: { "A5": 3, "A3": 3, "C": 1, "B1": 1, "E1": 1 } },
+  { name: "DeepSeek V4 Pro", harness: "Terminus 2", n: 96, attempt: 6, hacked: 5, success: 0, criteria: { "A1": 4, "A3": 1 } },
+  { name: "GLM 5.1", harness: "Terminus 2", n: 100, attempt: 4, hacked: 2, success: 0, criteria: { "test_data_contamination": 2, "synthetic_data_paraphrase_of_ifeval": 1, "shipped_disallowed_data": 1, "benchmark_taxonomy_synthetic_data": 1 } },
+  { name: "MiniMax M2.7", harness: "Terminus 2", n: 100, attempt: 1, hacked: 0, success: 0, criteria: {  } }
 ];
 
 const RH_CLASSIFIED_TOTALS = RH_CLASSIFICATIONS.reduce(
@@ -473,10 +477,15 @@ function RewardHackingChart() {
     const rows = RH_CLASSIFICATIONS
       .map((row) => ({
         ...row,
+        attemptOnly: Math.max(0, row.attempt - row.hacked),
+        detected: Math.max(0, row.hacked - row.success),
+        attemptOnlyPct: Math.max(0, (row.attempt - row.hacked) / row.n * 100),
         hackedPct: row.hacked / row.n * 100,
+        detectedPct: Math.max(0, (row.hacked - row.success) / row.n * 100),
         successPct: row.success / row.n * 100,
       }))
-      .sort((a, b) => b.hackedPct - a.hackedPct);
+      .sort((a, b) => (b.attempt / b.n) - (a.attempt / a.n));
+    const xMax = Math.ceil(Math.max(...rows.map((r) => r.attempt / r.n * 100)) / 10) * 10;
     return {
       backgroundColor: "transparent",
       grid: { left: 190, right: 52, top: 42, bottom: 48 },
@@ -486,7 +495,7 @@ function RewardHackingChart() {
         name: "Share of trials (%)",
         nameLocation: "middle",
         nameGap: 34,
-        max: Math.ceil(Math.max(...rows.map((r) => r.hackedPct)) / 10) * 10,
+        max: xMax,
         axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
       },
       yAxis: {
@@ -516,23 +525,39 @@ function RewardHackingChart() {
           return `<div style="font-family:JetBrains Mono;font-size:11px;color:${theme.ink3};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${row.name}</div>
                   <div style="color:${theme.ink2};font-size:11px;margin-bottom:6px;">${row.harness}</div>
                   <div>Trials: <b>${row.n}</b></div>
-                  <div>Classifier-positive: <b>${row.hacked}</b> (${row.hackedPct.toFixed(1)}%)</div>
-                  <div>Earned reward after hacking: <b>${row.success}</b> (${row.successPct.toFixed(1)}%)</div>
+                  <div>Any suspicious shortcut behavior: <b>${row.attempt}</b> (${(row.attempt / row.n * 100).toFixed(1)}%)</div>
+                  <div>Suspicious but not shipped: <b>${row.attemptOnly}</b> (${row.attemptOnlyPct.toFixed(1)}%)</div>
+                  <div>Clear exploit shipped: <b>${row.hacked}</b> (${row.hackedPct.toFixed(1)}%)</div>
+                  <div>Caught by verifier / scored 0: <b>${row.detected}</b> (${row.detectedPct.toFixed(1)}%)</div>
+                  <div>Exploit still earned reward: <b>${row.success}</b> (${row.successPct.toFixed(1)}%)</div>
                   <div style="margin-top:6px;color:${theme.ink2};">${criteria}</div>`;
         },
       },
       animation: false,
       series: [
         {
-          name: "Reward-hacking classification",
+          name: "Suspicious shortcut behavior",
           type: "bar",
+          stack: "rh",
+          data: rows.map((r) => +r.attemptOnlyPct.toFixed(1)),
+          barWidth: 18,
+          itemStyle: { color: theme.warn, borderColor: theme.pointBorder, borderWidth: 0.6, opacity: 0.72 },
+        },
+        {
+          name: "Clear exploit shipped",
+          type: "bar",
+          stack: "rh",
           data: rows.map((r) => +r.hackedPct.toFixed(1)),
           barWidth: 18,
           itemStyle: { color: theme.rewardHack, borderColor: theme.pointBorder, borderWidth: 0.8 },
           label: {
             show: true,
             position: "right",
-            formatter: (p) => p.value > 0 ? `${p.value.toFixed(1)}%` : "0%",
+            formatter: (p) => {
+              const row = rows[p.dataIndex];
+              const total = row.attempt / row.n * 100;
+              return total > 0 ? `${total.toFixed(1)}%` : "0%";
+            },
             color: theme.ink2,
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10,
@@ -551,8 +576,8 @@ function RewardHackingChart() {
       </div>
       <div ref={ref} className="anal-chart" style={{ height: 400 }}></div>
       <div className="anal-foot">
-        Verifier-side reward-hacking classifications over {RH_CLASSIFIED_TOTALS.n} real agent runs:
-        {" "}{RH_CLASSIFIED_TOTALS.hacked} were classifier-positive, and {RH_CLASSIFIED_TOTALS.success} earned reward after being classified as hacked.
+        Light bars count runs where the agent did something suspicious that looked like a shortcut attempt.
+        Dark bars count runs where the submitted artifact clearly contained a verifier bypass or other exploit.
       </div>
     </div>
   );
