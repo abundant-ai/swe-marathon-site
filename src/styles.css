@@ -2569,7 +2569,7 @@
     color: var(--bg);
   }
   .anal-tab.active .anal-tab-no,
-  .anal-tab.active .anal-tab-s { color: rgba(250, 247, 240, 0.6); }
+  .anal-tab.active .anal-tab-s { color: var(--bg); opacity: 0.6; }
   .anal-tab-no {
     font-family: var(--mono); font-size: 10px; color: var(--ink-3);
     letter-spacing: 0.12em; text-transform: uppercase;
