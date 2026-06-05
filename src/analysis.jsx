@@ -66,6 +66,24 @@ const LABEL_OFFSETS = {
 
 const labelOffset = (chart, id) => LABEL_OFFSETS[chart]?.[id] || [8, 0];
 
+/* Greedy label de-overlap in normalized [0,1] data space. Points are walked by
+   priority (lower first); a label shows only if no already-shown label sits
+   within (boxW, boxH) of it. This drops only the genuinely-coincident labels —
+   e.g. two same-model configs plotted on the same spot, which no fixed offset
+   can separate — while every well-spaced label keeps its tuned position. The
+   box is wider than tall because labels extend sideways from their point. */
+function shownLabelIds(points, { boxW = 0.13, boxH = 0.085 } = {}) {
+  const shown = [];
+  const ids = new Set();
+  for (const p of points.slice().sort((a, b) => a.priority - b.priority)) {
+    if (shown.every((s) => Math.abs(s.nx - p.nx) >= boxW || Math.abs(s.ny - p.ny) >= boxH)) {
+      shown.push(p);
+      ids.add(p.id);
+    }
+  }
+  return ids;
+}
+
 /* ---------- MODELS: visible configs with log-derived Pareto metrics ---------- */
 const ANALYSIS_MODELS = LEADERBOARD
   .filter((r) => !r.ref)
@@ -230,11 +248,20 @@ function ComputeHorizonChart() {
         };
       });
 
+    // Drop only labels that physically collide; higher pass@1 wins priority,
+    // coincident configs fall to hover. x is log-scaled (3M–80M).
+    const logMin = Math.log10(3), logSpan = Math.log10(80) - logMin;
+    const shownIds = shownLabelIds(configs.map((m) => ({
+      id: m.id,
+      nx: (Math.log10(Math.max(3, m.avgTokensM)) - logMin) / logSpan,
+      ny: m.pass1 / (maxPass || 1),
+      priority: -m.pass1,
+    })));
     const scatterData = configs.map((m) => ({
       value: [m.avgTokensM, m.pass1],
       m,
       itemStyle: { color: m.color, opacity: 0.95, borderColor: theme.pointBorder, borderWidth: 1 },
-      label: { show: !mobile, offset: mobile ? [0, 0] : labelOffset("horizon", m.id) },
+      label: { show: !mobile && shownIds.has(m.id), offset: mobile ? [0, 0] : labelOffset("horizon", m.id) },
     }));
 
     return {
@@ -370,11 +397,22 @@ function ParetoChart({ metric = "pass1" }) {
     const frontierPts = agg
       .filter((a) => !agg.some((b) => b !== a && b.rate >= a.rate && b.x <= a.x && (b.rate > a.rate || b.x < a.x)))
       .sort((p, q) => p.x - q.x);
+    // Drop only the labels that physically collide (frontier points keep
+    // priority, then higher-rate configs); coincident dupes fall to hover.
+    const frontierSet = new Set(frontierPts);
+    const xMax = Math.max(...agg.map((a) => a.x)) || 1;
+    const yMax = Math.max(...agg.map((a) => a.rate * 100)) || 1;
+    const shownIds = shownLabelIds(agg.map((a) => ({
+      id: a.m.id,
+      nx: a.x / xMax,
+      ny: (a.rate * 100) / yMax,
+      priority: (frontierSet.has(a) ? 0 : 1000) - a.rate * 100,
+    })));
     const scatterData = agg.map((a) => ({
       value: [a.x, a.rate * 100],
       a,
       itemStyle: { color: a.m.color, opacity: 0.95, borderColor: theme.pointBorder, borderWidth: 1 },
-      label: { show: !mobile, offset: mobile ? [0, 0] : labelOffset("pareto", a.m.id) },
+      label: { show: !mobile && shownIds.has(a.m.id), offset: mobile ? [0, 0] : labelOffset("pareto", a.m.id) },
     }));
 
     return {
