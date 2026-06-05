@@ -575,22 +575,22 @@ function Analysis() {
         <div className="anal-tabs">
           <button className={"anal-tab " + (tab === "pareto" ? "active" : "")} onClick={() => setTab("pareto")}>
             <span className="anal-tab-no">01</span>
-            <span className="anal-tab-t">Cost vs score</span>
+            <span className="anal-tab-t">Cost vs Score</span>
             <span className="anal-tab-s">Pareto frontier</span>
           </button>
           <button className={"anal-tab " + (tab === "partialPareto" ? "active" : "")} onClick={() => setTab("partialPareto")}>
             <span className="anal-tab-no">02</span>
-            <span className="anal-tab-t">Partial score</span>
+            <span className="anal-tab-t">Partial Score</span>
             <span className="anal-tab-s">uncalibrated Pareto</span>
           </button>
           <button className={"anal-tab " + (tab === "horizon" ? "active" : "")} onClick={() => setTab("horizon")}>
             <span className="anal-tab-no">03</span>
-            <span className="anal-tab-t">Compute horizon</span>
+            <span className="anal-tab-t">Compute Horizon</span>
             <span className="anal-tab-s">tokens vs resolution</span>
           </button>
           <button className={"anal-tab " + (tab === "rewardHack" ? "active" : "")} onClick={() => setTab("rewardHack")}>
             <span className="anal-tab-no">04</span>
-            <span className="anal-tab-t">Reward hacking</span>
+            <span className="anal-tab-t">Reward Hacking</span>
             <span className="anal-tab-s">bypass incidence</span>
           </button>
         </div>

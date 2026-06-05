@@ -812,19 +812,19 @@ function Leaderboard() {
 function BenchmarkBullets() {
   const bullets = [
     {
-      label: "Community-inspired tasks",
+      label: "Community-Inspired Tasks",
       text: "Tasks draw from the evals community and frontier-lab case studies, including Anthropic, OpenAI, and Cursor, alongside product clones, ML systems, and optization.",
     },
     {
-      label: "Handcrafted, not farmed",
+      label: "Handcrafted, Not Farmed",
       text: "Diverse, handcrafted, and contamination-free. Tasks are built with a unique environment, verifier, and human-written reference solution. No automated task generation from GitHub.",
     },
     {
-      label: "CUA-verified product clones",
+      label: "CUA-Verified Product Clones",
       text: "Full-stack clone tasks combine unit-test checks with a Computer-Use-Agent browser rubric, where a CUA agent operates the UI like a real user.",
     },
     {
-      label: "Reward-hacking resistant",
+      label: "Reward-Hacking Resistant",
       text: "Verifiers use visible and hidden tests, network egress restrictions, and adversarial exploit scans to prevent shortcuts and catch attempts to exploit the environment.",
     },
   ];
@@ -834,7 +834,7 @@ function BenchmarkBullets() {
       <div className="container">
         <div className="section-head">
           <div className="section-no"><span className="dot">●</span> 02 / design</div>
-          <h2 className="section-title">Benchmark design</h2>
+          <h2 className="section-title">Benchmark Design</h2>
         </div>
         <figure className="horizon-figure">
           <img
