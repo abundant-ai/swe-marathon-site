@@ -1,29 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#FAFAFA"/>
-  <text x="72" y="118" fill="#18181B" font-family="Courier New, Courier, monospace" font-size="62" font-weight="700">Abundant</text>
-  <rect x="972" y="68" width="156" height="34" fill="#18181B"/>
-  <text x="1050" y="92" fill="#FAFAFA" font-family="Courier New, Courier, monospace" font-size="13" text-anchor="middle" letter-spacing="1.8">BENCHMARK</text>
+  <rect width="1200" height="630" fill="#121312"/>
 
-  <rect x="72" y="156" width="1056" height="340" fill="#18181B"/>
-  <text x="112" y="218" fill="#FAFAFA" opacity="0.52" font-family="Courier New, Courier, monospace" font-size="20" letter-spacing="2.8">SWE-MARATHON</text>
-  <text x="112" y="300" fill="#FAFAFA" font-family="Courier New, Courier, monospace" font-size="58" font-weight="700">How long can coding</text>
-  <text x="112" y="374" fill="#4CAF50" font-family="Courier New, Courier, monospace" font-size="58" font-weight="700">agents stay useful?</text>
-  <text x="112" y="434" fill="#FAFAFA" opacity="0.74" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="26">20 long-horizon software engineering tasks,</text>
-  <text x="112" y="468" fill="#FAFAFA" opacity="0.74" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="26">1,300 logged trials, verifier-gated scoring.</text>
-
-  <g transform="translate(112 532)" font-family="Courier New, Courier, monospace" font-size="18">
-    <rect x="0" y="-24" width="174" height="54" fill="#FAFAFA" stroke="#18181B" stroke-width="1.5"/>
-    <text x="22" y="6" fill="#18181B">20 tasks</text>
-    <rect x="192" y="-24" width="202" height="54" fill="#FAFAFA" stroke="#18181B" stroke-width="1.5"/>
-    <text x="214" y="6" fill="#18181B">1-10h budget</text>
-    <rect x="412" y="-24" width="296" height="54" fill="#E8F5E9" stroke="#18181B" stroke-width="1.5"/>
-    <text x="434" y="6" fill="#18181B">&lt;19% resolution</text>
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
+    <text x="40" y="100" fill="#6BCF70" font-size="38" font-weight="800">New capabilities require new benchmarks.</text>
+    <text x="40" y="148" fill="#F4F4F5" font-size="38" font-weight="750">SWE-Marathon measures whether coding agents</text>
+    <text x="40" y="196" fill="#F4F4F5" font-size="38" font-weight="800">can stay coherent over a 1B+ token budget.</text>
   </g>
-  <path d="M794 430 C846 398 879 415 915 362 C948 314 986 340 1024 264 C1056 202 1090 178 1128 194" fill="none" stroke="#4CAF50" stroke-width="6"/>
-  <g fill="#18181B">
-    <circle cx="794" cy="430" r="7"/>
-    <circle cx="915" cy="362" r="7"/>
-    <circle cx="1024" cy="264" r="7"/>
-    <circle cx="1128" cy="194" r="7"/>
+
+  <g transform="translate(40 246)">
+    <g font-family="Courier New, Courier, monospace">
+      <g transform="translate(0 0)">
+        <rect x="0" y="0" width="304" height="64" fill="#121312" stroke="#303530" stroke-width="1.2"/>
+        <line x1="304" y1="0" x2="1120" y2="0" stroke="#303530" stroke-width="1.2"/>
+        <text x="22" y="25" fill="#A1A1AA" font-size="13" letter-spacing="1.1">2021</text>
+        <text x="22" y="49" fill="#F4F4F5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">HumanEval</text>
+        <text x="342" y="34" fill="#D4D4D8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="19">Function completion</text>
+        <text x="342" y="54" fill="#A1A1AA" font-size="13" letter-spacing="1.1">~1 MIN PER TASK</text>
+        <text x="1096" y="34" fill="#F4F4F5" font-size="14" font-weight="700" letter-spacing="1.1" text-anchor="end">~1K TOKENS</text>
+        <text x="1096" y="53" fill="#A1A1AA" font-size="13" letter-spacing="1.1" text-anchor="end">UNLOCKED CODE LLMS</text>
+      </g>
+
+      <g transform="translate(28 64)">
+        <rect x="0" y="0" width="304" height="64" fill="#121312" stroke="#303530" stroke-width="1.2"/>
+        <line x1="304" y1="0" x2="1092" y2="0" stroke="#303530" stroke-width="1.2"/>
+        <text x="22" y="25" fill="#A1A1AA" font-size="13" letter-spacing="1.1">2023</text>
+        <text x="22" y="49" fill="#F4F4F5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">SWE-bench</text>
+        <text x="342" y="34" fill="#D4D4D8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="19">Real GitHub issues</text>
+        <text x="342" y="54" fill="#A1A1AA" font-size="13" letter-spacing="1.1">~5-15 MIN PER TASK</text>
+        <text x="1068" y="34" fill="#F4F4F5" font-size="14" font-weight="700" letter-spacing="1.1" text-anchor="end">~100K TOKENS</text>
+        <text x="1068" y="53" fill="#A1A1AA" font-size="13" letter-spacing="1.1" text-anchor="end">UNLOCKED CODING AGENTS</text>
+      </g>
+
+      <g transform="translate(56 128)">
+        <rect x="0" y="0" width="304" height="64" fill="#121312" stroke="#303530" stroke-width="1.2"/>
+        <line x1="304" y1="0" x2="1064" y2="0" stroke="#303530" stroke-width="1.2"/>
+        <text x="22" y="25" fill="#A1A1AA" font-size="13" letter-spacing="1.1">2025</text>
+        <text x="22" y="49" fill="#F4F4F5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Terminal-Bench</text>
+        <text x="342" y="34" fill="#D4D4D8" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="19">Multi-step terminal tasks</text>
+        <text x="342" y="54" fill="#A1A1AA" font-size="13" letter-spacing="1.1">~5-15 MIN PER TASK</text>
+        <text x="1040" y="34" fill="#F4F4F5" font-size="14" font-weight="700" letter-spacing="1.1" text-anchor="end">~1M TOKENS</text>
+        <text x="1040" y="53" fill="#A1A1AA" font-size="13" letter-spacing="1.1" text-anchor="end">UNLOCKED TERMINAL AGENTS</text>
+      </g>
+
+      <g transform="translate(84 192)">
+        <rect x="0" y="0" width="304" height="76" fill="#1B1D1B" stroke="#5C635D" stroke-width="1.2"/>
+        <rect x="304" y="0" width="732" height="76" fill="#101810" stroke="#6BCF70" stroke-width="1.4"/>
+        <line x1="0" y1="0" x2="1036" y2="0" stroke="#8BDB91" stroke-width="1.2"/>
+        <line x1="0" y1="76" x2="1036" y2="76" stroke="#6BCF70" stroke-width="1.2"/>
+        <text x="26" y="31" fill="#8BDB91" font-size="13" font-weight="700" letter-spacing="1.2">2026</text>
+        <text x="26" y="58" fill="#6BCF70" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="28" font-weight="800">SWE-Marathon</text>
+        <text x="338" y="40" fill="#F4F4F5" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Days-long agentic work</text>
+        <text x="338" y="62" fill="#D8F6DA" font-size="15" letter-spacing="1.1">HOURS TO DAYS PER TASK</text>
+        <text x="1012" y="40" fill="#6BCF70" font-size="17" font-weight="700" letter-spacing="1.1" text-anchor="end">1B+ TOKENS</text>
+        <text x="1012" y="62" fill="#8BDB91" font-size="13" letter-spacing="1.1" text-anchor="end">UNLOCKING AUTONOMOUS AGENTS</text>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(984 566)">
+    <g transform="scale(1.35)" fill="none" stroke="#A1A1AA" stroke-width="1.5" stroke-linecap="round">
+      <path d="M12 2V22M2 12H22M4.92893 4.92893L19.0711 19.0711M4.92893 19.0711L19.0711 4.92893M8.46447 3.53553L15.5355 20.4645M3.53553 8.46447L20.4645 15.5355M3.53553 15.5355L20.4645 8.46447M8.46447 20.4645L15.5355 3.53553"/>
+    </g>
+    <text x="42" y="22" fill="#A1A1AA" font-family="Courier New, Courier, monospace" font-size="16" font-weight="700">abundant</text>
   </g>
 </svg>
