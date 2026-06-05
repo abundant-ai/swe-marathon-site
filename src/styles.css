@@ -784,11 +784,39 @@
     line-height: 1;
     letter-spacing: 0;
   }
+  .task-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0 0 8px;
+    min-height: calc(2 * 1.18em);
+  }
   .task-title {
     font-family: var(--heading); font-size: 20px; line-height: 1.18;
-    min-height: calc(2 * 1.18em);
-    margin: 0 0 8px; letter-spacing: 0;
+    margin: 0; letter-spacing: 0;
     font-weight: 700;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .task-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 22px;
+    flex: 0 0 18px;
+    margin-top: -1px;
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+    transition: color 0.12s ease, transform 0.12s ease;
+  }
+  .task-link:hover .task-arrow,
+  .task-link:focus-visible .task-arrow {
+    color: var(--accent);
+    transform: translateX(3px);
   }
   .task-desc {
     font-size: 13px;
@@ -2612,7 +2640,10 @@
     margin: 0; max-width: 640px;
   }
   .anal-controls { display: flex; gap: 6px; }
-  .anal-chart { width: 100%; }
+  .anal-chart { width: 100%; min-width: 0; }
+  .anal-chart-horizon { height: 420px; }
+  .anal-chart-pareto { height: 380px; }
+  .anal-chart-reward { height: 400px; }
   .anal-chart-dist { height: 360px; }
   .anal-foot {
     margin-top: 14px;
@@ -2680,12 +2711,71 @@
   }
 
   @media (max-width: 720px) {
-    .anal-tabs { grid-template-columns: repeat(2, 1fr); }
+    .anal-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .anal-tab { border-bottom: 1px solid var(--rule-2); }
     .anal-card-head { grid-template-columns: 1fr; }
     .anal-card { padding: 20px 18px 16px; }
     .anal-tab-t { font-size: 16px; }
     .anal-chart-dist { height: 640px; }
+  }
+
+  @media (max-width: 560px) {
+    .anal-tabs {
+      grid-template-columns: 1fr;
+      margin-bottom: 24px;
+    }
+    .anal-tab,
+    .anal-tab:last-child {
+      min-height: 0;
+      border-right: none;
+      border-bottom: 1px solid var(--rule-2);
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      column-gap: 12px;
+      row-gap: 2px;
+      align-items: baseline;
+    }
+    .anal-tab:last-child { border-bottom: none; }
+    .anal-tab-no {
+      grid-row: 1 / span 2;
+      align-self: start;
+      margin-top: 4px;
+    }
+    .anal-tab-t {
+      min-width: 0;
+      margin-top: 0;
+      font-size: 16px;
+      line-height: 1.15;
+    }
+    .anal-tab-s {
+      min-width: 0;
+      margin-top: 0;
+      font-size: 10px;
+      line-height: 1.25;
+    }
+    .anal-card {
+      padding: 18px 14px 14px;
+    }
+    .anal-card-head {
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 14px;
+    }
+    .anal-controls {
+      flex-wrap: wrap;
+    }
+    .anal-controls .pill {
+      font-size: 11px;
+      padding: 6px 10px;
+    }
+    .anal-chart-horizon,
+    .anal-chart-pareto {
+      height: 340px;
+    }
+    .anal-chart-reward {
+      height: 360px;
+    }
   }
 
   /* ---- Trajectory explorer (DeepSWE-inspired) ---- */
@@ -2797,12 +2887,13 @@
     display: inline-flex; align-items: center; gap: 6px;
     font-family: var(--mono); font-size: 10px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.06em;
-    color: var(--tk);
+    color: var(--ink-2);
     border-left: 3px solid var(--tk);
-    padding-left: 8px;
+    background: color-mix(in oklab, var(--tk) 10%, transparent);
+    padding: 3px 8px;
     white-space: nowrap;
   }
-  .traj-step-kind i { font-style: normal; font-size: 12px; }
+  .traj-step-kind i { font-style: normal; font-size: 12px; color: var(--ink); }
   .traj-step-title {
     font-size: 13px; color: var(--ink);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -2815,6 +2906,12 @@
     font-family: var(--mono); font-size: 14px; color: var(--accent);
     text-align: center;
   }
+  :root[data-theme="dark"] .traj-step-kind {
+    color: var(--ink);
+    background: color-mix(in oklab, var(--tk) 18%, rgba(255, 255, 255, 0.06));
+    border-left-color: color-mix(in oklab, var(--tk) 35%, var(--accent));
+  }
+  :root[data-theme="dark"] .traj-step-kind i { color: var(--ink-2); }
   .step-body {
     padding: 12px 14px 14px;
     border-top: 1px solid var(--rule-2);
@@ -2933,7 +3030,7 @@
     font-family: var(--mono); font-size: 11px; color: var(--ink-3);
     text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;
   }
-  /* Trial picker cards now lead with "Trial N", then id, then the differentiators */
+  /* Run picker cards lead with the run number, then the differentiators. */
   .artifact-option b { margin-bottom: 5px; }
   .artifact-option span { margin-bottom: 5px; }
   .artifact-option em { margin-bottom: 0; }

@@ -732,6 +732,25 @@ function formatTaskRate(value) {
   return `${value.toFixed(1)}%`;
 }
 
+function taskTitle(taskId) {
+  return TASKS.find((t) => t.id === taskId)?.title || taskId;
+}
+
+function runLabel(index) {
+  return `Run ${index + 1}`;
+}
+
+function trajectoryRunLabel(trial) {
+  if (!trial) return "Run";
+  const rows = TASK_DETAILS[trial.task]?.leaderboard?.rows || [];
+  const row = rows.find((r) =>
+    r.rank === trial.rank ||
+    (r.agent === trial.configAgent && r.model === trial.configModel)
+  );
+  const index = row?.trials?.findIndex((t) => t.id === trial.id);
+  return index != null && index >= 0 ? runLabel(index) : "Run";
+}
+
 // Per-failure-bucket accent. Reward hacking is red, consistent with the
 // cheat chips elsewhere on the site; the rest get distinct muted hues.
 function bucketColor(bucket) {
@@ -914,7 +933,10 @@ function Tasks() {
                       <TaskCompanyBadges taskId={task.id} />
                       <div className="task-budget">{task.agentH}h agent timeout</div>
                     </div>
-                    <h3 className="task-title">{task.title}</h3>
+                    <div className="task-title-row">
+                      <h3 className="task-title">{task.title}</h3>
+                      <span className="task-arrow" aria-hidden="true">›</span>
+                    </div>
                     <p className="task-desc">{task.desc}</p>
                     <div className="task-metrics">
                       <div>
@@ -1191,6 +1213,7 @@ function TrialShowcase({ artifacts }) {
   const [trajectoryRows, setTrajectoryRows] = useState([]);
   const [trajectoryStatus, setTrajectoryStatus] = useState("loading");
   const active = artifacts.trials.find((t) => t.id === activeId) || artifacts.trials[0];
+  const activeRun = runLabel(Math.max(0, artifacts.trials.findIndex((t) => t.id === active.id)));
   const hasLive = Boolean(active.liveUrl);
 
   useEffect(() => {
@@ -1224,9 +1247,9 @@ function TrialShowcase({ artifacts }) {
         </div>
       )}
 
-      <div className="artifact-pick-label">Pick a trial</div>
+      <div className="artifact-pick-label">Pick a run</div>
       <div className="artifact-selector">
-        {artifacts.trials.map((trial) => (
+        {artifacts.trials.map((trial, i) => (
           <button
             key={trial.id}
             className={"artifact-option " + (trial.id === active.id ? "active" : "")}
@@ -1240,7 +1263,8 @@ function TrialShowcase({ artifacts }) {
                 {trial.tag}
               </span>
             )}
-            <b>{trial.model}</b>
+            <b>{runLabel(i)}</b>
+            <span>{trial.model}</span>
             <span>{trial.agent}</span>
             <em>{trial.tokens} tokens · {trial.cost}</em>
           </button>
@@ -1258,7 +1282,7 @@ function TrialShowcase({ artifacts }) {
           </div>
           <iframe
             key={active.id}
-            title={`Interactive artifact ${active.trial}`}
+            title={`Interactive artifact ${activeRun}`}
             src={active.liveUrl}
             onLoad={() => setLoadedFor(active.id)}
             sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
@@ -1268,7 +1292,7 @@ function TrialShowcase({ artifacts }) {
 
       <TrajectoryExplorer
         trial={active.id}
-        label={`${active.agent} · ${active.model} · ${active.trial}`}
+        label={`${active.agent} · ${active.model} · ${activeRun}`}
         rows={trajectoryRows}
         status={trajectoryStatus}
       />
@@ -1379,10 +1403,10 @@ function TaskLeaderboard({ leaderboard }) {
 
             {isOpen && hasTrials && (
               <div className="task-lb-trials">
-                {row.trials.map((t) => (
+                {row.trials.map((t, i) => (
                   <a className={"trial-chip " + (hackSet.has(t.id) ? "is-hack" : "")} key={t.id} href={`#trajectory/${encodeURIComponent(t.id)}`}>
                     <span className="trial-chip-id">
-                      {t.trial}
+                      {runLabel(i)}
                       {hackSet.has(t.id) && <span className="trial-chip-hack">⚠ Reward hack</span>}
                     </span>
                     <span className="trial-chip-metrics">
@@ -1574,6 +1598,7 @@ function TrajectoryPage({ trialId }) {
   const needsPartialNote = trial.reward === 0 && trial.partial > 0;
   const stats = [
     { label: "Rank", value: `#${trial.rank}` },
+    { label: "Run", value: trajectoryRunLabel(trial) },
     { label: "Reward", value: trial.reward.toFixed(1) },
     { label: "Partial", value: trial.partial.toFixed(3) },
     trial.ux > 0 && { label: "CUA UX", value: trial.ux.toFixed(3) },
@@ -1588,10 +1613,10 @@ function TrajectoryPage({ trialId }) {
       <section className="task-page hero task-hero">
         <div className="container">
           <a className="back-link" href={`#task/${backTask}`}>← Back to leaderboard</a>
-          <div className="eyebrow">Trajectory · {trial.trial}</div>
+          <div className="eyebrow">Trajectory · {taskTitle(backTask)} · {trajectoryRunLabel(trial)}</div>
           <h1 className="title">{trial.configAgent} · {trial.configModel}</h1>
           <p className="lede">
-            Full agent trajectory for <b>{trial.trial}</b> — every tool call the agent made,
+            Full agent trajectory for <b>{taskTitle(backTask)} · {trajectoryRunLabel(trial)}</b> — every tool call the agent made,
             replayable step by step.
           </p>
           <div className="cta-row" style={{ marginTop: 18 }}>
