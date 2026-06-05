@@ -147,6 +147,16 @@ function tooltipCommon(theme) {
   };
 }
 
+/* Container-width layout token. Below 560px the plots go label-free and
+   full-width; above it they keep on-chart labels and a wide right margin. */
+function chartLayout(node) {
+  const width = node?.clientWidth || window.innerWidth || 0;
+  return {
+    width,
+    isMobile: width < 560,
+  };
+}
+
 /* ---------- Hook: ECharts instance bound to a div ref ---------- */
 function useEcharts(buildOption, deps) {
   const ref = useRef(null);
@@ -158,10 +168,15 @@ function useEcharts(buildOption, deps) {
     }
     const render = () => {
       if (!chartRef.current || !ref.current) return;
-      chartRef.current.setOption(buildOption(readThemeTokens(ref.current)), { notMerge: true });
+      chartRef.current.setOption(buildOption(readThemeTokens(ref.current), chartLayout(ref.current)), { notMerge: true });
+      chartRef.current.resize();
     };
     render();
-    const onResize = () => chartRef.current && chartRef.current.resize();
+    const onResize = () => render();
+    // Re-render on container resize so the label/margin strategy tracks width
+    // even when the viewport itself doesn't change (e.g. tab/layout shifts).
+    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(render);
+    if (resizeObserver) resizeObserver.observe(ref.current);
     const observer = new MutationObserver(render);
     observer.observe(document.documentElement, {
       attributes: true,
@@ -169,6 +184,7 @@ function useEcharts(buildOption, deps) {
     });
     window.addEventListener("resize", onResize);
     return () => {
+      if (resizeObserver) resizeObserver.disconnect();
       observer.disconnect();
       window.removeEventListener("resize", onResize);
     };
@@ -186,9 +202,12 @@ function useEcharts(buildOption, deps) {
    of the same model to show that more tokens ≠ higher pass@1.
    ============================================================ */
 function ComputeHorizonChart() {
-  const ref = useEcharts((theme) => {
+  const ref = useEcharts((theme, layout) => {
+    const mobile = layout.isMobile;
     const axis = axisCommon(theme);
     const tooltip = tooltipCommon(theme);
+    const axisLabel = { ...axis.axisLabel, fontSize: mobile ? 10 : 11, hideOverlap: true };
+    const nameTextStyle = { ...axis.nameTextStyle, fontSize: mobile ? 10 : 11 };
     const configs = ANALYSIS_MODELS.filter((m) => m.avgTokensM != null && m.avgTokensM > 0);
     const maxPass = Math.max(...configs.map((m) => m.pass1));
 
@@ -215,32 +234,36 @@ function ComputeHorizonChart() {
       value: [m.avgTokensM, m.pass1],
       m,
       itemStyle: { color: m.color, opacity: 0.95, borderColor: theme.pointBorder, borderWidth: 1 },
-      label: { show: true, offset: labelOffset("horizon", m.id) },
+      label: { show: !mobile, offset: mobile ? [0, 0] : labelOffset("horizon", m.id) },
     }));
 
     return {
       backgroundColor: "transparent",
-      grid: { left: 62, right: 230, top: 48, bottom: 64 },
+      grid: mobile
+        ? { left: 48, right: 10, top: 36, bottom: 60 }
+        : { left: 62, right: 230, top: 48, bottom: 64 },
       xAxis: {
         ...axis,
         type: "log",
-        name: "Mean tokens per trial (M, log)",
+        name: mobile ? "Tokens / trial (M, log)" : "Mean tokens per trial (M, log)",
         nameLocation: "middle",
-        nameGap: 34,
+        nameGap: mobile ? 30 : 34,
+        nameTextStyle,
         min: 3,
         max: 80,
         logBase: 10,
-        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "M" },
+        axisLabel: { ...axisLabel, formatter: (v) => v + "M" },
       },
       yAxis: {
         ...axis,
         type: "value",
         name: "Resolution rate (%)",
         nameLocation: "middle",
-        nameGap: 40,
+        nameGap: mobile ? 34 : 40,
+        nameTextStyle,
         min: 0,
         max: Math.ceil((maxPass + 4) / 5) * 5,
-        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
+        axisLabel: { ...axisLabel, formatter: (v) => v + "%" },
       },
       tooltip: {
         ...tooltip,
@@ -264,10 +287,10 @@ function ComputeHorizonChart() {
           name: "configs",
           type: "scatter",
           data: scatterData,
-          symbolSize: 17,
+          symbolSize: mobile ? 15 : 17,
           z: 5,
           label: {
-            show: true,
+            show: !mobile,
             position: "right",
             formatter: (p) => pointLabel(p.data.m),
             fontFamily: "JetBrains Mono, monospace",
@@ -283,7 +306,7 @@ function ComputeHorizonChart() {
             label: {
               show: true,
               formatter: (p) => cfgLabel(p.data.m),
-              fontSize: 10,
+              fontSize: mobile ? 9 : 10,
               color: theme.ink,
               backgroundColor: theme.tooltipBg,
               borderColor: theme.rule,
@@ -328,12 +351,17 @@ function ComputeHorizonChart() {
 function ParetoChart({ metric = "pass1" }) {
   const [xAxis, setXAxis] = useState("cost"); // cost | tokens
 
-  const ref = useEcharts((theme) => {
+  const ref = useEcharts((theme, layout) => {
+    const mobile = layout.isMobile;
     const axis = axisCommon(theme);
     const tooltip = tooltipCommon(theme);
+    const axisLabel = { ...axis.axisLabel, fontSize: mobile ? 10 : 11, hideOverlap: true };
+    const nameTextStyle = { ...axis.nameTextStyle, fontSize: mobile ? 10 : 11 };
     const xKey = xAxis === "cost" ? "costPerTrial" : "avgTokensM";
     const yKey = metric === "partial" ? "partialScore" : "pass1";
-    const yAxisName = metric === "partial" ? "Uncalibrated partial score (%)" : "Resolution rate (%)";
+    const yAxisName = metric === "partial"
+      ? (mobile ? "Partial score (%)" : "Uncalibrated partial score (%)")
+      : "Resolution rate (%)";
     const yTooltip = metric === "partial" ? "Partial score" : "Resolution rate";
     const agg = ANALYSIS_MODELS
       .filter((m) => m[xKey] != null && m[xKey] >= 0)
@@ -346,20 +374,25 @@ function ParetoChart({ metric = "pass1" }) {
       value: [a.x, a.rate * 100],
       a,
       itemStyle: { color: a.m.color, opacity: 0.95, borderColor: theme.pointBorder, borderWidth: 1 },
-      label: { show: true, offset: labelOffset("pareto", a.m.id) },
+      label: { show: !mobile, offset: mobile ? [0, 0] : labelOffset("pareto", a.m.id) },
     }));
 
     return {
       backgroundColor: "transparent",
-      grid: { left: 62, right: 230, top: 48, bottom: 64 },
+      grid: mobile
+        ? { left: 48, right: 10, top: 34, bottom: 60 }
+        : { left: 62, right: 230, top: 48, bottom: 64 },
       xAxis: {
         ...axis,
         type: "value",
-        name: xAxis === "cost" ? "Mean cost per trial (USD)" : "Mean tokens per trial (M)",
+        name: xAxis === "cost"
+          ? (mobile ? "Cost / trial (USD)" : "Mean cost per trial (USD)")
+          : (mobile ? "Tokens / trial (M)" : "Mean tokens per trial (M)"),
         nameLocation: "middle",
-        nameGap: 32,
+        nameGap: mobile ? 30 : 32,
+        nameTextStyle,
         axisLabel: {
-          ...axis.axisLabel,
+          ...axisLabel,
           formatter: (v) => xAxis === "cost" ? "$" + v.toFixed(0) : v.toFixed(0) + "M",
         },
       },
@@ -368,8 +401,9 @@ function ParetoChart({ metric = "pass1" }) {
         type: "value",
         name: yAxisName,
         nameLocation: "middle",
-        nameGap: 44,
-        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
+        nameGap: mobile ? 34 : 44,
+        nameTextStyle,
+        axisLabel: { ...axisLabel, formatter: (v) => v + "%" },
       },
       tooltip: {
         ...tooltip,
@@ -405,10 +439,10 @@ function ParetoChart({ metric = "pass1" }) {
           name: "agents",
           type: "scatter",
           data: scatterData,
-          symbolSize: 18,
+          symbolSize: mobile ? 15 : 18,
           z: 5,
           label: {
-            show: true,
+            show: !mobile,
             position: "right",
             formatter: (p) => pointLabel(p.data.a.m),
             fontFamily: "JetBrains Mono, monospace",
@@ -428,7 +462,7 @@ function ParetoChart({ metric = "pass1" }) {
             label: {
               show: true,
               formatter: (p) => cfgLabel(p.data.a.m),
-              fontSize: 10,
+              fontSize: mobile ? 9 : 10,
               color: theme.ink,
               backgroundColor: theme.tooltipBg,
               borderColor: theme.rule,
@@ -467,9 +501,12 @@ function ParetoChart({ metric = "pass1" }) {
    PLOT 3 — Reward-hacking incidence by model family
    ============================================================ */
 function RewardHackingChart() {
-  const ref = useEcharts((theme) => {
+  const ref = useEcharts((theme, layout) => {
+    const mobile = layout.isMobile;
     const axis = axisCommon(theme);
     const tooltip = tooltipCommon(theme);
+    const axisLabel = { ...axis.axisLabel, fontSize: mobile ? 10 : 11, hideOverlap: true };
+    const nameTextStyle = { ...axis.nameTextStyle, fontSize: mobile ? 10 : 11 };
     const rows = RH_CLASSIFICATIONS
       .map((row) => ({
         ...row,
@@ -479,25 +516,34 @@ function RewardHackingChart() {
       .sort((a, b) => b.hackedPct - a.hackedPct);
     return {
       backgroundColor: "transparent",
-      grid: { left: 190, right: 52, top: 42, bottom: 48 },
+      grid: mobile
+        ? { left: 100, right: 40, top: 32, bottom: 44 }
+        : { left: 190, right: 52, top: 42, bottom: 48 },
       xAxis: {
         ...axis,
         type: "value",
-        name: "Share of trials (%)",
+        name: mobile ? "Trials (%)" : "Share of trials (%)",
         nameLocation: "middle",
-        nameGap: 34,
+        nameGap: mobile ? 28 : 34,
+        nameTextStyle,
         max: Math.ceil(Math.max(...rows.map((r) => r.hackedPct)) / 10) * 10,
-        axisLabel: { ...axis.axisLabel, formatter: (v) => v + "%" },
+        axisLabel: { ...axisLabel, formatter: (v) => v + "%" },
       },
       yAxis: {
         type: "category",
         inverse: true,
-        data: rows.map((r) => `${r.name} / ${r.harness}`),
+        data: rows.map((r) => mobile ? r.name : `${r.name} / ${r.harness}`),
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { color: theme.ink2, fontFamily: "Inter, sans-serif", fontSize: 11 },
+        axisLabel: {
+          color: theme.ink2,
+          fontFamily: "Inter, sans-serif",
+          fontSize: mobile ? 10 : 11,
+          lineHeight: 12,
+        },
       },
       legend: {
+        show: !mobile,
         top: 0,
         right: 0,
         itemWidth: 10,
