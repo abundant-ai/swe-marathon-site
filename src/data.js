@@ -647,7 +647,7 @@ export const TASK_INSPIRATION = {
   ],
   "trimul-cuda": [
     { label: "AlphaFold-3 TriMul", url: "https://github.com/google-deepmind/alphafold3" },
-    { label: "TTT-Discover", url: "https://test-time-training.github.io/discover/" },
+    { label: "GPU MODE", url: "https://www.gpumode.com/" },
   ],
   "parameter-golf": [
     { label: "OpenAI: Parameter Golf", url: "https://github.com/openai/parameter-golf" },
