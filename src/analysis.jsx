@@ -120,7 +120,7 @@ function readThemeTokens(node) {
     ink3: css("--ink-3", "#71717A"),
     rule: css("--rule", "#E4E4E7"),
     rule2: css("--rule-2", "#F4F4F5"),
-    accent: css("--accent", "#4CAF50"),
+    accent: css("--accent", "#3D5AFE"),
     pos: css("--pos", "#2d7a4f"),
     warn: css("--warn", "#B45309"),
     tooltipBg: css("--paper", "#FAFAFA"),

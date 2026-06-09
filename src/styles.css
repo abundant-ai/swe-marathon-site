@@ -7,9 +7,9 @@
     --ink-3: #71717A;
     --rule: #E4E4E7;
     --rule-2: #F4F4F5;
-    --accent: #4CAF50;
-    --accent-bg: #E8F5E9;
-    --accent-light: #E8F5E9;
+    --accent: #3D5AFE;
+    --accent-bg: #E8ECFF;
+    --accent-light: #E8ECFF;
     --pos: #2d7a4f;
     --warn: #B45309;
     --nav-bg: rgba(255, 255, 255, 0.86);
@@ -29,9 +29,9 @@
     --ink-3: #A1A1AA;
     --rule: #303530;
     --rule-2: #232823;
-    --accent: #6BCF70;
-    --accent-bg: #18351F;
-    --accent-light: #203D25;
+    --accent: #8595FF;
+    --accent-bg: #1B2347;
+    --accent-light: #232D57;
     --pos: #8BDB91;
     --warn: #F59E0B;
     --nav-bg: rgba(18, 19, 18, 0.88);
@@ -49,9 +49,9 @@
       --ink-3: #A1A1AA;
       --rule: #303530;
       --rule-2: #232823;
-      --accent: #6BCF70;
-      --accent-bg: #18351F;
-      --accent-light: #203D25;
+      --accent: #8595FF;
+      --accent-bg: #1B2347;
+      --accent-light: #232D57;
       --pos: #8BDB91;
       --warn: #F59E0B;
       --nav-bg: rgba(18, 19, 18, 0.88);
@@ -690,7 +690,7 @@
   }
   .task-link.has-detail {
     background:
-      linear-gradient(135deg, rgba(76, 175, 80, 0.12), transparent 42%),
+      linear-gradient(135deg, rgba(61, 90, 254, 0.12), transparent 42%),
       var(--bg);
   }
   .task-link.has-detail.is-cua {
@@ -1685,7 +1685,7 @@
   .task-lb-row.clickable { cursor: pointer; }
   .task-lb-row.clickable:hover { border-color: var(--accent); background: var(--bg-2); }
   .task-lb-row.top {
-    background: linear-gradient(90deg, rgba(76, 175, 80, 0.12), transparent 70%), var(--accent-bg);
+    background: linear-gradient(90deg, rgba(61, 90, 254, 0.12), transparent 70%), var(--accent-bg);
   }
   .task-lb-row.open { border-color: var(--accent); }
   .task-lb-chev {
@@ -2194,7 +2194,7 @@
   .finding-card:hover,
   .finding-card:focus-visible {
     background:
-      linear-gradient(135deg, rgba(76, 175, 80, 0.12), transparent 46%),
+      linear-gradient(135deg, rgba(61, 90, 254, 0.12), transparent 46%),
       var(--bg);
     color: var(--ink);
     outline: 0;
