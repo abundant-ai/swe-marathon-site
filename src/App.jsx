@@ -14,7 +14,7 @@ import {
 
 const Analysis = lazy(() => import("./analysis.jsx"));
 
-const PAPER_URL = "/swe-marathon-paper.pdf";
+const PAPER_URL = "https://arxiv.org/abs/2606.07682";
 const TASK_FAMILIES = CATEGORIES;
 
 /* ---------------- COMPONENTS ---------------- */
@@ -1968,8 +1968,8 @@ function Citation() {
   title        = {{SWE-Marathon: Can Agents Autonomously Complete Ultra-Long-Horizon Software Work?}},
   author       = {${citationAuthors}},
   year         = {2026},
-  howpublished = {\\url{https://github.com/abundant-ai/swe-marathon}},
-  note         = {Benchmark and evaluation code.}
+  howpublished = {\\url{${PAPER_URL}}},
+  note         = {Benchmark and evaluation code available at \\url{https://github.com/abundant-ai/swe-marathon}.}
 }`;
   const [copied, setCopied] = useState(false);
   return (
@@ -2028,7 +2028,7 @@ function Footer() {
           <div>
             <div className="foot-h">Resources</div>
             <div className="foot-list">
-              <a href={PAPER_URL} target="_blank" rel="noreferrer">Paper PDF</a>
+              <a href={PAPER_URL} target="_blank" rel="noreferrer">Paper</a>
               <a href="mailto:jesse@abundant.ai">Get in Touch</a>
               <a href="https://github.com/abundant-ai/swe-marathon">GitHub ↗</a>
             </div>
