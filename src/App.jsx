@@ -1871,6 +1871,7 @@ function Findings() {
 const CORE_CONTRIBUTORS = [
   { name: "Rishi Desai", affiliation: "Abundant" },
   { name: "Jesse Hu", affiliation: "Abundant" },
+  { name: "Ke Huang", affiliation: "Abundant" },
   { name: "Joan Cabezas", affiliation: "Abundant" },
   { name: "Neel Harsola", affiliation: "Abundant" },
   { name: "Pratyush Shukla", affiliation: "Abundant" },
@@ -1903,6 +1904,7 @@ const BENCHMARK_CONTRIBUTORS = [
 const CONTRIBUTOR_LINKS = {
   "Rishi Desai": "https://www.rishidesai.org/",
   "Jesse Hu": "https://www.linkedin.com/in/jessehu/",
+  "Ke Huang": "https://www.linkedin.com/in/kehuangsf/",
   "Joan Cabezas": "https://www.linkedin.com/in/joancabezas/",
   "Neel Harsola": "https://www.linkedin.com/in/neelharsola/",
   "Pratyush Shukla": "https://www.linkedin.com/in/prattyagi/",
